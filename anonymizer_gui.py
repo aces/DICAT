@@ -78,9 +78,9 @@ class dicom_anonymizer(Tkinter.Tk):
                 key_index+=1
 
                    
+            self.field_dict = field_dict
             field_edit_win.button_done = Tkinter.Button(field_edit_win,text=u"Done",  command=self.collect_edited_data)
             field_edit_win.button_done.grid(column=1,row=key_index)
-            self.field_dict = field_dict
      
     def collect_edited_data(self):
          
@@ -90,8 +90,22 @@ class dicom_anonymizer(Tkinter.Tk):
          # Remove the first item (corresponding to the title row in displayed table
          new_vals.pop(0)
 
-         print self.field_dict['0010,0040']['Value']
-         print new_vals
+         key_index=0
+         for key in self.field_dict.keys():
+             if 'Value' in self.field_dict[key]:
+                if self.field_dict[key]['Value'] == new_vals[key_index]:
+                    self.field_dict[key]['Update'] = False
+                else:
+                    self.field_dict[key]['Update'] = True
+                    self.field_dict[key]['Value'] = new_vals[key_index]
+             else:
+                 self.field_dict[key]['Update'] = False
+             key_index += 1
+
+         (anonymize_dcm, original_dcm) = methods.Dicom_zapping(self.dirname, self.field_dict)
+         updated_dict = methods.Grep_DICOM_values(anonymize, self.field_dict)
+
+          
          
 if __name__ == "__main__":
     app = dicom_anonymizer(None)

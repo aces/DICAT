@@ -25,7 +25,6 @@ def Grep_DICOM_fields(xml_file):
 def Grep_DICOM_values(dicom_dir, dicom_fields):
     # Grep first dicom of the directory
     # TO DO: Need to check if file is dicom though, otherwise go to next one
-    find_cmd = "find " + dicom_dir + " -type f "
     file_list = []
     for f in os.listdir(dicom_dir):
         file_list.append(f)
@@ -48,17 +47,48 @@ def Grep_DICOM_values(dicom_dir, dicom_fields):
 # Run dcmmodify on all fields to zap #
 ######################################
 def Dicom_zapping(dicom_folder, dicom_fields):
+    
+    # Grep all dicoms present in directory
+    file_list = []
+    for f in os.listdir(dicom_folder):
+        file_list.append(f)
+
+    # Create an original_dcm and anonymized_dcm directory in dicom_folder
+    original_dcm = dicom_folder + "/original_dcm"
+    anonymize_dcm = dicom_folder + "/anonymized_dcm"
+    os.mkdir(original_dcm, 0755)
+    os.mkdir(anonymize_dcm, 0755)
+    
+    # Move all dicom files into anonymized_dcm (we'll move the .bak file into original_dcm once dcmodify has been run) 
+    for f in file_list:
+        move_dicom = "mv " + dicom_folder +"/" + f + " " + anonymize_dcm 
+        subprocess.call(move_dicom, shell=True)        
+    
+    # Create the dcmodify command
+    modify_cmd = "dcmodify "
+    changed_fields_nb = 0
     for name in dicom_fields:
-        print name
-        value = ""
-        if 'Update' in dicom_fields[name]:
-            update = dicom_fields[name]['Update']
-        modify_cmd = "dcmodify -ma (" + name + ")=\"" + value + "\""
-        print modify_cmd
+        # Grep the new values
+        new_val = ""
+        if 'Value' in dicom_fields[name]: 
+            new_val = dicom_fields[name]['Value']
 
+        # Run dcmodify if update is set to True
+        if dicom_fields[name]['Update'] == True:
+            modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
+            changed_fields_nb += 1
+    modify_cmd += anonymize_dcm + "/*"
+   
+    # If no dicom field was updated
+    if changed_fields_nb > 0: 
+        subprocess.call(modify_cmd, shell=True)
+        mv_bak_cmd = "mv " + anonymize_dcm + "/*bak " + original_dcm 
+        subprocess.call(mv_bak_cmd, shell=True)
+    else:
+        mv_dcm_cmd = "mv " + anonymize_dcm + "/* " + original_dcm
+        subprocess.call(mv_dcm_cmd, shell=True)
 
-
-
+    return anonymize_dcm, original_dcm
 
 ### Test function
 def anonymize_folder(folder_name):
