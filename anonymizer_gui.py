@@ -73,7 +73,8 @@ class dicom_anonymizer(Tkinter.Tk):
                 else:
                     field_edit_win.Field.insert(key_index, "")
                 field_edit_win.Field.grid(column=2,row=key_index)
-                
+                #if not field_dict[keys]['Editable']: #kr#
+                #    field_edit_win.Field.config(state="disabled") #kr#
                 # Get the field order into an array
                 key_index+=1
 
@@ -103,7 +104,7 @@ class dicom_anonymizer(Tkinter.Tk):
              key_index += 1
 
          (anonymize_dcm, original_dcm) = methods.Dicom_zapping(self.dirname, self.field_dict)
-         updated_dict = methods.Grep_DICOM_values(anonymize, self.field_dict)
+         updated_dict = methods.Grep_DICOM_values(anonymize_dcm, self.field_dict)
 
           
          

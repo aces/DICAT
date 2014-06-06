@@ -13,7 +13,9 @@ def Grep_DICOM_fields(xml_file):
     for item in xmldoc.findall('item'):
         name = item.find('name').text
         description = item.find('description').text
-        dicom_fields[name] = {"Description": description}
+        editable = True if (item.find('editable').text=="yes") else False #kr#
+        dicom_fields[name] = {"Description": description, "Editable": editable} #kr#
+        #dicom_fields[name] = {"Description": description}
     return dicom_fields
 
 
@@ -74,10 +76,15 @@ def Dicom_zapping(dicom_folder, dicom_fields):
             new_val = dicom_fields[name]['Value']
 
         # Run dcmodify if update is set to True
-        if dicom_fields[name]['Update'] == True:
-            modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
+        if not dicom_fields[name]['Editable'] and 'Value' in dicom_fields[name]: #kr#
+            modify_cmd += " -ma \"(" + name + ")\"=\" \" " #kr#
             changed_fields_nb += 1
+        else:
+            if dicom_fields[name]['Update'] == True:
+                modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
+                changed_fields_nb += 1
     modify_cmd += anonymize_dcm + "/*"
+    print modify_cmd
    
     # If no dicom field was updated
     if changed_fields_nb > 0: 
