@@ -10,46 +10,51 @@ from xml.dom import minidom
 
 class simpleapp_wx(wx.Frame):
     def __init__(self,parent,id,title):
+        """Initialize the application"""
         wx.Frame.__init__(self,parent,id,title)
         self.parent = parent
-        self.initialize()
 
-    def initialize(self):
+        # Initialize all the wxPython components
+        self.InitUI()
+
+        # Set up the dictionary map
         self.IDMap = {}
+
+        # Load the data
+        self.LoadXML("candidates.xml")
+
+        # Show the window only after loading data
+        # This is specific to wxPython, but can't go into
+        # InitUI because first we need to load the data
+        self.Show(True)
+
+    def InitUI(self):
+        """Sets up all wxPython related UI elements"""
         self.sizer = wx.GridBagSizer()
 
+        # Add the textboxes for data entry
         self.candidatename = wx.TextCtrl(self,-1,value=u"Real name")
         self.candidateid = wx.TextCtrl(self, -1, value=u"Identifier")
         self.sizer.Add(self.candidatename, (0,0),(1,1), wx.EXPAND)
         self.sizer.Add(self.candidateid, (0,1),(1,1), wx.EXPAND)
-        #sizer.Add(self.candidateid,(1,1),(2,2),wx.EXPAND)
-        #self.Bind(wx.EVT_TEXT_ENTER, self.OnPressEnter, self.candidatename)
 
+        # Add the Add Candidate button
         button = wx.Button(self,-1,label="Add candidate")
         self.sizer.Add(button, (0,2), (1, 1), wx.EXPAND)
         self.Bind(wx.EVT_BUTTON, self.AddIdentifierEvent, button)
 
-        #button = wx.Button(self, -1, label="Save map")
-        #self.Bind(wx.EVT_BUTTON, self.SaveMapEvent, button)
-        #self.sizer.Add(button, (1, 2))
-
-
+        # Create the data table
         self.datatable = wx.ListCtrl(self, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
         self.datatable.InsertColumn(0, "Identifier")
         self.datatable.InsertColumn(1, "Real Name")
         self.sizer.Add(self.datatable, (2, 0), (1, 2), wx.EXPAND)
 
-        self.LoadXML("candidates.xml")
-
-            
+        # Some final cleanup for GridBagSizer
         self.sizer.AddGrowableCol(0)
         self.SetSizerAndFit(self.sizer)
-        #self.SetSizeHints(-1,self.GetSize().y,-1,self.GetSize().y );
-        #self.candidatename.SetFocus()
-        #self.candidatename.SetSelection(-1,-1)
-        self.Show(True)
 
     def LoadXML(self, file):
+        """Parses the XML file and loads the data into the current window"""
         try:
             xmldoc = minidom.parse(file)
             itemlist = xmldoc.getElementsByTagName('Candidate')
@@ -62,6 +67,7 @@ class simpleapp_wx(wx.Frame):
             pass
 
     def SaveMapAction(self):
+        """Function which performs the action of writing the XML file"""
         f = open("candidates.xml", "w")
         f.write("<?xml version=\"1.0\"?>\n<data>\n")
         print self.IDMap
@@ -73,16 +79,25 @@ class simpleapp_wx(wx.Frame):
         f.write("</data>")
 
     def SaveMapEvent(self, event):
+        """Handles any wxPython event which should trigger a save action"""
         self.SaveMapAction()
 
-
-
     def AddIdentifierEvent(self,event):
+        """
+        Handles any wxPython event which should trigger adding an identifier to the
+        data table and gets the appropriate values to be added to the mapping
+        """
         name = self.candidatename.GetValue()
         id = self.candidateid.GetValue()
         self.AddIdentifierAction(id, name)
 
     def AddIdentifierAction(self, candid, realname, save=True):
+        """
+        Adds the given identifier and real name to the mapping. If
+        the "save" parameter is true, this also triggers the saving
+        of the XML file. 
+        This is set to False on initial load.
+        """
         self.IDMap[candid] = realname
 
         idx = self.datatable.InsertStringItem(0, candid)
@@ -94,5 +109,5 @@ class simpleapp_wx(wx.Frame):
 
 if __name__ == "__main__":
     app = wx.App()
-    frame = simpleapp_wx(None,-1,'my application')
+    frame = simpleapp_wx(None,-1,'Hack-a-Tuna ID Mapper')
     app.MainLoop()
