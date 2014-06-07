@@ -59,7 +59,7 @@ class TunahackIDMapper(wx.Frame):
         self.datatable.InsertColumn(1, "Real Name")
         self.sizer.Add(self.datatable, (2, 0), (1, 2), wx.EXPAND)
 
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnClick, self.datatable)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnRowClick, self.datatable)
         # Some final cleanup for GridBagSizer
         self.sizer.AddGrowableCol(0)
         self.SetSizerAndFit(self.sizer)
@@ -124,7 +124,8 @@ class TunahackIDMapper(wx.Frame):
             self.SaveMapAction()
         self.sizer.Fit(self)
 
-    def OnClick(self, event):
+    def OnRowClick(self, event):
+        """Update the text boxes' data on row click"""
         RowIdx = event.Index
         ClickedName = self.datatable.GetItem(RowIdx, 1).Text
         ClickedID = self.datatable.GetItem(RowIdx, 0).Text
