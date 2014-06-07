@@ -2,77 +2,100 @@
     <item>
       <name>0010,0030</name>
       <description>PatientBirthDate</description>
+      <editable>yes</editable>
     </item>
     <item>
       <name>0010,0040</name>
       <description>PatientSex</description>
+      <editable>yes</editable>
     </item>
     <item>
       <name>0010,0020</name>
       <description>PatientID</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0008,0080</name>
       <description>InstitutionName</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0008,0081</name>
       <description>InstitutionAddress</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0008,1010</name>
       <description>StationName</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0008,1030</name>
       <description>StudyDescription</description>
+      <editable>no</editable>
     </item>
+<!--    
     <item>
       <name>0018,1000</name>
       <description>DeviceSerialNumber</description>
+      <editable>no</editable>
     </item>
+-->    
     <item>
       <name>0008,0090</name>
       <description>ReferringPhysicianName</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0008,1048</name>
       <description>0008,1048</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0010,1010</name>
       <description>PatientName</description>
+      <editable>yes</editable>
     </item>
+<!--
     <item>
       <name>0020,000d</name>
       <description>StudyInstanceUID</description>
+      <editable>no</editable>
     </item>
+-->    
     <item>
       <name>0032,1032</name>
       <description>RequestingPhysician</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0032,1060</name>
       <description>RequestedProcedureDescription</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0040,0254</name>
       <description>PerformedProcedureStepDescription</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0040,0253</name>
       <description>PerformedProcedureStepID</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0023,0006</name>
       <description>0023,0006</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0010,1001</name>
       <description>0010,1001</description>
+      <editable>no</editable>
     </item>
     <item>
       <name>0010,0021</name>
       <description>0010,0021</description>
+      <editable>no</editable>
     </item>
 </data>    

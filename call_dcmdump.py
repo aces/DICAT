@@ -1,5 +1,4 @@
 import xml.etree.ElementTree as ET
-import os
 import subprocess
 import re
 
@@ -42,13 +41,16 @@ def Grep_DICOM_values(dicom_file, dicom_fields):
 # Run dcmmodify on all fields to zap #
 ######################################
 def Dicom_zapping(dicom_folder, dicom_fields):
+    modify_cmd = "dcmodify "
     for name in dicom_fields:
         print name
         value = ""
         if 'Update' in dicom_fields[name]:
             update = dicom_fields[name]['Update']
-        modify_cmd = "dcmodify -ma (" + name + ")=\"" + value + "\""
-        print modify_cmd
+            modify_cmd += "-ma \"(" + name + ")\"=\"" + value + "\" "
+    modify_cmd +=  dicom_folder + "/*"    
+    subprocess.call(modify_cmd, shell=True)
+    print modify_cmd
 
 
 
