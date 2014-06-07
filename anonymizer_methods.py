@@ -3,6 +3,7 @@ import sys
 import xml.etree.ElementTree as ET
 import subprocess
 import re
+import glob
 
 ###################################
 # Read dicom fields from XML file #
@@ -84,13 +85,16 @@ def Dicom_zapping(dicom_folder, dicom_fields):
                 modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
                 changed_fields_nb += 1
     modify_cmd += anonymize_dcm + "/*"
-    print modify_cmd
    
     # If no dicom field was updated
     if changed_fields_nb > 0: 
         subprocess.call(modify_cmd, shell=True)
-        mv_bak_cmd = "mv " + anonymize_dcm + "/*bak " + original_dcm 
-        subprocess.call(mv_bak_cmd, shell=True)
+        globuleux = anonymize_dcm + "/*.bak" 
+        for bak_file in glob.glob(globuleux):
+            new_name = re.sub('.bak','',bak_file)
+            new_name = re.sub(anonymize_dcm,'',new_name)
+            mv_bak_cmd = "mv " + bak_file + " " + original_dcm + new_name
+            subprocess.call(mv_bak_cmd, shell=True)
     else:
         mv_dcm_cmd = "mv " + anonymize_dcm + "/* " + original_dcm
         subprocess.call(mv_dcm_cmd, shell=True)
