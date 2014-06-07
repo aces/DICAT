@@ -49,6 +49,9 @@ class TunahackIDMapper(wx.Frame):
         self.sizer.Add(button, (1,2), (1, 1), wx.EXPAND)
         self.Bind(wx.EVT_BUTTON, self.AddIdentifierEvent, button)
 
+        self.ErrorMessage = wx.StaticText(self, label="")
+        self.sizer.Add(self.ErrorMessage, (2, 2), (1, 1), wx.EXPAND)
+
 
         # Create the data table
         self.datatable = wx.ListCtrl(self, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
@@ -56,7 +59,7 @@ class TunahackIDMapper(wx.Frame):
         self.datatable.InsertColumn(1, "Real Name")
         self.sizer.Add(self.datatable, (2, 0), (1, 2), wx.EXPAND)
 
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnClick, self.datatable)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnRowClick, self.datatable)
         # Some final cleanup for GridBagSizer
         self.sizer.AddGrowableCol(0)
         self.SetSizerAndFit(self.sizer)
@@ -105,9 +108,13 @@ class TunahackIDMapper(wx.Frame):
         of the XML file. 
         This is set to False on initial load.
         """
+
+        self.ErrorMessage.SetLabel("")
         if candid in self.IDMap:
-            print "Error, already exists"
+            self.ErrorMessage.SetLabel("ERROR: Candidate\nkey already exists")
+            self.sizer.Fit(self)
             return
+
         self.IDMap[candid] = realname
 
         idx = self.datatable.InsertStringItem(0, candid)
@@ -117,11 +124,14 @@ class TunahackIDMapper(wx.Frame):
             self.SaveMapAction()
         self.sizer.Fit(self)
 
-    def OnClick(self, event):
-        pass
-        #import pdb; pdb.set_trace()
-        #name = self.candidatename.SetValue("abc")
-        #id = self.candidateid.SetValue("def")
+    def OnRowClick(self, event):
+        """Update the text boxes' data on row click"""
+        RowIdx = event.Index
+        ClickedName = self.datatable.GetItem(RowIdx, 1).Text
+        ClickedID = self.datatable.GetItem(RowIdx, 0).Text
+
+        name = self.candidatename.SetValue(ClickedName)
+        id = self.candidateid.SetValue(ClickedID)
 
 if __name__ == "__main__":
     app = wx.App()
