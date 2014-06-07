@@ -26,7 +26,7 @@ class dicom_anonymizer(Tkinter.Tk):
         self.button_select = Tkinter.Button(self,text=u"Select",  command=self.askdirectory)
         self.button_select.grid(column=1,row=1)
 
-        self.button_function = Tkinter.Button(self,text=u"Anonymize",  command=self.anonymize)
+        self.button_function = Tkinter.Button(self,text=u"View DICOM Fields",  command=self.anonymize)
 
         
         self.grid_columnconfigure(0,weight=1)
@@ -55,9 +55,9 @@ class dicom_anonymizer(Tkinter.Tk):
             field_edit_win.grid()
             
             # Set column names
-            field_edit_win.Name_field=Tkinter.Label(field_edit_win,text="Dicom Field", relief="ridge", width=30, anchor="w", fg="white",bg="black")
+            field_edit_win.Name_field=Tkinter.Label(field_edit_win,text="Dicom Field", relief="ridge", width=30, anchor="w", fg="white",bg="#282828")
             field_edit_win.Name_field.grid(column=1,row=0)
-            field_edit_win.Name_value=Tkinter.Label(field_edit_win,text="Value in Dicom", relief="ridge", width=55, anchor="w", fg="white",bg="black")
+            field_edit_win.Name_value=Tkinter.Label(field_edit_win,text="Value in Dicom", relief="ridge", width=55, anchor="w", fg="white",bg="#282828")
             field_edit_win.Name_value.grid(column=2,row=0)
             
             # Display description of fields to zap in first column
@@ -67,20 +67,23 @@ class dicom_anonymizer(Tkinter.Tk):
                 field_edit_win.Field_label=Tkinter.Label(field_edit_win,text=str(field_dict[keys]['Description'])+':', relief="ridge", width=30, anchor="w", fg="black",bg="#B0B0B0")
                 field_edit_win.Field_label.grid(column=1,row=key_index, sticky="w")
                 # Enter value to modify
-                field_edit_win.Field=Tkinter.Entry(field_edit_win,textvariable=self.edited_entries[key_index], width=55)
-                if 'Value' in field_dict[keys]:
-                    field_edit_win.Field.insert(key_index,field_dict[keys]['Value'])
+                if not field_dict[keys]['Editable']: #kr#
+                    var=Tkinter.StringVar()
+                    field_edit_win.Field=Tkinter.Entry(field_edit_win,textvariable=var,state="disable", width=55)
+                    if 'Value' in field_dict[keys]:
+                        var.set(field_dict[keys]['Value'])
                 else:
-                    field_edit_win.Field.insert(key_index, "")
+                    field_edit_win.Field=Tkinter.Entry(field_edit_win,textvariable=self.edited_entries[key_index], width=55)
+                    if 'Value' in field_dict[keys]:
+                        field_edit_win.Field.insert(key_index,field_dict[keys]['Value'])
+                    else:
+                        field_edit_win.Field.insert(key_index, "")
                 field_edit_win.Field.grid(column=2,row=key_index)
-                #if not field_dict[keys]['Editable']: #kr#
-                #    field_edit_win.Field.config(state="disabled") #kr#
-                # Get the field order into an array
                 key_index+=1
 
                    
             self.field_dict = field_dict
-            field_edit_win.button_done = Tkinter.Button(field_edit_win,text=u"Done",  command=self.collect_edited_data)
+            field_edit_win.button_done = Tkinter.Button(field_edit_win,text=u"Anonymize",  command=self.collect_edited_data)
             field_edit_win.button_done.grid(column=1,row=key_index)
      
     def collect_edited_data(self):
