@@ -9,6 +9,9 @@ Authors
 =======
 
 Ayan Sengupta <uam111@gmail.com>              - GUI
+
 Cecile Madjar <cecile.madjar@gmail.com>       - Anonymization
+
 Dave MacFarlane <david.macfarlane2@mcgill.ca> - ID Mapper
+
 Samir Das <samir.das@mcgill.ca>               - Concept
