@@ -107,7 +107,6 @@ class dicom_anonymizer(Tkinter.Tk):
              key_index += 1
 
          (anonymize_dcm, original_dcm) = methods.Dicom_zapping(self.dirname, self.field_dict)
-         updated_dict = methods.Grep_DICOM_values(anonymize_dcm, self.field_dict)
 
           
          
