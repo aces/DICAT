@@ -49,6 +49,9 @@ class TunahackIDMapper(wx.Frame):
         self.sizer.Add(button, (1,2), (1, 1), wx.EXPAND)
         self.Bind(wx.EVT_BUTTON, self.AddIdentifierEvent, button)
 
+        self.ErrorMessage = wx.StaticText(self, label="")
+        self.sizer.Add(self.ErrorMessage, (2, 2), (1, 1), wx.EXPAND)
+
 
         # Create the data table
         self.datatable = wx.ListCtrl(self, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
@@ -105,9 +108,13 @@ class TunahackIDMapper(wx.Frame):
         of the XML file. 
         This is set to False on initial load.
         """
+
+        self.ErrorMessage.SetLabel("")
         if candid in self.IDMap:
-            print "Error, already exists"
+            self.ErrorMessage.SetLabel("ERROR: Candidate\nkey already exists")
+            self.sizer.Fit(self)
             return
+
         self.IDMap[candid] = realname
 
         idx = self.datatable.InsertStringItem(0, candid)
