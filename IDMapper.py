@@ -105,6 +105,9 @@ class TunahackIDMapper(wx.Frame):
         of the XML file. 
         This is set to False on initial load.
         """
+        if candid in self.IDMap:
+            print "Error, already exists"
+            return
         self.IDMap[candid] = realname
 
         idx = self.datatable.InsertStringItem(0, candid)
