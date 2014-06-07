@@ -8,7 +8,7 @@ except ImportError:
 
 from xml.dom import minidom
 
-class simpleapp_wx(wx.Frame):
+class TunahackIDMapper(wx.Frame):
     def __init__(self,parent,id,title):
         """Initialize the application"""
         wx.Frame.__init__(self,parent,id,title)
@@ -33,15 +33,22 @@ class simpleapp_wx(wx.Frame):
         self.sizer = wx.GridBagSizer()
 
         # Add the textboxes for data entry
-        self.candidatename = wx.TextCtrl(self,-1,value=u"Real name")
-        self.candidateid = wx.TextCtrl(self, -1, value=u"Identifier")
-        self.sizer.Add(self.candidatename, (0,0),(1,1), wx.EXPAND)
-        self.sizer.Add(self.candidateid, (0,1),(1,1), wx.EXPAND)
+        self.candidatename = wx.TextCtrl(self,-1,value=u"")
+        self.candidateid = wx.TextCtrl(self, -1, value=u"")
 
+        self.sizer.Add(self.candidatename, (1,1),(1,1), wx.EXPAND)
+        self.sizer.Add(self.candidateid, (1,0),(1,1), wx.EXPAND)
+
+        label = wx.StaticText(self, label="Identifier")
+        self.sizer.Add(label, (0, 0), (1, 1), wx.EXPAND)
+
+        label = wx.StaticText(self, label="Real Name")
+        self.sizer.Add(label, (0, 1), (1, 1), wx.EXPAND)
         # Add the Add Candidate button
         button = wx.Button(self,-1,label="Add candidate")
-        self.sizer.Add(button, (0,2), (1, 1), wx.EXPAND)
+        self.sizer.Add(button, (1,2), (1, 1), wx.EXPAND)
         self.Bind(wx.EVT_BUTTON, self.AddIdentifierEvent, button)
+
 
         # Create the data table
         self.datatable = wx.ListCtrl(self, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
@@ -49,6 +56,7 @@ class simpleapp_wx(wx.Frame):
         self.datatable.InsertColumn(1, "Real Name")
         self.sizer.Add(self.datatable, (2, 0), (1, 2), wx.EXPAND)
 
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnClick, self.datatable)
         # Some final cleanup for GridBagSizer
         self.sizer.AddGrowableCol(0)
         self.SetSizerAndFit(self.sizer)
@@ -70,7 +78,6 @@ class simpleapp_wx(wx.Frame):
         """Function which performs the action of writing the XML file"""
         f = open("candidates.xml", "w")
         f.write("<?xml version=\"1.0\"?>\n<data>\n")
-        print self.IDMap
         for key in self.IDMap:
             f.write("\t<Candidate>\n")
             f.write("\t\t<Identifier>%s</Identifier>\n" % key)
@@ -107,7 +114,13 @@ class simpleapp_wx(wx.Frame):
             self.SaveMapAction()
         self.sizer.Fit(self)
 
+    def OnClick(self, event):
+        pass
+        #import pdb; pdb.set_trace()
+        #name = self.candidatename.SetValue("abc")
+        #id = self.candidateid.SetValue("def")
+
 if __name__ == "__main__":
     app = wx.App()
-    frame = simpleapp_wx(None,-1,'Hack-a-Tuna ID Mapper')
+    frame = TunahackIDMapper(None,-1,'Hack-a-Tuna ID Mapper')
     app.MainLoop()
