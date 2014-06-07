@@ -50,6 +50,7 @@ class TunahackIDMapper(wx.Frame):
         self.Bind(wx.EVT_BUTTON, self.AddIdentifierEvent, button)
 
         self.ErrorMessage = wx.StaticText(self, label="")
+        self.ErrorMessage.SetForegroundColour((255,0,0))
         self.sizer.Add(self.ErrorMessage, (2, 2), (1, 1), wx.EXPAND)
 
 
