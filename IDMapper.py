@@ -125,10 +125,12 @@ class TunahackIDMapper(wx.Frame):
         self.sizer.Fit(self)
 
     def OnClick(self, event):
-        pass
-        #import pdb; pdb.set_trace()
-        #name = self.candidatename.SetValue("abc")
-        #id = self.candidateid.SetValue("def")
+        RowIdx = event.Index
+        ClickedName = self.datatable.GetItem(RowIdx, 1).Text
+        ClickedID = self.datatable.GetItem(RowIdx, 0).Text
+
+        name = self.candidatename.SetValue(ClickedName)
+        id = self.candidateid.SetValue(ClickedID)
 
 if __name__ == "__main__":
     app = wx.App()
