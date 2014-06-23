@@ -6,12 +6,11 @@ import anonymizer_methods as methods
 import os
 
 from Tkinter import *
-from ttk import Frame, Style
 from shutil import make_archive
 
-class dicom_anonymizer(Frame):
+class dicom_anonymizer(Tkinter.Frame):
     def __init__(self, parent):
-        Frame.__init__(self, parent)
+        Tkinter.Frame.__init__(self, parent)
         self.parent = parent
         self.dirname=''
         self.dir_opt = {} 
@@ -20,9 +19,6 @@ class dicom_anonymizer(Frame):
         
     def initialize(self):
         self.parent.title("DICOM-anonymizer")
-        self.style = Style()
-        self.style.theme_use("default")
-        
         self.grid()
    
         self.entryVariable = Tkinter.StringVar()
@@ -80,8 +76,7 @@ class dicom_anonymizer(Frame):
             self.field_edit_win.columnconfigure(0, weight=1)
             self.field_edit_win.columnconfigure(1, weight=1)
             self.field_edit_win.rowconfigure(0, weight=1)
-             
-            
+                        
             # Set column names
             self.field_edit_win.Name_field=Tkinter.Label(self.field_edit_win,text="Dicom Field", relief="ridge", width=30, anchor="w", fg="white",bg="#282828")
             self.field_edit_win.Name_field.grid(column=0,row=0, padx=(5,0), pady=(5,0), sticky=N+S+W+E)
@@ -120,7 +115,7 @@ class dicom_anonymizer(Frame):
 
             self.field_edit_win.buttonClear = Tkinter.Button(self.bottomPanel,text=u"Clear",  command=self.clear, width=8)
             self.field_edit_win.buttonClear.grid(column=1,row=0, padx=20)
-     
+            self.center(self.field_edit_win)
 
     def clear(self):
          for items in self.edited_entries:
