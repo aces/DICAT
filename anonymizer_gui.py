@@ -23,7 +23,6 @@ class dicom_anonymizer(Frame):
         self.style = Style()
         self.style.theme_use("default")
         
-        self.parent.minsize(440,100)
         self.grid()
    
         self.entryVariable = Tkinter.StringVar()
@@ -77,7 +76,6 @@ class dicom_anonymizer(Frame):
         if len(field_dict)!=0:
             self.field_edit_win = Tkinter.Toplevel(self)
             self.field_edit_win.title('Fields to Edit')
-           # self.field_edit_win.geometry("690x450+120+120")
             self.field_edit_win.grid()
             self.field_edit_win.columnconfigure(0, weight=1)
             self.field_edit_win.columnconfigure(1, weight=1)
@@ -114,7 +112,7 @@ class dicom_anonymizer(Frame):
     
             self.field_dict = field_dict
             
-            self.bottomPanel = Frame(self.field_edit_win)
+            self.bottomPanel = Tkinter.Frame(self.field_edit_win)
             self.bottomPanel.grid(row=self.key_index, column=0, columnspan=2, pady=10)
             
             self.field_edit_win.button_done = Tkinter.Button(self.bottomPanel,text=u"Anonymize",  command=self.collect_edited_data)
