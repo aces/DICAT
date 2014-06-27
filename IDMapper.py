@@ -72,7 +72,7 @@ class TunahackIDMapper(Frame):
         self.candidateDoB = Entry(self.frame, textvariable=self.textCandDoB, width=20)
 
         self.tableColumns = ("Identifier", "Real Name", "Date of Birth")
-        self.datatable = ttk.Treeview(self.frame, columns=self.tableColumns, show="headings")
+        self.datatable = ttk.Treeview(self.frame, selectmode='browse', columns=self.tableColumns, show="headings")
         for col in self.tableColumns:
             self.datatable.heading(col, text=col.title(), 
                                    command=lambda c=col: sortby(self.datatable, c, 0))
