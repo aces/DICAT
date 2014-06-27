@@ -1,9 +1,10 @@
 #!/usr/bin/python
 # -*- coding: iso-8859-1 -*-
 
-import Tkinter, Tkconstants, tkFileDialog
+import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
 import anonymizer_methods as methods
 import os
+
 
 from Tkinter import *
 from shutil import make_archive
@@ -25,14 +26,14 @@ class dicom_anonymizer(Tkinter.Frame):
         self.entryVariable.set("Select the DICOM directory")
 
         self.entry = Entry(self, width=40, textvariable=self.entryVariable)
-        self.entry.grid(row=1, column=0, padx=15, pady=15)
         self.entry.focus_set()
         self.entry.selection_range(0, Tkinter.END)
 
         self.buttonSelect = Button(self, text="Select", command=self.askdirectory)
-        self.buttonSelect.grid(row=1, column=1, padx=(0,15), pady=15)
-
         self.buttonsPanel = Frame(self)
+
+        self.entry.grid(row=1, column=0, padx=15, pady=15)
+        self.buttonSelect.grid(row=1, column=1, padx=(0,15), pady=15)
         self.buttonsPanel.grid(row=2, column=0, columnspan=2, pady=10)
 
         self.buttonView = Button(self.buttonsPanel, text="View DICOM fields", command=self.anonymize)
@@ -70,13 +71,14 @@ class dicom_anonymizer(Tkinter.Frame):
         fields_keys=list(field_dict.keys())
         self.edited_entries=[Tkinter.StringVar() for i in range(len(fields_keys)+1)]
         if len(field_dict)!=0:
-            self.field_edit_win = Tkinter.Toplevel(self)
+            self.field_edit_win = Tkinter.Toplevel()
             self.field_edit_win.title('Fields to Edit')
             self.field_edit_win.grid()
             self.field_edit_win.columnconfigure(0, weight=1)
             self.field_edit_win.columnconfigure(1, weight=1)
             self.field_edit_win.rowconfigure(0, weight=1)
-                        
+            self.field_edit_win.rowconfigure(1, weight=1)  
+          
             # Set column names
             self.field_edit_win.Name_field=Tkinter.Label(self.field_edit_win,text="Dicom Field", relief="ridge", width=30, anchor="w", fg="white",bg="#282828")
             self.field_edit_win.Name_field.grid(column=0,row=0, padx=(5,0), pady=(5,0), sticky=N+S+W+E)
@@ -115,16 +117,16 @@ class dicom_anonymizer(Tkinter.Frame):
 
             self.field_edit_win.buttonClear = Tkinter.Button(self.bottomPanel,text=u"Clear",  command=self.clear, width=8)
             self.field_edit_win.buttonClear.grid(column=1,row=0, padx=20)
-            self.center(self.field_edit_win)
+        self.center(self.field_edit_win)
 
     def clear(self):
-         for items in self.edited_entries:
-             items.set("")
+        for items in self.edited_entries:
+            items.set("")
 
     def collect_edited_data(self):
-         self.field_edit_win.status_label=Tkinter.Label(self.field_edit_win,text='processing data....', anchor="w",fg="white",bg="blue")
-         self.field_edit_win.status_label.grid(column=1, row=self.key_index+1)
          
+         self.field_edit_win.config(cursor="watch")
+         self.field_edit_win.update()         
          new_vals = []
          for entries in self.edited_entries:
              new_vals.append(entries.get())
@@ -145,12 +147,21 @@ class dicom_anonymizer(Tkinter.Frame):
 
          (anonymize_dcm, original_dcm) = methods.Dicom_zapping(self.dirname, self.field_dict)
          self.field_edit_win.destroy()
-             
+         tkMessageBox.showinfo("Message", "Congrats! Your have successfully anonymized your files!")
+            
 
     def zipDicom(self):
          directory = self.entry.get()
          archiveName = directory 
-         make_archive(archiveName, 'zip', directory)
+         if (os.listdir(directory) == []):
+             tkMessageBox.showinfo("Message", "The directory " + directory + " is empty")
+         else:
+             self.config(cursor="watch")
+             self.update()
+             make_archive(archiveName, 'zip', directory)
+             tkMessageBox.showinfo("Message", "A new file " + archiveName + ".zip has been created")
+             self.config(cursor="arrow")
+             self.update()
           
 if __name__ == "__main__":
     root = Tk()
