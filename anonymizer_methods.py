@@ -31,7 +31,7 @@ def Grep_DICOM_values(dicom_dir, dicom_fields):
     file_list = []
     for f in os.listdir(dicom_dir):
         file_list.append(f)
-    dicom_file = dicom_dir + "/" + file_list[1]
+    dicom_file = dicom_dir + os.path.sep + file_list[1]
     
     # Grep information from dicom header and store them 
     # into dicom_fields dictionary under flag Value
@@ -57,14 +57,14 @@ def Dicom_zapping(dicom_folder, dicom_fields):
         file_list.append(f)
 
     # Create an original_dcm and anonymized_dcm directory in dicom_folder
-    original_dcm = dicom_folder + "/original_dcm"
-    anonymize_dcm = dicom_folder + "/anonymized_dcm"
+    original_dcm = dicom_folder + os.path.sep + "original_dcm"
+    anonymize_dcm = dicom_folder + os.path.sep + "anonymized_dcm"
     os.mkdir(original_dcm, 0755)
     os.mkdir(anonymize_dcm, 0755)
     
     # Move all dicom files into anonymized_dcm (we'll move the .bak file into original_dcm once dcmodify has been run) 
     for f in file_list:
-        move(os.path.join(dicom_folder, f), anonymize_dcm)
+        move(dicom_folder + os.path.sep + f, anonymize_dcm)
          
     # Create the dcmodify command
     modify_cmd = "dcmodify "
@@ -83,15 +83,16 @@ def Dicom_zapping(dicom_folder, dicom_fields):
             if dicom_fields[name]['Update'] == True:
                 modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
                 changed_fields_nb += 1
-    modify_cmd += anonymize_dcm + "/*"
+    modify_cmd += anonymize_dcm + os.path.sep + "*"
    
     # If no dicom field was updated
     if changed_fields_nb > 0: 
         subprocess.call(modify_cmd, shell=True)
-        globuleux = anonymize_dcm + "/*.bak" 
+        globuleux = anonymize_dcm + os.path.sep + "*.bak" 
         for bak_file in glob.glob(globuleux):
-            new_name = re.sub('.bak','',bak_file)
-            new_name = re.sub(anonymize_dcm,'',new_name)
+            first = bak_file.rfind(os.path.sep)
+            last = bak_file.find(".bak")
+            new_name = bak_file[first:last]
             move(bak_file, original_dcm + new_name)            
     else:
         move(anonymize_dcm + os.path.sep + "*", original_dcm)
