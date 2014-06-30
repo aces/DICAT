@@ -51,7 +51,6 @@ class dicom_anonymizer(Frame):
         self.buttonZip.grid(row=0, column=1, padx=(10,0), sticky=E+W)
         self.buttonZip.configure(state=DISABLED)
 
-        self.parent.resizable(True,False)
         self.center(self.parent)
     
     def center(self, win):

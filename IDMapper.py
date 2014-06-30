@@ -49,7 +49,8 @@ class TunahackIDMapper(Frame):
         self.frame.grid(column=0, row=0, padx=10, pady=5, sticky=N+S+E+W)
  
         for i in range(0, 3):
-            self.frame.columnconfigure(i, weight=1)
+            self.frame.columnconfigure(i, weight=6)
+        self.frame.columnconfigure(3, weight=1)
         
         for i in range(3, 4):
             self.frame.rowconfigure(i, weight=1)
@@ -58,8 +59,8 @@ class TunahackIDMapper(Frame):
         self.labelName = Label(self.frame, text=u'Real Name')
         self.labelDoB = Label(self.frame, text=u'Date of Birth')
 
-        self.buttonAdd = Button(self.frame, width=10, text=u'Add candidate', command=self.AddIdentifierEvent) 
-        self.buttonClear = Button(self.frame, width=10, text=u'Clear', command=self.clear)
+        self.buttonAdd = Button(self.frame, width=12, text=u'Add candidate', command=self.AddIdentifierEvent) 
+        self.buttonClear = Button(self.frame, width=12, text=u'Clear', command=self.clear)
 
         self.textCandId = StringVar()
         self.candidateid = Entry(self.frame, textvariable=self.textCandId, width=20)
@@ -90,8 +91,8 @@ class TunahackIDMapper(Frame):
         self.candidatename.grid(row=1, column=1, padx=(4,4), pady=(0,10), sticky=E+W)
         self.candidateDoB.grid(row=1, column=2, padx=(4,4), pady=(0,10), sticky=E+W)
  
-        self.buttonAdd.grid(row=0, column=3, padx=(4,0))
-        self.buttonClear.grid(row=1, column=3, padx=(4,0))
+        self.buttonAdd.grid(row=0, column=3, padx=(4,0), sticky=E+W)
+        self.buttonClear.grid(row=1, column=3, padx=(4,0), sticky=E+W)
           
         self.datatable.grid(row=3, column=0, columnspan=3, pady=10, sticky='nsew')
         self.error.grid(row=3, column=3)
