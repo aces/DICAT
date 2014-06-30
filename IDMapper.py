@@ -51,7 +51,7 @@ class TunahackIDMapper(Frame):
         for i in range(0, 3):
             self.frame.columnconfigure(i, weight=1)
         
-        for i in range(0, 1):
+        for i in range(3, 4):
             self.frame.rowconfigure(i, weight=1)
 
         self.labelID = Label(self.frame, text=u'Identifier')
@@ -82,13 +82,13 @@ class TunahackIDMapper(Frame):
         self.ErrorMessage = StringVar()
         self.error = Label(self.frame, textvariable=self.ErrorMessage, fg='red')
 
-        self.labelID.grid(row=0, column=0, padx=(0,4))
-        self.labelName.grid(row=0, column=1, padx=(4,4))
-        self.labelDoB.grid(row=0, column=2, padx=(4,4))
+        self.labelID.grid(row=0, column=0, padx=(0,4), sticky=E+W)
+        self.labelName.grid(row=0, column=1, padx=(4,4), sticky=E+W)
+        self.labelDoB.grid(row=0, column=2, padx=(4,4), sticky=E+W)
 
-        self.candidateid.grid(row=1, column=0, padx=(0,4), pady=(0,10))
-        self.candidatename.grid(row=1, column=1, padx=(4,4), pady=(0,10))
-        self.candidateDoB.grid(row=1, column=2, padx=(4,4), pady=(0,10))
+        self.candidateid.grid(row=1, column=0, padx=(0,4), pady=(0,10), sticky=E+W)
+        self.candidatename.grid(row=1, column=1, padx=(4,4), pady=(0,10), sticky=E+W)
+        self.candidateDoB.grid(row=1, column=2, padx=(4,4), pady=(0,10), sticky=E+W)
  
         self.buttonAdd.grid(row=0, column=3, padx=(4,0))
         self.buttonClear.grid(row=1, column=3, padx=(4,0))

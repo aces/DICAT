@@ -9,9 +9,9 @@ import os
 from Tkinter import *
 from shutil import make_archive
 
-class dicom_anonymizer(Tkinter.Frame):
+class dicom_anonymizer(Frame):
     def __init__(self, parent):
-        Tkinter.Frame.__init__(self, parent)
+        Frame.__init__(self, parent)
         self.parent = parent
         self.dirname=''
         self.dir_opt = {} 
@@ -20,28 +20,35 @@ class dicom_anonymizer(Tkinter.Frame):
         
     def initialize(self):
         self.parent.title("DICOM-anonymizer")
-        self.grid()
-   
+        self.parent.columnconfigure(0, weight=1)
+        self.parent.rowconfigure(0, weight=1)
+
+        self.frame = Frame(self.parent)
+        self.frame.grid(column=0, row=0, padx=10, pady=5, sticky=N+S+E+W)
+
+        self.frame.columnconfigure(0, weight=6)
+        self.frame.columnconfigure(1, weight=1)
+
         self.entryVariable = Tkinter.StringVar()
         self.entryVariable.set("Select the DICOM directory")
 
-        self.entry = Entry(self, width=40, textvariable=self.entryVariable)
+        self.entry = Entry(self.frame, width=40, textvariable=self.entryVariable)
         self.entry.focus_set()
         self.entry.selection_range(0, Tkinter.END)
 
-        self.buttonSelect = Button(self, text="Select", command=self.askdirectory)
-        self.buttonsPanel = Frame(self)
+        self.buttonSelect = Button(self.frame, text=u"Select", command=self.askdirectory)
+        self.buttonsPanel = Frame(self.frame)
 
-        self.entry.grid(row=1, column=0, padx=15, pady=15)
-        self.buttonSelect.grid(row=1, column=1, padx=(0,15), pady=15)
-        self.buttonsPanel.grid(row=2, column=0, columnspan=2, pady=10)
+        self.entry.grid(row=0, column=0, padx=15, pady=10, sticky=E+W)
+        self.buttonSelect.grid(row=0, column=1, padx=(0,15), pady=10, sticky=E+W)
+        self.buttonsPanel.grid(row=1, column=0, columnspan=2, pady=(4,16))
 
-        self.buttonView = Button(self.buttonsPanel, text="View DICOM fields", command=self.anonymize)
-        self.buttonView.grid(row=0, column=0, padx=(0,10))
+        self.buttonView = Button(self.buttonsPanel, text=u"View DICOM fields", command=self.anonymize)
+        self.buttonView.grid(row=0, column=0, padx=(0,10), sticky=E+W)
         self.buttonView.configure(state=DISABLED)
 
-        self.buttonZip = Button(self.buttonsPanel, text="Zip DICOM folder", command=self.zipDicom)
-        self.buttonZip.grid(row=0, column=1, padx=(10,0))
+        self.buttonZip = Button(self.buttonsPanel, text=u"Zip DICOM folder", command=self.zipDicom)
+        self.buttonZip.grid(row=0, column=1, padx=(10,0), sticky=E+W)
         self.buttonZip.configure(state=DISABLED)
 
         self.parent.resizable(True,False)
