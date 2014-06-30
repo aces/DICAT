@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 import subprocess
 import re
 import glob
-
+from shutil import move
 ###################################
 # Read dicom fields from XML file #
 ###################################
@@ -64,9 +64,8 @@ def Dicom_zapping(dicom_folder, dicom_fields):
     
     # Move all dicom files into anonymized_dcm (we'll move the .bak file into original_dcm once dcmodify has been run) 
     for f in file_list:
-        move_dicom = "mv " + dicom_folder +"/" + f + " " + anonymize_dcm 
-        subprocess.call(move_dicom, shell=True)        
-    
+        move(os.path.join(dicom_folder, f), anonymize_dcm)
+         
     # Create the dcmodify command
     modify_cmd = "dcmodify "
     changed_fields_nb = 0
@@ -93,12 +92,10 @@ def Dicom_zapping(dicom_folder, dicom_fields):
         for bak_file in glob.glob(globuleux):
             new_name = re.sub('.bak','',bak_file)
             new_name = re.sub(anonymize_dcm,'',new_name)
-            mv_bak_cmd = "mv " + bak_file + " " + original_dcm + new_name
-            subprocess.call(mv_bak_cmd, shell=True)
+            move(bak_file, original_dcm + new_name)            
     else:
-        mv_dcm_cmd = "mv " + anonymize_dcm + "/* " + original_dcm
-        subprocess.call(mv_dcm_cmd, shell=True)
-
+        move(anonymize_dcm + os.path.sep + "*", original_dcm)
+        
     return anonymize_dcm, original_dcm
 
 ### Test function
