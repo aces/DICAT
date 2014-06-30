@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import subprocess
 import re
 import glob
+import platform
 from shutil import move
 ###################################
 # Read dicom fields from XML file #
@@ -61,13 +62,19 @@ def Dicom_zapping(dicom_folder, dicom_fields):
     anonymize_dcm = dicom_folder + os.path.sep + "anonymized_dcm"
     os.mkdir(original_dcm, 0755)
     os.mkdir(anonymize_dcm, 0755)
-    
+    opSystem = platform.system()
     # Move all dicom files into anonymized_dcm (we'll move the .bak file into original_dcm once dcmodify has been run) 
     for f in file_list:
         move(dicom_folder + os.path.sep + f, anonymize_dcm)
          
     # Create the dcmodify command
-    modify_cmd = "dcmodify "
+    # Have to overcome Mac's Argument list is too long error 
+    # using UNIX xargs which will not work on default Windows config
+    if opSystem == 'Windows':
+        modify_cmd = "dcmodify "
+    else:
+        modify_cmd = "echo "
+
     changed_fields_nb = 0
     for name in dicom_fields:
         # Grep the new values
@@ -86,8 +93,11 @@ def Dicom_zapping(dicom_folder, dicom_fields):
     modify_cmd += anonymize_dcm + os.path.sep + "*"
    
     # If no dicom field was updated
-    if changed_fields_nb > 0: 
-        subprocess.call(modify_cmd, shell=True)
+    if changed_fields_nb > 0:
+        if opSystem == 'Windows': 
+            subprocess.call(modify_cmd, shell=True)
+        else:
+            subprocess.call(modify_cmd + " |xargs dcmodify", shell=True)
         globuleux = anonymize_dcm + os.path.sep + "*.bak" 
         for bak_file in glob.glob(globuleux):
             first = bak_file.rfind(os.path.sep)

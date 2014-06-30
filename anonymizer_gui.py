@@ -153,7 +153,10 @@ class dicom_anonymizer(Frame):
 
          (anonymize_dcm, original_dcm) = methods.Dicom_zapping(self.dirname, self.field_dict)
          self.field_edit_win.destroy()
-         tkMessageBox.showinfo("Message", "Congrats! Your have successfully anonymized your files!")
+         if os.listdir(anonymize_dcm) != [] and os.listdir(original_dcm) != []:
+             tkMessageBox.showinfo("Message", "Congrats! Your have successfully anonymized your files!")
+         else:
+             tkMessageBox.showinfo("Message", "There was an error when processing files")  
             
 
     def zipDicom(self):
