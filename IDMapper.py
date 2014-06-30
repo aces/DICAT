@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# -*- coding: iso-8859-1 -*-
 
 from Tkinter import *
 from xml.dom import minidom
