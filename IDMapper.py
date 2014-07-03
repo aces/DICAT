@@ -1,71 +1,116 @@
-#!/usr/bin/env python_32
-# -*- coding: iso-8859-1 -*-
+#!/usr/bin/python
 
-try:
-    import wx
-except ImportError:
-    raise ImportError,"The wxPython module is required to run this program"
-
+from Tkinter import *
 from xml.dom import minidom
 
-class TunahackIDMapper(wx.Frame):
-    def __init__(self,parent,id,title):
-        """Initialize the application"""
-        wx.Frame.__init__(self,parent,id,title)
-        self.parent = parent
+import ttk
 
+def sortby(tree, col, descending):
+    """Sort tree contents when a column is clicked on."""
+    """From: https://code.google.com/p/python-ttk/source/browse/trunk/pyttk-samples/treeview_multicolumn.py?r=21"""
+    # grab values to sort
+    data = [(tree.set(child, col), child) for child in tree.get_children('')]
+
+    # reorder data
+    data.sort(reverse=descending)
+    for indx, item in enumerate(data):
+        tree.move(item[1], '', indx)
+
+    # switch the heading so that it will sort in the opposite direction
+    tree.heading(col,
+        command=lambda col=col: sortby(tree, col, int(not descending)))
+
+  
+class TunahackIDMapper(Frame):
+    
+    def __init__(self, parent):
+        """Initialize the application"""
+        Frame.__init__(self, parent)
+        self.parent = parent
+        
         # Initialize all the wxPython components
         self.InitUI()
-
+        
         # Set up the dictionary map
         self.IDMap = {}
 
         # Load the data
         self.LoadXML("candidates.xml")
 
-        # Show the window only after loading data
-        # This is specific to wxPython, but can't go into
-        # InitUI because first we need to load the data
-        self.Show(True)
-
+     
     def InitUI(self):
-        """Sets up all wxPython related UI elements"""
-        self.sizer = wx.GridBagSizer()
+        
+        self.parent.title('Hack-a-Tuna ID Mapper')
+        self.parent.columnconfigure(0, weight=1)
+        self.parent.rowconfigure(0, weight=1)
 
-        # Add the textboxes for data entry
-        self.candidatename = wx.TextCtrl(self,-1,value=u"")
-        self.candidateid = wx.TextCtrl(self, -1, value=u"")
+        self.frame = Frame(self.parent)
+        self.frame.grid(column=0, row=0, padx=10, pady=5, sticky=N+S+E+W)
+ 
+        for i in range(0, 3):
+            self.frame.columnconfigure(i, weight=6)
+        self.frame.columnconfigure(3, weight=1)
+        
+        for i in range(3, 4):
+            self.frame.rowconfigure(i, weight=1)
 
-        self.sizer.Add(self.candidatename, (1,1),(1,1), wx.EXPAND)
-        self.sizer.Add(self.candidateid, (1,0),(1,1), wx.EXPAND)
+        self.labelID = Label(self.frame, text=u'Identifier')
+        self.labelName = Label(self.frame, text=u'Real Name')
+        self.labelDoB = Label(self.frame, text=u'Date of Birth')
 
-        label = wx.StaticText(self, label="Identifier")
-        self.sizer.Add(label, (0, 0), (1, 1), wx.EXPAND)
+        self.buttonAdd = Button(self.frame, width=12, text=u'Add candidate', command=self.AddIdentifierEvent) 
+        self.buttonClear = Button(self.frame, width=12, text=u'Clear', command=self.clear)
 
-        label = wx.StaticText(self, label="Real Name")
-        self.sizer.Add(label, (0, 1), (1, 1), wx.EXPAND)
-        # Add the Add Candidate button
-        button = wx.Button(self,-1,label="Add candidate")
-        self.sizer.Add(button, (1,2), (1, 1), wx.EXPAND)
-        self.Bind(wx.EVT_BUTTON, self.AddIdentifierEvent, button)
+        self.textCandId = StringVar()
+        self.candidateid = Entry(self.frame, textvariable=self.textCandId, width=20)
+        self.candidateid.focus_set()
 
-        self.ErrorMessage = wx.StaticText(self, label="")
-        self.ErrorMessage.SetForegroundColour((255,0,0))
-        self.sizer.Add(self.ErrorMessage, (2, 2), (1, 1), wx.EXPAND)
+        self.textCandName = StringVar()
+        self.candidatename = Entry(self.frame, textvariable=self.textCandName, width=20)
 
+        self.textCandDoB = StringVar() 
+        self.candidateDoB = Entry(self.frame, textvariable=self.textCandDoB, width=20)
 
-        # Create the data table
-        self.datatable = wx.ListCtrl(self, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
-        self.datatable.InsertColumn(0, "Identifier")
-        self.datatable.InsertColumn(1, "Real Name")
-        self.sizer.Add(self.datatable, (2, 0), (1, 2), wx.EXPAND)
+        self.tableColumns = ("Identifier", "Real Name", "Date of Birth")
+        self.datatable = ttk.Treeview(self.frame, selectmode='browse', columns=self.tableColumns, show="headings")
+        for col in self.tableColumns:
+            self.datatable.heading(col, text=col.title(), 
+                                   command=lambda c=col: sortby(self.datatable, c, 0))
 
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.OnRowClick, self.datatable)
-        # Some final cleanup for GridBagSizer
-        self.sizer.AddGrowableCol(0)
-        self.SetSizerAndFit(self.sizer)
+        self.datatable.bind("<<TreeviewSelect>>", self.OnRowClick)
+      
+        self.ErrorMessage = StringVar()
+        self.error = Label(self.frame, textvariable=self.ErrorMessage, fg='red')
+
+        self.labelID.grid(row=0, column=0, padx=(0,4), sticky=E+W)
+        self.labelName.grid(row=0, column=1, padx=(4,4), sticky=E+W)
+        self.labelDoB.grid(row=0, column=2, padx=(4,4), sticky=E+W)
+
+        self.candidateid.grid(row=1, column=0, padx=(0,4), pady=(0,10), sticky=E+W)
+        self.candidatename.grid(row=1, column=1, padx=(4,4), pady=(0,10), sticky=E+W)
+        self.candidateDoB.grid(row=1, column=2, padx=(4,4), pady=(0,10), sticky=E+W)
+ 
+        self.buttonAdd.grid(row=0, column=3, padx=(4,0), sticky=E+W)
+        self.buttonClear.grid(row=1, column=3, padx=(4,0), sticky=E+W)
+          
+        self.datatable.grid(row=3, column=0, columnspan=3, pady=10, sticky='nsew')
+        self.error.grid(row=3, column=3)
+     
+        self.center(self.parent)
+
+ 
+    def center(self, win):
+        
+        win.update_idletasks()
+        width = win.winfo_width()
+        height = win.winfo_height()
+        x = (win.winfo_screenwidth() // 2) - (width // 2)
+        y = (win.winfo_screenheight() // 2) - (height // 2)
+        win.geometry('%dx%d+%d+%d' % (width, height, x, y))
+
 
     def LoadXML(self, file):
+        
         """Parses the XML file and loads the data into the current window"""
         try:
             xmldoc = minidom.parse(file)
@@ -73,68 +118,87 @@ class TunahackIDMapper(wx.Frame):
             for s in itemlist:
                 identifier = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
                 realname = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
-
-                self.AddIdentifierAction(identifier, realname, False)
+                dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
+                self.AddIdentifierAction(identifier, realname, dob, False)
         except:
             pass
 
+
     def SaveMapAction(self):
+        
         """Function which performs the action of writing the XML file"""
         f = open("candidates.xml", "w")
         f.write("<?xml version=\"1.0\"?>\n<data>\n")
         for key in self.IDMap:
             f.write("\t<Candidate>\n")
             f.write("\t\t<Identifier>%s</Identifier>\n" % key)
-            f.write("\t\t<RealName>%s</RealName>\n" % self.IDMap[key])
+            f.write("\t\t<RealName>%s</RealName>\n" % self.IDMap[key][1])
+            f.write("\t\t<DateOfBirth>%s</DateOfBirth>\n" % self.IDMap[key][2])
             f.write("\t</Candidate>\n")
         f.write("</data>")
+
 
     def SaveMapEvent(self, event):
         """Handles any wxPython event which should trigger a save action"""
         self.SaveMapAction()
 
-    def AddIdentifierEvent(self,event):
-        """
-        Handles any wxPython event which should trigger adding an identifier to the
-        data table and gets the appropriate values to be added to the mapping
-        """
-        name = self.candidatename.GetValue()
-        id = self.candidateid.GetValue()
-        self.AddIdentifierAction(id, name)
 
-    def AddIdentifierAction(self, candid, realname, save=True):
+    def AddIdentifierEvent(self):
+        
+        name = self.candidatename.get()
+        candid = self.candidateid.get()
+        dob = self.candidateDoB.get()
+        self.AddIdentifierAction(candid, name, dob)
+
+
+    def AddIdentifierAction(self, candid, realname, dob, save=True):
         """
         Adds the given identifier and real name to the mapping. If
         the "save" parameter is true, this also triggers the saving
         of the XML file. 
         This is set to False on initial load.
         """
-
-        self.ErrorMessage.SetLabel("")
+        self.ErrorMessage.set("")
         if candid in self.IDMap:
-            self.ErrorMessage.SetLabel("ERROR: Candidate\nkey already exists")
-            self.sizer.Fit(self)
+            self.ErrorMessage.set("ERROR: Candidate\nkey already exists")
             return
 
-        self.IDMap[candid] = realname
-
-        idx = self.datatable.InsertStringItem(0, candid)
-        self.datatable.SetStringItem(idx, 1, realname)
-
+        mapList = [candid, realname, dob]
+        self.IDMap[candid] = mapList
+                        
+        insertedList = [(candid, realname, dob)]
+        for item in insertedList:
+            self.datatable.insert('', 'end', values=item)
+        
         if(save):
             self.SaveMapAction()
-        self.sizer.Fit(self)
+                     
 
     def OnRowClick(self, event):
+        
         """Update the text boxes' data on row click"""
-        RowIdx = event.Index
-        ClickedName = self.datatable.GetItem(RowIdx, 1).Text
-        ClickedID = self.datatable.GetItem(RowIdx, 0).Text
+        item_id = str(self.datatable.focus())
+        item = self.datatable.item(item_id)['values']
+        
+        self.textCandId.set(item[0])
+        self.textCandName.set(item[1])
+        self.textCandDoB.set(item[2])
 
-        name = self.candidatename.SetValue(ClickedName)
-        id = self.candidateid.SetValue(ClickedID)
+
+    def clear(self):
+        
+        self.textCandId.set("")
+        self.textCandName.set("")
+        self.textCandDoB.set("")
+        self.candidateid.focus_set()
+
+
+def main():
+       
+    root = Tk()
+    app = TunahackIDMapper(root)
+    root.mainloop()
+ 
 
 if __name__ == "__main__":
-    app = wx.App()
-    frame = TunahackIDMapper(None,-1,'Hack-a-Tuna ID Mapper')
-    app.MainLoop()
+    main()
