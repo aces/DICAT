@@ -15,3 +15,5 @@ Cecile Madjar <cecile.madjar@gmail.com>       - Anonymization
 Dave MacFarlane <david.macfarlane2@mcgill.ca> - ID Mapper
 
 Samir Das <samir.das@mcgill.ca>               - Concept
+
+Daniel Krötz <d.kroetz@fz-juelich.de>         - Documentation, testing on Windows
