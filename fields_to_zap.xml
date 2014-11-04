@@ -52,7 +52,7 @@
       <editable>no</editable>
     </item>
     <item>
-      <name>0010,1010</name>
+      <name>0010,0010</name>
       <description>PatientName</description>
       <editable>yes</editable>
     </item>
