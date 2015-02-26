@@ -65,8 +65,9 @@ def Dicom_zapping(dicom_folder, dicom_fields):
         list_file.append(f)
 
     # create new location for files and directories
-    anonymize_dcm = os.path.join(dicom_folder, "anonymized_dcm")
-    os.mkdir(anonymize_dcm, 0755)
+	subject_dcm = os.path.basename(dicom_folder)
+    anonymize_dcm = os.path.join(dicom_folder, "anonymized_dcm", subject_dcm)
+    os.makedirs(anonymize_dcm, 0755)
 
     original_dcm = os.path.join(dicom_folder, "original_dcm")
     os.mkdir(original_dcm, 0755)

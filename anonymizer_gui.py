@@ -161,13 +161,13 @@ class dicom_anonymizer(Frame):
 
     def zipDicom(self):
          directory = self.entry.get()
-         archiveName = directory 
+         archiveName = directory + "_dcm" 
          if (os.listdir(directory) == []):
              tkMessageBox.showinfo("Message", "The directory " + directory + " is empty")
          else:
              self.config(cursor="watch")
              self.update()
-             make_archive(archiveName, 'zip', directory)
+             make_archive(archiveName, 'zip', os.path.join(directory, "anonymized_dcm"))
              tkMessageBox.showinfo("Message", "A new file " + archiveName + ".zip has been created")
              self.config(cursor="arrow")
              self.update()
