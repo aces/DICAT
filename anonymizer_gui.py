@@ -70,7 +70,8 @@ class dicom_anonymizer(Frame):
         return self.dirname
         
     def anonymize(self):
-        XML_file = "fields_to_zap.xml"    
+        scriptpath = os.path.dirname(os.path.realpath(__file__))
+        XML_file = os.path.join(scriptpath, "fields_to_zap.xml")
         field_dict=methods.Grep_DICOM_fields(XML_file)
         field_dict=methods.Grep_DICOM_values(self.dirname, field_dict)
         fields_keys=list(field_dict.keys())
@@ -160,13 +161,13 @@ class dicom_anonymizer(Frame):
 
     def zipDicom(self):
          directory = self.entry.get()
-         archiveName = directory 
+         archiveName = directory + "_dcm" 
          if (os.listdir(directory) == []):
              tkMessageBox.showinfo("Message", "The directory " + directory + " is empty")
          else:
              self.config(cursor="watch")
              self.update()
-             make_archive(archiveName, 'zip', directory)
+             make_archive(archiveName, 'zip', os.path.join(directory, "anonymized_dcm"))
              tkMessageBox.showinfo("Message", "A new file " + archiveName + ".zip has been created")
              self.config(cursor="arrow")
              self.update()
@@ -174,4 +175,5 @@ class dicom_anonymizer(Frame):
 if __name__ == "__main__":
     root = Tk()
     app = dicom_anonymizer(root)
+    root.lift()
     root.mainloop()
