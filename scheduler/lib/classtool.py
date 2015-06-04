@@ -1,6 +1,6 @@
 class ClassTool():
     """
-    Not used!  Useful for during development  as inheritable class  MyClass(ClassTool).
+    Not used!  Useful for development as inheritable class  MyClass(ClassTool).
     """
     #no constructor
     def __repr__(self):
