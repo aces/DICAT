@@ -5,7 +5,10 @@ import subprocess
 import re
 import glob
 import platform
+import shutil
 from shutil import move
+import dicom
+
 ###################################
 # Read dicom fields from XML file #
 ###################################
@@ -20,6 +23,32 @@ def Grep_DICOM_fields(xml_file):
         #dicom_fields[name] = {"Description": description}
     return dicom_fields
 
+
+
+
+################################
+# Grep value from dicom fields using PyDicom #
+################################
+def Grep_DICOM_values_PyDicom(dicom_dir, dicom_fields):
+    # Grep first dicom of the directory
+    # TO DO: Need to check if file is dicom though, otherwise go to next one
+    file_list = []
+    for f in os.listdir(dicom_dir):
+        file_list.append(f)
+    dicom_file = dicom_dir + os.path.sep + file_list[0]
+    dicom_dataset = dicom.read_file(dicom_file)
+    return_dict={}
+    # Grep information from dicom header and store them 
+    # into dicom_fields dictionary under flag Value
+    for field_values in dicom_fields.values():
+        #print field_values['Description']
+        try:
+            print field_values['Description']+'->'+dicom_dataset.data_element(field_values['Description']).value
+            return_dict[field_values['Description']]=dicom_dataset.data_element(field_values['Description']).value
+        except:
+            continue    
+
+    return return_dict
 
 
 
@@ -45,6 +74,38 @@ def Grep_DICOM_values(dicom_dir, dicom_fields):
             dicom_fields[name]['Value'] = value
     return dicom_fields
 
+
+
+######################################
+# Run dcmmodify on all fields to zap using PyDicom recursive wrapper#
+######################################
+def Dicom_zapping_PyDicom(dicom_folder, dicom_fields):
+    anonymized_folder=dicom_folder+'_anonymized'
+    shutil.copytree(dicom_folder, anonymized_folder)
+
+    for root,dirs,files in os.walk(anonymized_folder):
+        if len(files)!=0:
+            for dicom_file in files:
+                print 'anonymizing->'+dicom_file
+                actual_zapping(os.path.join(root, dicom_file), dicom_fields)  
+
+
+######################################
+# Actual zapping method #
+######################################
+def actual_zapping(dicom_file, dicom_fields):
+    
+
+    dicom_dataset = dicom.read_file(dicom_file)
+
+    for field_values in dicom_fields.values():
+        if field_values['Editable'] is True:
+            try:
+                dicom_dataset.data_element(field_values['Description']).value=''
+                
+            except:
+                continue
+    dicom_dataset.save_as(dicom_file)
 
 
 ######################################
@@ -85,10 +146,12 @@ def Dicom_zapping(dicom_folder, dicom_fields):
         # Run dcmodify if update is set to True
         if not dicom_fields[name]['Editable'] and 'Value' in dicom_fields[name]: #kr#
             modify_cmd += " -ma \"(" + name + ")\"=\" \" " #kr#
+            print modify_cmd
             changed_fields_nb += 1
         else:
             if dicom_fields[name]['Update'] == True:
                 modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
+                print modify_cmd
                 changed_fields_nb += 1
     modify_cmd += anonymize_dcm + os.path.sep + "*"
    
