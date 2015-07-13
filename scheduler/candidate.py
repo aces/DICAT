@@ -111,3 +111,5 @@ class Candidate():
                     activevisit = [candidatefullname, visitlabel, when, where, who]
         return activevisit
   
+
+
