@@ -21,24 +21,24 @@ def readdata(datafile):
 
 #Specific functions
 def readcandidatedata():
-    db = shelve.open("candidate")
+    db = shelve.open("candidatedata")
     return db
 
 
 def savecandidatedata(data):
-    db = shelve.open("candidate")
+    db = shelve.open("candidatedata")
     for key in data:
         db[data[key].uid] = data[key]
     db.close()
 
 
 def readstudydata():
-    db = shelve.open("studysetup.db")
+    db = shelve.open("studydata")
     return db
 
 
 def savestudydata(data):
-    db = shelve.open("studysetup.db")
+    db = shelve.open("studydata")
     for key in data:
         db[data[key].uid] = data[key]
     db.close()
