@@ -7,7 +7,7 @@ import glob
 import platform
 import shutil
 from shutil import move
-import dicom
+import pydicom
 
 ###################################
 # Read dicom fields from XML file #
