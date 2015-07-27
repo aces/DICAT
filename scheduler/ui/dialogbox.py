@@ -1,32 +1,30 @@
-#import packages
+#import standard packages
 from Tkinter import *
-import functools
-import lib.utilities as utilities
-import lib.multilanguage as multilanguage
+#import internal packages
+import lib.utilities as Utilities
+import lib.multilanguage as MultiLanguage
 
 class DialogBox(Toplevel):
     """
     This class was created mainly because the native dialog box don't work as expected when called from a top-level window.
-    This class (although it could be improved in many aspects) insure that the parent window cannot get focus while this dialog box is still active.
+    This class (although it could be improved in many aspects) insure that the parent window cannot get focus while a dialog box is still active.
     """
     def __init__(self,parent, title, message, button1, button2):
         Toplevel.__init__(self,parent)
         self.transient(parent)
         self.parent = parent
         self.title(title)
-        
         body = Frame(self)
         self.initial_focus = self.body(body, message)
         body.pack(padx=4, pady=4)
-        
         self.buttonbox(button1, button2)
         self.grab_set()
-        
+
         if not self.initial_focus:
             self.initial_focus = self
         
         self.protocol("WM_DELETE_WINDOW", self.button2)
-        utilities.centerwindow(self)
+        Utilities.center_window(self)
         self.initial_focus.focus_set()
         self.deiconify()
         self.wait_window(self)
@@ -70,9 +68,9 @@ class DialogBox(Toplevel):
 #########################################################################################        
 class ConfirmYesNo(DialogBox):
     def __init__(self, parent, message):
-        title = multilanguage.dialogtitle_confirm
-        button1 = multilanguage.dialog_yes
-        button2 = multilanguage.dialog_no
+        title = MultiLanguage.dialog_title_confirm
+        button1 = MultiLanguage.dialog_yes
+        button2 = MultiLanguage.dialog_no
         DialogBox.__init__(self, parent, title, message, button1, button2)
     
     

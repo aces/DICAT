@@ -1,9 +1,10 @@
+#imports from standard packages
 import shelve
 """
 The data_management.py file contains functions related to data management only.
-Generic functions: savedata(data, datafilename) and readdata(datafile)
+Generic functions: savedata(data, datafilename) and readdata(datafile).  Currently, these are not being used.
 
-Specific functions readcandidatedata(), savecandidatedata(), readstudydata() and savestudydata() are used to get/save candidate data and study setup data respectively. 
+Specific functions read_candidate_data(), save_candidate_data(), read_studydata() and save_study_data() are used to get/save candidate data and study setup data respectively.
 """
 """
 #Generic functions
@@ -20,25 +21,28 @@ def readdata(datafile):
 """
 
 #Specific functions
-def readcandidatedata():
+def read_candidate_data():
     db = shelve.open("candidatedata")
     return db
 
-
-def savecandidatedata(data):
+def save_candidate_data(data):
     db = shelve.open("candidatedata")
     for key in data:
         db[data[key].uid] = data[key]
     db.close()
 
-
-def readstudydata():
+def read_studydata():
     db = shelve.open("studydata")
     return db
 
-
-def savestudydata(data):
+def save_study_data(data):
     db = shelve.open("studydata")
     for key in data:
         db[data[key].uid] = data[key]
     db.close()
+
+#self-test "module"  TODO remove
+if __name__ == '__main__':
+    print 'testing module:  datamanagement.py'
+    data=dict(read_candidate_data());
+    print data;

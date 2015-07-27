@@ -1,0 +1,17 @@
+Naming convention according to https://www.python.org/dev/peps/pep-0008/
+
+Indentation:  Use 4 spaces per indentation level
+
+Package and Module Names: Should be called one per line (yes:  import os;  no:  import os, tkinter, ttk)
+
+Class names: Use the CapWords convention
+
+Function names:  Use lowercase with words separated by underscores
+
+Method names:  Use lowercase with words separated by underscores
+               Use one leading underscore only for non-public methods and instance variables
+               To avoid name clashes with subclasses, use two leading underscores to invoke Python's name mangling rules.
+
+Instance variable names: Use lowercase with words separated by underscores
+
+Constant names: Use uppercase with words separated by underscores. Constant should only be defined at the module level.

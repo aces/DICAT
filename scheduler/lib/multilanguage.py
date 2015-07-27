@@ -1,58 +1,57 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# read language preference from appdata file
+#read language preference from appdata file
 #from utilities import readappdata  #TODO replace and remove
 #language = readappdata()[0]
 
-language = "en"
+language = "fr" #TODO make dynamic
 
-if language == "fr":  #TODO make dynamic
-
+if language == "fr":
     ######################  TOP LEVEL MENU BAR  ######################
-    apptitle = u"Outils LORIS"
+    app_title = u"Outils LORIS"
     #APPLICATION menu
-    menuapplication = u"Application"
-    settingapplication = u"Préferences"
-    quitapplication = u"Quitter"
+    application_menu = u"Application"
+    application_setting = u"Préferences"
+    application_quit = u"Quitter"
     #PROJECT menu
     #menuproject = u"Projet"    #TODO remove?
     #openproject = u"Ouvrir un projet"
     #modifyproject = u"Modifier le projet ouvert"
     #newproject = u"Créer un nouveau projet"
     #CANDIDATE menu
-    menucandidate = "Candidat"
-    addcandidate = u"Nouveau candidat"
-    findcandidate = u"Trouver candidat"
-    updatecandidate = u"Mettre à jour"
-    excludecandidate = u"Exclure un candidat"
-    getcandidateid = u"Obtenir l'identifiant d'un candidat"
-    clearallfield = u"Effacer"
+    candidate_menu = u"Candidat"
+    candidate_add = u"Nouveau candidat"
+    candidate_find = u"Trouver candidat"
+    candidate_update = u"Mettre à jour"
+    candidate_exclude_include_toggle = u"Inclure/Exclure un candidat"
+    candidate_get_id = u"Obtenir l'identifiant d'un candidat"
+    #clear_all_field = u"Effacer"
     #ANONYMIZER menu
-    menuanonymizer = u"DICOM"
+    anonymizer_menu = u"DICOM"
+    anonymizer_run = u"Anonymizer"
     #CALENDAR menu
-    menucalendar = u"Calendrier"
-    newappointment = u"Nouveau Rendez-vous"
+    calendar_menu = u"Calendrier"
+    calendar_new_appointment = u"Nouveau Rendez-vous"
     #HELP menu
-    menuhelp = u"Aide"
-    gethelp = u"Obtenir de l'aide"
-    aboutwindow = u"A propos de ..."       
+    help_menu = u"Aide"
+    help_get_help = u"Obtenir de l'aide"
+    help_about_window = u"A propos de ..."
     ######################  PROJECT INFO PANE  #######################
-    project_infopane = u"Informations"
-    project_detailpane = u"Détails du Projet"
-    visit_detailpane = u"Détails des Visites"
-    projectname = u"Projet"
-    projectstart = u"Début"
-    projectend = u"Fin"
-    targetrecruitment = u"Cible de recrutement"
-    currentrecruitment = u"Recrutement actuel"
-    totalvisit = u"Nombre de Visites"    
+    project_info_pane = u"Projet"
+    project_detail_pane = u"Détails du Projet"
+    visit_detail_pane = u"Détails des Visites"
+    project_name = u"Projet"
+    project_start = u"Début"
+    project_end = u"Fin"
+    target_recruitment = u"Cible de recrutement"
+    current_recruitment = u"Recrutement actuel"
+    total_visit = u"Nombre de Visites"
     ####################  MULTI-TAB DATA SECTION  #####################
     calendar_pane = u"Calendrier"
     candidate_pane = u"Candidats"
-    
-    
-    labelcandidatetable = u"Faites un double-clic sur l'une des lignes pour remplir les champs ci-dessus"
+
+    label_candidate_table = u"Faites un double-clic sur l'une des lignes pour remplir les champs ci-dessus"
     datatable_id = u"ID"
     datatable_firstname = u"Prénom"
     datatable_lastname = "Nom"
@@ -62,9 +61,8 @@ if language == "fr":  #TODO make dynamic
     datatable_city = u"Ville"
     datatable_province = u"Province"
     datatable_country = u"Pays"
-    datatable_postalcode = u"Code Postal"
-    
-    
+    datatable_postal_code = u"Code Postal"
+
     calendar_monday = u"Lundi"
     calendar_tuesday = u"Mardi"
     calendar_wednesday = u"Mercredi"
@@ -84,83 +82,91 @@ if language == "fr":  #TODO make dynamic
     calendar_october = u"Octobre"
     calendar_november = u"Novembre"
     calendar_december = u"Décembre"
+
     ################  COLUMN HEADER  ##################
     col_candidate = u"Candidat"
     col_visitlabel = u"Visite"
     col_when = u"Date/Heure"
     col_where = u"Endroit"
     col_status = u"Statut"
-    
     ####################  STATUS  #####################
-    status_active = "actif"
-    status_tentative = "provisoire"
-    
+    status_active = u"actif"
+    status_tentative = u"provisoire"
     #################  DATA WINDOWS  ##################
-    schedulewindow_title ="Calendrier"
-    candidatewindow_title = "Information du candidat"
-    
-    
+    data_window_title = u"DATA WINDOW" #TODO trouver un titre français
     ##################  DIALOGBOX  ####################
-    dialog_yes = "Oui"
-    dialog_no = "Non"
-    dialogtitle_confirm = "Veuillez confirmer!"
-    dialogclose = "Vous êtes sur le point de fermer cette fenêtre sans sauvegarder!  Voulez-vous continuer?"
-    
-    candidate_firstname = "prénom"
+    # very not sure what to do about that section
+    dialog_yes = u"Oui"
+    dialog_no = u"Non"
+    dialog_title_confirm = u"Veuillez confirmer!"
+    dialog_close = u"Vous êtes sur le point de fermer cette fenêtre sans sauvegarder!\n\nVoulez-vous continuer?"
+    ################  DATA WINDOW  ###################
+    schedule_pane = u"Calendrier"
+    candidate_pane = u"Candidat"
+    candidate_firstname = u"Prénom"
+    candidate_lastname = u"Nom de famille"
+    candidate_phone = u"Téléphone"
+    candidate_pscid = u"ID"
+    candidate_status = u"Status"
+    schedule_visit_label = u"Visite"
+    schedule_visit_rank = u"#"
+    schedule_visit_status = u"Status"
+    schedule_visit_when = u"Date"
+    schedule_optional =u"Optionnel"
         
 elif language == "en":
-    apptitle = "LORIS tools"
+    app_title = u"LORIS tools"
     #APPLICATION menu
-    menuapplication = u"Application"
-    settingapplication = u"Preferences"
-    quitapplication = u"Quit"
+    application_menu = u"Application"
+    application_setting = u"Preferences"
+    application_quit = u"Quit"
     #PROJECT menu
     #menuproject = u"Project"   #TODO remove?
     #openproject = u"Open project"
     #modifyproject = u"Modify open project"
     #newproject = u"New project"    
     #CANDIDATE menu
-    menucandidate = u"Candidate"
-    addcandidate = u"New candidate"
-    findcandidate = u"Find a candidate"
-    updatecandidate = u"Update"
-    excludecandidate = u"Exclude a candidate"
-    getcandidateid = u"Get a canditate ID"
-    clearallfield = u"Clear"
+    candidate_menu = u"Candidate"
+    candidate_add = u"New candidate"
+    candidate_find = u"Find a candidate"
+    candidate_update = u"Update"
+    candidate_exclude_include_toggle = u"Include/Exclude a candidate"
+    candidate_get_id = u"Get a canditate ID"
+    #clear_all_field = u"Clear"
     #CALENDAR menu
-    menucalendar = u"Calendar"
-    newappointment = u"New appointment"
+    calendar_menu = u"Calendar"
+    calendar_new_appointment = u"New appointment"
     #ANONYMIZER menu
-    menuanonymizer = u"DICOM"
+    anonymizer_menu = u"DICOM"
+    anonymizer_run = u"Anonymizer"
     #HELP menu
-    menuhelp = u"Help"
-    gethelp = u"Get some help"
-    aboutwindow = u"About this..."
+    help_menu = u"Help"
+    help_get_help = u"Get some help"
+    help_about_window = u"About this..."
     ######################  PROJECT INFO PANE  #######################
-    project_infopane = u"Informations"
-    project_detailpane = u"Project Details"
-    visit_detailpane = u"Visit Details"
-    projectname = u"Project"
-    projectstart = u"Start"
-    projectend = u"End"
-    targetrecruitment = u"Recruitment target"
-    currentrecruitment = u"Current recruitment"
-    totalvisit = u"Total number of Visits"    
+    project_info_pane = u"Project Informations"
+    project_detail_pane = u"Project Details"
+    visit_detail_pane = u"Visit Details"
+    project_name = u"Project"
+    project_start = u"Start"
+    project_end = u"End"
+    target_recruitment = u"Recruitment target"
+    current_recruitment = u"Current recruitment"
+    total_visit = u"Total number of Visits"
     ####################  MULTI-TAB DATA SECTION  #####################
     calendar_pane = u"Calendar"
     candidate_pane = u"Candidates"
-    labelcandidatetable = u"Double click on row to populate fields above"
+    label_candidate_table = u"Double click on row to populate fields above"
     datatable_id = u"ID"
     datatable_firstname = u"First Name"
-    datatable_lastname = "Last Name"
+    datatable_lastname = u"Last Name"
     datatable_dob = u"Date of Birth"
     datatable_phone = u"Phone"
     datatable_address = u"Address"
     datatable_city = u"City"
     datatable_province = u"Province"
     datatable_country = u"Country"
-    datatable_postalcode = u"Postal Code"
-    
+    datatable_postal_code = u"Postal Code"
     
     calendar_monday = u"Monday"
     calendar_tuesday = u"Tuesday"
@@ -189,16 +195,26 @@ elif language == "en":
     col_where = u"Place"
     col_status = u"Status"  
     ####################  STATUS  #####################
-    status_active = "active" 
-    status_tentative = "tentative"
-    
+    status_active = u"active"
+    status_tentative = u"tentative"
     #################  DATA WINDOWS  ##################
-    schedulewindow_title ="Scheduler"
-    candidatewindow_title = "Candidate information"
-    
-    
+    data_window_title =u"Data Window"
     ##################  DIALOGBOX  ####################
-    dialog_yes = "Yes"
-    dialog_no = "No"
-    dialogtitle_confirm = "Please confirm!"
-    dialogclose = "You are about to close this window without saving! \n\nDo you want to continue?"
+    # very not sure what to do about that section
+    dialog_yes = u"Yes"
+    dialog_no = u"No"
+    dialog_title_confirm = u"Please confirm!"
+    dialog_close = u"You are about to close this window without saving! \n\nDo you want to continue?"
+    ################  DATA WINDOW  ###################
+    schedule_pane = u"Calendrier"
+    candidate_pane = u"Candidat"
+    candidate_firstname = u"Firstname"
+    candidate_lastname = u"Lastname"
+    candidate_phone = u"Phone"
+    candidate_pscid = u"ID"
+    candidate_status = u"Status"
+    schedule_visit_label = u"Visit"
+    schedule_visit_rank = u"#"
+    schedule_visit_status = u"Status"
+    schedule_visit_when = u"Date"
+    schedule_optional =u"Optional"
