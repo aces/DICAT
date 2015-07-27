@@ -98,8 +98,6 @@ if language == "fr":
     # very not sure what to do about that section
     dialog_yes = u"Oui"
     dialog_no = u"Non"
-    dialog_ok = u"OK"
-    dialog_cancel = u"Cancel"
     dialog_title_confirm = u"Veuillez confirmer!"
     dialog_close = u"Vous êtes sur le point de fermer cette fenêtre sans sauvegarder!\n\nVoulez-vous continuer?"
     dialog_quit  = u"Vous êtes sur le point de fermer l'application sans sauvegarder!\n\nVoulez-vous quitter?"
@@ -116,6 +114,8 @@ if language == "fr":
     schedule_visit_status = u"Status"
     schedule_visit_when = u"Date"
     schedule_optional =u"Optionnel"
+    ################  NEW CANDIDATE ##################
+    newcandidate_title = u"Création d'un nouveau candidat"
         
 elif language == "en":
     app_title = u"LORIS tools"
@@ -208,6 +208,7 @@ elif language == "en":
     dialog_no = u"No"
     dialog_title_confirm = u"Please confirm!"
     dialog_close = u"You are about to close this window without saving! \n\nDo you want to continue?"
+    dialog_quit  = u"You are about to close the application without saving!\n\nDo you want to quit?"
     ################  DATA WINDOW  ###################
     schedule_pane = u"Calendrier"
     candidate_pane = u"Candidat"
@@ -221,3 +222,5 @@ elif language == "en":
     schedule_visit_status = u"Status"
     schedule_visit_when = u"Date"
     schedule_optional =u"Optional"
+    ################  NEW CANDIDATE ##################
+    newcandidate_title = u"Create a new candidate"
