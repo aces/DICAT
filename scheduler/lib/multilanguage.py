@@ -98,7 +98,7 @@ if language == "fr":
     status_tentative  = u"provisoire"
 
     #################  DATA WINDOWS  ##################
-    data_window_title = u"DATA WINDOW" #TODO trouver un titre français
+    data_window_title = u"Information sur le candidat" 
     
     ##################  DIALOGBOX  ####################
     # very not sure what to do about that section
@@ -215,7 +215,7 @@ elif language == "en":
     status_tentative = u"tentative"
 
     #################  DATA WINDOWS  ##################
-    data_window_title = u"Data Window"
+    data_window_title = u"Candidate information"
     
     ##################  DIALOGBOX  ####################
     # very not sure what to do about that section
