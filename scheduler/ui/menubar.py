@@ -44,13 +44,12 @@ class MenuBar(Tkinter.Menu):
 
     def quit_application(self):
         # TODO Mac instance has a Python->quit menu on top of Application->Quitter
-        parent        = Tkinter.Frame(self)
-        button_ok     = MultiLanguage.dialog_ok
-        button_cancel = MultiLanguage.dialog_cancel
-        newwin        = DialogBox.ConfirmYesNo(parent, MultiLanguage.dialog_quit)
+        parent     = Tkinter.Frame(self)
+        button_yes = MultiLanguage.dialog_yes
+        button_no  = MultiLanguage.dialog_no
+        newwin     = DialogBox.ConfirmYesNo(parent, MultiLanguage.dialog_quit)
         if newwin.buttonvalue == 1:
             self.quit()
-            print 'running quit_application'
         else:
             return
         pass
