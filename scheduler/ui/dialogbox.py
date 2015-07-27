@@ -9,7 +9,7 @@ class DialogBox(Toplevel):
     This class was created mainly because the native dialog box don't work as expected when called from a top-level window.
     This class (although it could be improved in many aspects) insure that the parent window cannot get focus while a dialog box is still active.
     """
-    def __init__(self,parent, title, message, button1, button2):
+    def __init__(self,parent, title, message, button_ok, button_cancel):
         Toplevel.__init__(self,parent)
         self.transient(parent)
         self.parent = parent
@@ -17,13 +17,13 @@ class DialogBox(Toplevel):
         body = Frame(self)
         self.initial_focus = self.body(body, message)
         body.pack(padx=4, pady=4)
-        self.buttonbox(button1, button2)
+        self.buttonbox(button_ok, button_cancel)
         self.grab_set()
 
         if not self.initial_focus:
             self.initial_focus = self
         
-        self.protocol("WM_DELETE_WINDOW", self.button2)
+        self.protocol("WM_DELETE_WINDOW", self.button_cancel)
         Utilities.center_window(self)
         self.initial_focus.focus_set()
         self.deiconify()
@@ -34,25 +34,25 @@ class DialogBox(Toplevel):
         label.pack(padx=4, pady=4)
         pass
       
-    def buttonbox(self, button1, button2):
+    def buttonbox(self, button_ok, button_cancel):
         #add a standard button box
         box = Frame(self)
-        b1 = Button(box, text=button1, width=12, command=self.button1, default=ACTIVE)
+        b1 = Button(box, text=button_ok, width=12, command=self.button_ok, default=ACTIVE)
         b1.pack(side=LEFT, padx=4, pady=4)
-        b2 = Button(box, text=button2, width=12, command=self.button2, default=ACTIVE)
+        b2 = Button(box, text=button_cancel, width=12, command=self.button_cancel, default=ACTIVE)
         b2.pack(side=LEFT, padx=4, pady=4)
-        self.bind("<Return>", self.button1)
-        self.bind("<Escape>", self.button2)
+        self.bind("<Return>", self.button_ok)
+        self.bind("<Escape>", self.button_cancel)
         box.pack()
         
-    def button1(self, event=None):
+    def button_ok(self, event=None):
         if not self.validate():
             self.initial_focus.focus_set() #put focus on Button
             return
         self.buttonvalue = 1
         self.closedialog()
         
-    def button2(self, event=None):
+    def button_cancel(self, event=None):
         self.buttonvalue = 2
         self.closedialog()
         
@@ -69,9 +69,9 @@ class DialogBox(Toplevel):
 class ConfirmYesNo(DialogBox):
     def __init__(self, parent, message):
         title = MultiLanguage.dialog_title_confirm
-        button1 = MultiLanguage.dialog_yes
-        button2 = MultiLanguage.dialog_no
-        DialogBox.__init__(self, parent, title, message, button1, button2)
+        button_yes = MultiLanguage.dialog_yes
+        button_no  = MultiLanguage.dialog_no
+        DialogBox.__init__(self, parent, title, message, button_yes, button_no)
     
     
 

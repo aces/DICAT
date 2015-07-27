@@ -2,6 +2,7 @@
 import Tkinter
 #import internal packages
 import lib.multilanguage as MultiLanguage
+import ui.dialogbox as DialogBox
 
 class MenuBar(Tkinter.Menu):
     def __init__(self, parent):
@@ -42,9 +43,16 @@ class MenuBar(Tkinter.Menu):
         pass
 
     def quit_application(self):
-        #TODO implement quit_application()
-        print 'running quit_application'
-        self.quit()
+        # TODO Mac instance has a Python->quit menu on top of Application->Quitter
+        parent        = Tkinter.Frame(self)
+        button_ok     = MultiLanguage.dialog_ok
+        button_cancel = MultiLanguage.dialog_cancel
+        newwin        = DialogBox.ConfirmYesNo(parent, MultiLanguage.dialog_quit)
+        if newwin.buttonvalue == 1:
+            self.quit()
+            print 'running quit_application'
+        else:
+            return
         pass
 
     def open_calendar(self):

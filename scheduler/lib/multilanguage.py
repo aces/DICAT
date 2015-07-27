@@ -98,8 +98,11 @@ if language == "fr":
     # very not sure what to do about that section
     dialog_yes = u"Oui"
     dialog_no = u"Non"
+    dialog_ok = u"OK"
+    dialog_cancel = u"Cancel"
     dialog_title_confirm = u"Veuillez confirmer!"
     dialog_close = u"Vous êtes sur le point de fermer cette fenêtre sans sauvegarder!\n\nVoulez-vous continuer?"
+    dialog_quit  = u"Vous êtes sur le point de fermer l'application sans sauvegarder!\n\nVoulez-vous quitter?"
     ################  DATA WINDOW  ###################
     schedule_pane = u"Calendrier"
     candidate_pane = u"Candidat"
