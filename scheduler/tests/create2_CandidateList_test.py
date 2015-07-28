@@ -25,6 +25,6 @@ candidatedb[candidatedata.uid] = candidatedata
 candidatedata = candidate.Candidate('Marc', 'St-Pierre', '412-897-9874')
 candidatedb[candidatedata.uid] = candidatedata
 
-datamanagement.savecandidatedata(candidatedb)
+datamanagement.save_candidate_data(candidatedb)
 
 #TESTED

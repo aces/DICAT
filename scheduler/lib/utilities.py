@@ -1,20 +1,25 @@
+#imports from standard packages
 from uuid import uuid1
 import time
 
-def generateUniqueID():
+"""
+This file contains utility functions used throughout the application
+"""
+
+def generate_uid():
     """
-    will generate a random 14-bit sequence number is chosen.
+    will generate a random UUID.
     see python documentation https://docs.python.org/2/library/uuid.html
     """
     ui = str(uuid1())
     return ui
 
-def isUnique(visitdata):
+def is_unique(data, dataset):
     """
-    will verify if the visitdata passed as argument is unique in a set
+    will verify if 'data' passed as argument is unique in a dataset
     """
     seen = set()
-    return not any(value in seen or seen.add(value) for value in visitdata)
+    return not any(value in seen or seen.add(value) for value in data)
 
 
 def describe(something):
@@ -29,10 +34,25 @@ def describe(something):
     returnvalue = objectclass, " (", objecttype, "): ", attributes
     return returnvalue
 
+def get_current_date():
+    """
+    will return today's date as a string of format yyyymmdd
+    """
+    return time.strftime("%Y%m%d")
+
+def get_current_time(option):
+    """
+    will return current time as a string of format hhmmss
+    """
+    if option == 1:
+        return time.strftime("%H%M%S")
+    elif option == 2:
+        return time.strftime("%H:%M:%S")
+    else:
+        pass
 
 
-
-def errorlog(message):
+def error_log(message):
     # append/save timestamp and exception to errorlog.txt
     # object Exception e is sent as is and this method is taking care of parsing it to string
     # and adding a timestamp
@@ -48,7 +68,7 @@ def errorlog(message):
 
 
 
-def centerwindow(win):
+def center_window(win):
     win.update_idletasks()
     width = win.winfo_width()
     height = win.winfo_height()
@@ -61,7 +81,7 @@ def centerwindow(win):
 
 
 ########################################################################################
-def gatherattributes(something):
+def gather_attributes(something):
     """
     Receive an object and return an array containing the object attributes and value
     """
@@ -71,11 +91,11 @@ def gatherattributes(something):
     return attributes
 
 
-def searchuid(db, value):
+def search_uid(db, value):
     return filter(lambda candidate: candidate['uid'] == value, db)
     
 
-def printobject(something):
+def print_object(something):
     #for dev only!
     #will print key, attributes, value in the console.
     #most likely will be an dict or a class instance.
@@ -90,3 +110,10 @@ def printobject(something):
         for attr, value in something.__dict__.iteritems():
             print attr, value
     print "\n\n"
+
+
+# self-test "module"  TODO remove before release
+if __name__ == '__main__':
+    import lib.datamanagement as DataManagement
+    data=dict(DataManagement.read_studydata())
+    print_object(data)

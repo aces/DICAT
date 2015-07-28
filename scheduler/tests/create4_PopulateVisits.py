@@ -11,7 +11,7 @@ import candidate
 import lib.datamanagement as datamanagement
 import lib.utilities as utilities
 
-db = dict(datamanagement.readcandidatedata())
+db = dict(datamanagement.read_candidate_data())
 
 #get all key values
 keylist = []
@@ -29,34 +29,34 @@ visitdate = '2014-12-25'  #TODO add regex controls
 visittime = '13:15' #TODO add regex controls
 visitwhere = 'CRIUGM lobby'
 visitwhom = 'Annie'
-thisvisit = candidate1.setvisitdate(visitlabel, visitdate, visittime, visitwhere, visitwhom)
-candidate1.setnextvisitwindow(candidate1, thisvisit)
+thisvisit = candidate1.set_visit_date(visitlabel, visitdate, visittime, visitwhere, visitwhom)
+candidate1.set_next_visit_window(candidate1, thisvisit)
 
 visitlabel = 'V1'  #TODO selection from droplist
 visitdate = '2014-12-27'  #TODO add regex controls
 visittime = '14:30' #TODO add regex controls
 visitwhere = 'CRIUGM M-124'
 visitwhom = 'Jean'
-thisvisit = candidate2.setvisitdate(visitlabel, visitdate, visittime, visitwhere, visitwhom)
-candidate2.setnextvisitwindow(candidate2, thisvisit)
+thisvisit = candidate2.set_visit_date(visitlabel, visitdate, visittime, visitwhere, visitwhom)
+candidate2.set_next_visit_window(candidate2, thisvisit)
 
 visitlabel = 'V1'  #TODO selection from droplist
 visitdate = '2015-01-13'  #TODO add regex controls
 visittime = '09:15' #TODO add regex controls
 visitwhere = 'McDo'
 visitwhom = 'Scott'
-thisvisit = candidate3.setvisitdate(visitlabel, visitdate, visittime, visitwhere, visitwhom)
-candidate3.setnextvisitwindow(candidate3, thisvisit)
+thisvisit = candidate3.set_visit_date(visitlabel, visitdate, visittime, visitwhere, visitwhom)
+candidate3.set_next_visit_window(candidate3, thisvisit)
 
 visitlabel = 'V0'  #TODO selection from droplist
 visitdate = '2015-02-24'  #TODO add regex controls
 visittime = '15:30' #TODO add regex controls
 visitwhere = 'IGA'
 visitwhom = 'Charlie'
-thisvisit = candidate4.setvisitdate(visitlabel, visitdate, visittime, visitwhere, visitwhom)
-candidate4.setnextvisitwindow(candidate4, thisvisit)
+thisvisit = candidate4.set_visit_date(visitlabel, visitdate, visittime, visitwhere, visitwhom)
+candidate4.set_next_visit_window(candidate4, thisvisit)
 
-datamanagement.savecandidatedata(db)
+datamanagement.save_candidate_data(db)
 
 
 """

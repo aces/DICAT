@@ -4,7 +4,7 @@ import datetime
 import lib.datamanagement as datamanagement
 
 #loading data
-candidatedb = dict(datamanagement.readcandidatedata())
+candidatedb = dict(datamanagement.read_candidate_data())
 #GUI:  selecting a candidate from db
 #print '\nGUI:  SELECTING ONE CANDIDATE,...'
 happycandidate = candidatedb.get("a045a530-a31f-11e4-9c66-fc4dd4d3c3f3")
@@ -18,11 +18,11 @@ visittime = '13:15' #TODO add regex controls
 visitwhere = 'CRIUGM lobby'
 visitwhom = 'me'
 #print 'system:  create visitset instance if necessary and add collected information to proper visit in Candidate.visitset'
-thisvisit = happycandidate.setvisitdate(visitlabel, visitdate, visittime, visitwhere, visitwhom)
-happycandidate.setnextvisitwindow(happycandidate, thisvisit)
+thisvisit = happycandidate.set_visit_date(visitlabel, visitdate, visittime, visitwhere, visitwhom)
+happycandidate.set_next_visit_window(happycandidate, thisvisit)
 #print'\nGUI:  NOW THIS CANDIDATE HAS A DATE FOR HIS/HER FIRST VISIT + A RANGE FOR THE FOLLOWING VISIT'
 #print '\nGUI:  put on screen all active visits (sorted by datetime)  =>  see test3.py'
-datamanagement.savecandidatedata(candidatedb)
+datamanagement.save_candidate_data(candidatedb)
 
 
 #TESTED
