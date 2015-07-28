@@ -16,7 +16,7 @@ class DataWindow(Toplevel):
         print "running DataWindow(Toplevel) " + str(candidate_uuid)  #TODO remove when done
         self.transient(parent) 
         self.parent = parent
-        self.title(MultiLanguage.data_window_title)  #TODO find a better title for the thing
+        self.title(MultiLanguage.data_window_title)
         body = Frame(self)
         self.initial_focus = self.body(body, candidate_uuid)
         body.pack(padx=5, pady=5)
