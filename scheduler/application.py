@@ -41,7 +41,6 @@ class UserInterface(Frame):
         self.filter_candidate_label = Label(self.filter_visit, text='Filters for Active / Tentative / Closed ...')
         self.filter_candidate_label.pack(side=TOP, expand=NO, fill=BOTH)
 
-
         # get data from shelve files
         data = dict(DataManagement.read_candidate_data())  # TODO place data management elsewhere
 
@@ -50,8 +49,8 @@ class UserInterface(Frame):
         self.visit_table = DataTable.DataTable(self.visit_pane, data, visit_column_headers)
         self.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
         column_header = ('firstname', 'lastname', 'phone', 'status')
-        data_table = DataTable.DataTable(self.candidate_pane, data, column_header)
-        data_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
+        self.data_table = DataTable.DataTable(self.candidate_pane, data, column_header)
+        self.data_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
 
 class Application(Tk):
     def __init__(self):

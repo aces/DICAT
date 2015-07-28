@@ -101,12 +101,19 @@ if language == "fr":
     data_window_title = u"Information sur le candidat" 
     
     ##################  DIALOGBOX  ####################
+<<<<<<< Updated upstream
     # very not sure what to do about that section
     dialog_yes           = u"Oui"
     dialog_no            = u"Non"
     dialog_title_confirm = u"Veuillez confirmer!"
     dialog_close         = u"Vous êtes sur le point de fermer cette fenêtre sans sauvegarder!\n\nVoulez-vous continuer?"
     dialog_quit          = u"Vous êtes sur le point de fermer l'application sans sauvegarder!\n\nVoulez-vous quitter?"
+=======
+    dialog_yes = "Oui"
+    dialog_no = "Non"
+    dialogtitle_confirm = "Veuillez confirmer!"
+    dialogclose = "Vous êtes sur le point de fermer cette fenêtre sans sauvegarder!\n\nVoulez-vous continuer?"
+>>>>>>> Stashed changes
     
     ################  DATA WINDOW  ###################
     schedule_pane         = u"Calendrier"
