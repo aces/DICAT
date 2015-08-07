@@ -7,11 +7,7 @@ import glob
 import platform
 import shutil
 from shutil import move
-try:
-    __import__('pydicom')
-    import pydicom as dicom
-except ImportError:
-    import dicom
+import dicom
 
 
 
@@ -125,8 +121,8 @@ def Dicom_zapping(dicom_folder, dicom_fields):
         file_list.append(f)
 
     # Create an original_dcm and anonymized_dcm directory in dicom_folder
-    original_dcm = dicom_folder + os.path.sep + "original_dcm"
-    anonymize_dcm = dicom_folder + os.path.sep + "anonymized_dcm"
+    original_dcm  = dicom_folder + os.path.sep + dicom_fields['0010,0010']['Value']
+    anonymize_dcm = dicom_folder + os.path.sep + dicom_fields['0010,0010']['Value'] + "_anonymized"
     os.mkdir(original_dcm, 0755)
     os.mkdir(anonymize_dcm, 0755)
     opSystem = platform.system()
@@ -175,8 +171,18 @@ def Dicom_zapping(dicom_folder, dicom_fields):
             move(bak_file, original_dcm + new_name)            
     else:
         move(anonymize_dcm + os.path.sep + "*", original_dcm)
-        
-    return anonymize_dcm, original_dcm
+
+    if os.path.exists(anonymize_dcm) and os.path.exists(original_dcm):
+        shutil.make_archive(anonymize_dcm, 'zip', anonymize_dcm)
+        if os.path.exists(anonymize_dcm + '.zip'):
+            shutil.rmtree(anonymize_dcm)
+        shutil.make_archive(original_dcm, 'zip', original_dcm)
+        if os.path.exists(original_dcm):
+            shutil.rmtree(original_dcm)
+    else:
+        sys.exit('Failed to anonymize data')
+
+    return anonymize_dcm + '.zip', original_dcm + '.zip'
 
 ### Test function
 def anonymize_folder(folder_name):
@@ -187,3 +193,15 @@ def anonymize_folder(folder_name):
     else:
         return dict_data_fields
         
+def zipDicom(self):
+         directory = self.entry.get()
+         archiveName = directory
+         if (os.listdir(directory) == []):
+             tkMessageBox.showinfo("Message", "The directory " + directory + " is empty")
+         else:
+             self.config(cursor="watch")
+             self.update()
+             make_archive(archiveName, 'zip', directory)
+             tkMessageBox.showinfo("Message", "A new file " + archiveName + ".zip has been created")
+             self.config(cursor="arrow")
+             self.update()
