@@ -3,3 +3,4 @@ build/
 dicom/
 .idea
 ~*.doc
+*.pyc
