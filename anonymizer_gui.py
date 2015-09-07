@@ -70,7 +70,8 @@ class dicom_anonymizer(Frame):
         return self.dirname
         
     def anonymize(self):
-        XML_file = os.path.dirname(os.path.abspath(__file__)) + "/fields_to_zap.xml"
+        # XML_file = os.path.dirname(os.path.abspath(__file__)) + "/fields_to_zap.xml"
+        XML_file = "fields_to_zap.xml"
         field_dict=methods.Grep_DICOM_fields(XML_file)
         field_dict=methods.Grep_DICOM_values(self.dirname, field_dict)
         fields_keys=list(field_dict.keys())
