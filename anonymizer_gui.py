@@ -6,7 +6,6 @@ import os
 
 
 from Tkinter import *
-from shutil import make_archive
 
 class dicom_anonymizer(Frame):
     def __init__(self, parent):
@@ -46,10 +45,6 @@ class dicom_anonymizer(Frame):
         self.buttonView.grid(row=0, column=0, padx=(0,10), sticky=E+W)
         self.buttonView.configure(state=DISABLED)
 
-        self.buttonZip = Button(self.buttonsPanel, text=u"Zip DICOM folder", command=self.zipDicom)
-        self.buttonZip.grid(row=0, column=1, padx=(10,0), sticky=E+W)
-        self.buttonZip.configure(state=DISABLED)
-
         self.center(self.parent)
     
     def center(self, win):
@@ -66,7 +61,6 @@ class dicom_anonymizer(Frame):
         self.dirname=tkFileDialog.askdirectory(**self.dir_opt)
         self.entryVariable.set(self.dirname)
         self.buttonView.configure(state=NORMAL)
-        self.buttonZip.configure(state=NORMAL)
         return self.dirname
         
     def anonymize(self):
@@ -152,25 +146,12 @@ class dicom_anonymizer(Frame):
 
          (anonymize_dcm, original_dcm) = methods.Dicom_zapping(self.dirname, self.field_dict)
          self.field_edit_win.destroy()
-         if os.listdir(anonymize_dcm) != [] and os.listdir(original_dcm) != []:
+         if os.path.exists(anonymize_dcm) != [] and os.path.exists(original_dcm) != []:
              tkMessageBox.showinfo("Message", "Congrats! Your have successfully anonymized your files!")
          else:
              tkMessageBox.showinfo("Message", "There was an error when processing files")  
             
 
-    def zipDicom(self):
-         directory = self.entry.get()
-         archiveName = directory 
-         if (os.listdir(directory) == []):
-             tkMessageBox.showinfo("Message", "The directory " + directory + " is empty")
-         else:
-             self.config(cursor="watch")
-             self.update()
-             make_archive(archiveName, 'zip', directory)
-             tkMessageBox.showinfo("Message", "A new file " + archiveName + ".zip has been created")
-             self.config(cursor="arrow")
-             self.update()
-          
 if __name__ == "__main__":
     root = Tk()
     app = dicom_anonymizer(root)
