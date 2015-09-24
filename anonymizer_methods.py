@@ -22,8 +22,10 @@ def GrepDicomsFromFolder(dicom_folder):
     subdirs_list = []
     # Grep DICOM files recursively and insert them in dicoms_list
     # Same for subdirectories
-    for root, subdirs, files in os.walk(dicom_folder):
-        if len(files) != 0:
+    for root, subdirs, files in os.walk(dicom_folder, topdown=True):
+        print "subdirs is", subdirs
+        print "files are", files
+        if len(files) != 0 or len(subdirs) != 0:
             for dicom_file in files:
                 if dicom_file != ".DS_Store":
                     dicoms_list.append(os.path.join(root,dicom_file))
@@ -33,6 +35,7 @@ def GrepDicomsFromFolder(dicom_folder):
             sys.exit('Could not find any files in ' + dicom_folder)
 
     return dicoms_list, subdirs_list
+
 
 
 ###################################
