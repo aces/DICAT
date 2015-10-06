@@ -22,10 +22,12 @@ def GrepDicomsFromFolder(dicom_folder):
     subdirs_list = []
     # Grep DICOM files recursively and insert them in dicoms_list
     # Same for subdirectories
+    # Regular expression to identify files that are not DICOM.
+    pattern = re.compile("\.bmp$|\.png$|\.zip$|\.txt$|\.jpeg$|\.pdf$|\.DS_Store")
     for root, subdirs, files in os.walk(dicom_folder, topdown=True):
         if len(files) != 0 or len(subdirs) != 0:
             for dicom_file in files:
-                if dicom_file != ".DS_Store" and re.search("bmp", dicom_file) is None:
+                if pattern.search(dicom_file) is None:
                     dicoms_list.append(os.path.join(root,dicom_file))
             for subdir in subdirs:
                 subdirs_list.append(subdir)
