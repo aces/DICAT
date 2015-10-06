@@ -10,7 +10,7 @@ try:
     import pydicom as dicom
 except ImportError:
     import dicom
-
+    import re
 
 ###########################################
 # Grep recursively all DICOMs from folder #
@@ -23,11 +23,9 @@ def GrepDicomsFromFolder(dicom_folder):
     # Grep DICOM files recursively and insert them in dicoms_list
     # Same for subdirectories
     for root, subdirs, files in os.walk(dicom_folder, topdown=True):
-        print "subdirs is", subdirs
-        print "files are", files
         if len(files) != 0 or len(subdirs) != 0:
             for dicom_file in files:
-                if dicom_file != ".DS_Store":
+                if dicom_file != ".DS_Store" and re.search("bmp", dicom_file) is None:
                     dicoms_list.append(os.path.join(root,dicom_file))
             for subdir in subdirs:
                 subdirs_list.append(subdir)
