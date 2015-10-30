@@ -65,9 +65,16 @@ class dicom_anonymizer(Frame):
         return self.dirname
         
     def anonymize(self):
+        # determine which anonymizer tool to use (PyDICOM or DICOM toolkit)
+        anonymizer_tool = methods.FindAnonymizerTool()
+        # exit with an error message if neither PyDICOM or DICOM toolkit were found
+        if anonymizer_tool == False:
+            tkMessageBox.showinfo("Message", "Error: no tool was found to read or anonymizer DICOM files.")
+            exit()
         XML_file = os.path.dirname(os.path.abspath(__file__)) + "/fields_to_zap.xml"
         field_dict=methods.Grep_DICOM_fields(XML_file)
         field_dict=methods.Grep_DICOM_values(self.dirname, field_dict)
+        #field_dict=methods.Grep_DICOM_values_PyDicom(self.dirname, field_dict)
         fields_keys=list(field_dict.keys())
         self.edited_entries=[Tkinter.StringVar() for i in range(len(fields_keys)+1)]
         if len(field_dict)!=0:
@@ -89,6 +96,8 @@ class dicom_anonymizer(Frame):
             self.key_index=1
             field_order = []
             for keys in fields_keys:
+#                print "\nkeys is: " + keys
+#                print "\nfield is: " + field_dict[keys]['Description']
                 self.field_edit_win.Field_label=Tkinter.Label(self.field_edit_win,text=str(field_dict[keys]['Description'])+':', relief="ridge", width=30, anchor="w", fg="black",bg="#B0B0B0")
                 self.field_edit_win.Field_label.grid(column=0,row=self.key_index, padx=(5,0), sticky=N+S+W+E)
                 # Enter value to modify

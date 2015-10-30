@@ -5,12 +5,57 @@ import subprocess
 import re
 import shutil
 from shutil import move
-try:
-    __import__('pydicom')
-    import pydicom as dicom
-except ImportError:
-    import dicom
-    import re
+
+"""
+Test whether PyDICOM module exists and import it.
+Notes:
+- in the past, PyDICOM was imported using "import pydicom as dicom"
+- newer versions of the PyDICOM module are imported using "import dicom"
+- returns true if the PyDICOM was imported, false otherwise
+"""
+def ImportPyDICOM():
+    # try importing older version of PyDICOM
+    try:
+        import pydicom as dicom
+        # set use_pydicom to true as PyDICOM was found and imported
+        return True
+    except ImportError:
+        # try importing newer versions of PyDICOM
+        try:
+            import dicom
+            # set use_pydicom to true as PyDICOM was found and imported
+            return True
+        except ImportError:
+            # set use_pydicom to false as PyDICOM was not found
+            return False
+
+"""
+Determine which anonymizer tool will be used by the program:
+- PyDICOM python module if found and imported
+- DICOM toolkit if found on the filesystem
+"""
+def FindAnonymizerTool():
+    # If found PyDICOM was found, PyDICOM will be used and returned
+    if ImportPyDICOM() == True:
+        return 'PyDICOM'
+    # Else if dcmdump executable exists, the DICOM toolkit will be used and returned
+    elif TestExecutable('dcmdump') == True:
+        return 'DICOM_toolkit'
+    # Else, no anonymizer tool were found and return false
+    else:
+        return False
+
+"""
+Test if an executable exists.
+Returns True if executable exists, False if not found.
+"""
+def TestExecutable(executable):
+    # try running the executable
+    try:
+        subprocess.call([executable])
+        return True
+    except OSError as e:
+        return False
 
 ###########################################
 # Grep recursively all DICOMs from folder #
