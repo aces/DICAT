@@ -13,21 +13,21 @@ Notes:
 - newer versions of the PyDICOM module are imported using "import dicom"
 - returns true if the PyDICOM was imported, false otherwise
 """
-def ImportPyDICOM():
-    # try importing older version of PyDICOM
+# create a boolean variable that returns True if PyDICOM was imported, False if not
+use_pydicom = False
+try:
+    import pydicom as dicom
+    # set use_pydicom to true as PyDICOM was found and imported
+    use_pydicom = True
+except ImportError:
+    # try importing newer versions of PyDICOM
     try:
-        import pydicom as dicom
+        import dicom
         # set use_pydicom to true as PyDICOM was found and imported
-        return True
+        use_pydicom = True
     except ImportError:
-        # try importing newer versions of PyDICOM
-        try:
-            import dicom
-            # set use_pydicom to true as PyDICOM was found and imported
-            return True
-        except ImportError:
-            # set use_pydicom to false as PyDICOM was not found
-            return False
+        # set use_pydicom to false as PyDICOM was not found
+        use_pydicom = False
 
 """
 Determine which anonymizer tool will be used by the program:
@@ -36,7 +36,7 @@ Determine which anonymizer tool will be used by the program:
 """
 def FindAnonymizerTool():
     # If found PyDICOM was found, PyDICOM will be used and returned
-    if ImportPyDICOM() == True:
+    if use_pydicom == True:
         return 'PyDICOM'
     # Else if dcmdump executable exists, the DICOM toolkit will be used and returned
     elif TestExecutable('dcmdump') == True:
@@ -98,39 +98,42 @@ def Grep_DICOM_fields(xml_file):
     return dicom_fields
 
 
-##############################################
-# Grep value from DICOM fields using PyDicom #
-##############################################
+"""
+Grep value from DICOM fields using PyDICOM
+"""
 def Grep_DICOM_values_PyDicom(dicom_folder, dicom_fields):
-    # Grep first dicom of the directory
-    # TO DO: Need to check if file is dicom though, otherwise go to next one
+    # Grep first DICOM of the directory
+    # TODO: Need to check if file is DICOM though, otherwise go to next one
     (dicoms_list, subdirs_list) = GrepDicomsFromFolder(dicom_folder)
-    dicom_file    = dicoms_list[0]
+    dicom_file = dicoms_list[0]
+
+    # Read DICOM file using PyDICOM
     dicom_dataset = dicom.read_file(dicom_file)
-    return_dict   = {}
-    # Grep information from dicom header and store them 
+
+    # Grep information from DICOM header and store them
     # into dicom_fields dictionary under flag Value
-    for field_values in dicom_fields.values():
-        #print field_values['Description']
+    # Dictionnary of DICOM values to be returned
+    return_dict = {}
+    for name in dicom_fields:
         try:
-            print field_values['Description']+'->'+dicom_dataset.data_element(field_values['Description']).value
-            return_dict[field_values['Description']]=dicom_dataset.data_element(field_values['Description']).value
+            print dicom_fields[name]['Description']+'->'+dicom_dataset.data_element(dicom_fields[name]['Description']).value
+            dicom_fields[name]['Value'] = dicom_dataset.data_element(dicom_fields[name]['Description']).value
         except:
             continue    
 
-    return return_dict
+    return dicom_fields
 
 
-################################
-# Grep value from DICOM fields #
-################################
+"""
+Grep value from DICOM fields using dcmdump from DICOM toolkit
+"""
 def Grep_DICOM_values(dicom_folder, dicom_fields):
-    # Grep first dicom of the directory
-    # TO DO: Need to check if file is dicom though, otherwise go to next one
+    # Grep first DICOM of the directory
+    # TODO: Need to check if file is DICOM though, otherwise go to next one
     (dicoms_list, subdirs_list) = GrepDicomsFromFolder(dicom_folder)
-    dicom_file = dicoms_list[1]
+    dicom_file = dicoms_list[0]
     
-    # Grep information from dicom header and store them 
+    # Grep information from DICOM header and store them
     # into dicom_fields dictionary under flag Value
     for name in dicom_fields:
         dump_cmd = "dcmdump -ml +P " + name + " -q " + dicom_file

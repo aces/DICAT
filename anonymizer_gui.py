@@ -71,10 +71,19 @@ class dicom_anonymizer(Frame):
         if anonymizer_tool == False:
             tkMessageBox.showinfo("Message", "Error: no tool was found to read or anonymizer DICOM files.")
             exit()
+
+        # Read the XML file with the identifying DICOM fields
         XML_file = os.path.dirname(os.path.abspath(__file__)) + "/fields_to_zap.xml"
         field_dict=methods.Grep_DICOM_fields(XML_file)
-        field_dict=methods.Grep_DICOM_values(self.dirname, field_dict)
-        #field_dict=methods.Grep_DICOM_values_PyDicom(self.dirname, field_dict)
+
+        # Read DICOM header and grep identifying DICOM field values
+        if anonymizer_tool == "PyDICOM":
+            field_dict=methods.Grep_DICOM_values_PyDicom(self.dirname, field_dict)
+            #field_dict=methods.Grep_DICOM_values(self.dirname, field_dict)
+
+        elif anonymizer_tool == "DICOM_toolkit":
+            field_dict=methods.Grep_DICOM_values(self.dirname, field_dict)
+
         fields_keys=list(field_dict.keys())
         self.edited_entries=[Tkinter.StringVar() for i in range(len(fields_keys)+1)]
         if len(field_dict)!=0:
