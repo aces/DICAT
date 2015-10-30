@@ -49,6 +49,7 @@ def FindAnonymizerTool():
 Test if an executable exists.
 Returns True if executable exists, False if not found.
 """
+# TODO: find a way to not display dcmdump help in the terminal
 def TestExecutable(executable):
     # try running the executable
     try:
@@ -113,10 +114,8 @@ def Grep_DICOM_values_PyDicom(dicom_folder, dicom_fields):
     # Grep information from DICOM header and store them
     # into dicom_fields dictionary under flag Value
     # Dictionnary of DICOM values to be returned
-    return_dict = {}
     for name in dicom_fields:
         try:
-            print dicom_fields[name]['Description']+'->'+dicom_dataset.data_element(dicom_fields[name]['Description']).value
             dicom_fields[name]['Value'] = dicom_dataset.data_element(dicom_fields[name]['Description']).value
         except:
             continue    

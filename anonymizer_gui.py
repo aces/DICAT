@@ -8,6 +8,15 @@ import os
 from Tkinter import *
 from shutil import make_archive
 
+
+# Determine which anonymizer tool to use (PyDICOM or DICOM toolkit)
+anonymizer_tool = methods.FindAnonymizerTool()
+# exit with an error message if neither PyDICOM or DICOM toolkit were found
+if anonymizer_tool == False:
+    tkMessageBox.showinfo("Message", "Error: no tool was found to read or anonymizer DICOM files.")
+    exit()
+
+
 class dicom_anonymizer(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
@@ -65,13 +74,6 @@ class dicom_anonymizer(Frame):
         return self.dirname
         
     def anonymize(self):
-        # determine which anonymizer tool to use (PyDICOM or DICOM toolkit)
-        anonymizer_tool = methods.FindAnonymizerTool()
-        # exit with an error message if neither PyDICOM or DICOM toolkit were found
-        if anonymizer_tool == False:
-            tkMessageBox.showinfo("Message", "Error: no tool was found to read or anonymizer DICOM files.")
-            exit()
-
         # Read the XML file with the identifying DICOM fields
         XML_file = os.path.dirname(os.path.abspath(__file__)) + "/fields_to_zap.xml"
         field_dict=methods.Grep_DICOM_fields(XML_file)
@@ -79,8 +81,6 @@ class dicom_anonymizer(Frame):
         # Read DICOM header and grep identifying DICOM field values
         if anonymizer_tool == "PyDICOM":
             field_dict=methods.Grep_DICOM_values_PyDicom(self.dirname, field_dict)
-            #field_dict=methods.Grep_DICOM_values(self.dirname, field_dict)
-
         elif anonymizer_tool == "DICOM_toolkit":
             field_dict=methods.Grep_DICOM_values(self.dirname, field_dict)
 
@@ -105,8 +105,6 @@ class dicom_anonymizer(Frame):
             self.key_index=1
             field_order = []
             for keys in fields_keys:
-#                print "\nkeys is: " + keys
-#                print "\nfield is: " + field_dict[keys]['Description']
                 self.field_edit_win.Field_label=Tkinter.Label(self.field_edit_win,text=str(field_dict[keys]['Description'])+':', relief="ridge", width=30, anchor="w", fg="black",bg="#B0B0B0")
                 self.field_edit_win.Field_label.grid(column=0,row=self.key_index, padx=(5,0), sticky=N+S+W+E)
                 # Enter value to modify
@@ -142,33 +140,39 @@ class dicom_anonymizer(Frame):
             items.set("")
 
     def collect_edited_data(self):
-         
-         self.field_edit_win.config(cursor="watch")
-         self.field_edit_win.update()         
-         new_vals = []
-         for entries in self.edited_entries:
-             new_vals.append(entries.get())
-         # Remove the first item (corresponding to the title row in displayed table
-         new_vals.pop(0)
 
-         key_nb=0
-         for key in self.field_dict.keys():
-             if 'Value' in self.field_dict[key]:
+        self.field_edit_win.config(cursor="watch")
+        self.field_edit_win.update()
+        new_vals = []
+        for entries in self.edited_entries:
+            new_vals.append(entries.get())
+        # Remove the first item (corresponding to the title row in displayed table
+        new_vals.pop(0)
+
+        key_nb=0
+        for key in self.field_dict.keys():
+            if 'Value' in self.field_dict[key]:
                 if self.field_dict[key]['Value'] == new_vals[key_nb]:
                     self.field_dict[key]['Update'] = False
                 else:
                     self.field_dict[key]['Update'] = True
                     self.field_dict[key]['Value'] = new_vals[key_nb]
-             else:
-                 self.field_dict[key]['Update'] = False
-             key_nb += 1
+            else:
+                self.field_dict[key]['Update'] = False
+            key_nb += 1
 
-         (anonymize_dcm, original_dcm) = methods.Dicom_zapping(self.dirname, self.field_dict)
-         self.field_edit_win.destroy()
-         if os.path.exists(anonymize_dcm) != [] and os.path.exists(original_dcm) != []:
-             tkMessageBox.showinfo("Message", "Congrats! Your have successfully anonymized your files!")
-         else:
-             tkMessageBox.showinfo("Message", "There was an error when processing files")  
+        # Edit DICOM field values to anonymize the dataset
+        #(anonymize_dcm, original_dcm) = ''
+        if anonymizer_tool == "PyDICOM":
+            (anonymize_dcm, original_dcm) = methods.Dicom_zapping(self.dirname, self.field_dict)
+        elif anonymizer_tool == "DICOM_toolkit":
+            (anonymize_dcm, original_dcm) = methods.Dicom_zapping(self.dirname, self.field_dict)
+
+        self.field_edit_win.destroy()
+        if os.path.exists(anonymize_dcm) != [] and os.path.exists(original_dcm) != []:
+            tkMessageBox.showinfo("Message", "Congrats! Your have successfully anonymized your files!")
+        else:
+            tkMessageBox.showinfo("Message", "There was an error when processing files")
             
 
 if __name__ == "__main__":
