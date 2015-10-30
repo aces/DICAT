@@ -175,7 +175,6 @@ def actual_zapping(dicom_file, dicom_fields):
                 continue
     dicom_dataset.save_as(dicom_file)
 
-
 ######################################
 # Run dcmmodify on all fields to zap #
 ######################################
@@ -185,14 +184,7 @@ def Dicom_zapping(dicom_folder, dicom_fields):
     (dicoms_list, subdirs_list) = GrepDicomsFromFolder(dicom_folder)
 
     # Create an original_dcm and anonymized_dcm directory in the DICOM folder, as well as subdirectories
-    original_dir  = dicom_folder + os.path.sep + dicom_fields['0010,0010']['Value']
-    anonymize_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010']['Value'] + "_anonymized"
-    os.mkdir(original_dir,  0755)
-    os.mkdir(anonymize_dir, 0755)
-    # Create subdirectories in original and anonymize directory, as found in DICOM folder
-    for subdir in subdirs_list:
-        os.mkdir(original_dir  + os.path.sep + subdir,  0755)
-        os.mkdir(anonymize_dir + os.path.sep + subdir,  0755)
+    (original_dir, anonymize_dir)  = createDirectories(dicom_folder, dicom_fields, subdirs_list)
 
     # Initialize the dcmodify command
     modify_cmd = "dcmodify "
@@ -241,6 +233,26 @@ def Dicom_zapping(dicom_folder, dicom_fields):
             shutil.rmtree(dicom_folder + os.path.sep + subdir)
 
     return original_zip, anonymize_zip
+
+
+"""
+Create two directories in the main DICOM folder:
+- one to copy over the original DICOM folders (not anonymized)
+- one for the anonymized DICOM files
+"""
+def createDirectories(dicom_folder, dicom_fields, subdirs_list):
+
+    # Create an original_dcm and anonymized_dcm directory in the DICOM folder, as well as subdirectories
+    original_dir  = dicom_folder + os.path.sep + dicom_fields['0010,0010']['Value']
+    anonymize_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010']['Value'] + "_anonymized"
+    os.mkdir(original_dir,  0755)
+    os.mkdir(anonymize_dir, 0755)
+    # Create subdirectories in original and anonymize directory, as found in DICOM folder
+    for subdir in subdirs_list:
+        os.mkdir(original_dir  + os.path.sep + subdir,  0755)
+        os.mkdir(anonymize_dir + os.path.sep + subdir,  0755)
+
+    return original_dir, anonymize_dir
 
 
 def zipDicom(directory):
