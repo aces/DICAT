@@ -149,15 +149,26 @@ def Grep_DICOM_values(dicom_folder, dicom_fields):
 ######################################
 def Dicom_zapping_PyDicom(dicom_folder, dicom_fields):
 
-    anonymized_folder=dicom_folder+'_anonymized'
-    shutil.copytree(dicom_folder, anonymized_folder)
+    print "Hello!"
+    # Grep all DICOMs present in directory
+    (dicoms_list, subdirs_list) = GrepDicomsFromFolder(dicom_folder)
 
-    for root,dirs,files in os.walk(anonymized_folder):
+    # Create an original_dcm and anonymized_dcm directory in the DICOM folder, as well as subdirectories
+    (original_dir, anonymize_dir) = createDirectories(dicom_folder, dicom_fields, subdirs_list)
+
+    # Move DICOMs into the original_directory created
+    for dicom in dicoms_list:
+        shutil.copy(dicom, anonymize_dir)
+        move(dicom, original_dir)
+
+#TODO: finish implementing this
+    for root, dirs, files in os.walk(anonymize_dir):
         if len(files)!=0:
             for dicom_file in files:
                 print 'anonymizing->'+dicom_file
-                actual_zapping(os.path.join(root, dicom_file), dicom_fields)  
+                #actual_zapping(os.path.join(root, dicom_file), dicom_fields)
 
+    return anonymize_dir, original_dir
 
 ######################################
 # Actual zapping method #
