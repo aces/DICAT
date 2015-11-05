@@ -17,12 +17,12 @@ Notes:
 # otherwise
 use_pydicom = False
 try:
-    import pydicom as dicom
+    import pydicom_FG as dicom
 
     use_pydicom = True  # set to true as PyDICOM was found and imported
 except ImportError:
     try:  # try importing newer versions of PyDICOM
-        import dicom
+        import dicom_FG
 
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
@@ -65,10 +65,10 @@ def test_executable(executable):
      :rtype: bool
 
     """
-    # TODO: find a way to not display dcmdump help in the terminal
 
-    try:  # try running the executable
-        subprocess.call([executable])
+    # try running the executable
+    try:
+        subprocess.call([executable], stdout=open(os.devnull, 'wb'))
         return True
     except OSError:
         return False
@@ -241,14 +241,6 @@ def Dicom_zapping_PyDicom(dicom_folder, dicom_fields):
         # Zap the DICOM fields in the file that needs to be anonymized
         actual_PyDICOM_zapping(os.path.join(anonymize_dcm), dicom_fields)
 
-    # Zap DICOMs recursively
-    # for dicom in dicoms_list:
-    #     anonymize_dcm = dicom.replace(dicom_folder, anonymize_dir)
-    #     if len(dicom) != 0:
-    #         move(dicom, anonymize_dcm)
-    #         actual_PyDICOM_zapping(os.path.join(anonymize_dcm, dicom),
-    #                                dicom_fields)
-
     # Zip the anonymize and original DICOM folders
     (anonymize_zip, original_zip) = zip_DICOM_directories(anonymize_dir,
                                                           original_dir,
@@ -394,18 +386,11 @@ def Dicom_zapping(dicom_folder, dicom_fields):
         else:
             move(dicom, original_dcm)
 
-    # If anonymize and original folders exist, zip them
-    if os.path.exists(anonymize_dir) and os.path.exists(original_dir):
-        original_zip = zipDicom(original_dir)
-        anonymize_zip = zipDicom(anonymize_dir)
-    else:
-        sys.exit('Failed to anonymize data')
-
-    # If archive anonymized and original DICOMs found, remove subdirectories in
-    # root directory
-    if os.path.exists(anonymize_zip) and os.path.exists(original_zip):
-        for subdir in subdirs_list:
-            shutil.rmtree(dicom_folder + os.path.sep + subdir)
+     # Zip the anonymize and original DICOM folders
+    (anonymize_zip, original_zip) = zip_DICOM_directories(anonymize_dir,
+                                                          original_dir,
+                                                          subdirs_list,
+                                                          dicom_folder)
 
     return original_zip, anonymize_zip
 

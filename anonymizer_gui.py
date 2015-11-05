@@ -11,7 +11,6 @@ starting the program.
 Will exit with an error message if neither PyDICOM or DICOM toolkit were found.
 '''
 anonymizer_tool = methods.find_anonymizer_tool()
-# exit with an error message if neither PyDICOM or DICOM toolkit were found
 if not anonymizer_tool:
     message = "Error: no tool was found to read or anonymizer DICOM files."
     tkMessageBox.showinfo("Message", message)
