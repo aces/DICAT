@@ -17,12 +17,12 @@ Notes:
 # otherwise
 use_pydicom = False
 try:
-    import pydicom_FG as dicom
+    import pydicom as dicom
 
     use_pydicom = True  # set to true as PyDICOM was found and imported
 except ImportError:
     try:  # try importing newer versions of PyDICOM
-        import dicom_FG
+        import dicom
 
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
@@ -89,7 +89,7 @@ def GrepDicomsFromFolder(dicom_folder):
     """
 
     # Initialize list of DICOMs and subdirectories
-    dicoms_list = []
+    dicoms_list  = []
     subdirs_list = []
     # Grep DICOM files recursively and insert them in dicoms_list
     # Same for subdirectories
