@@ -88,14 +88,10 @@ class dicom_anonymizer(Frame):
         XML_filename = "fields_to_zap.xml"
         XML_filepath = os.path.dirname(os.path.abspath(__file__))
         XML_file = XML_filepath + "/" + XML_filename
-        field_dict = methods.Grep_DICOM_fields(XML_file)
+        field_dict = methods.grep_dicom_fields(XML_file)
 
         # Read DICOM header and grep identifying DICOM field values
-        if anonymizer_tool == "PyDICOM":
-            field_dict = methods.Grep_DICOM_values_PyDicom(self.dirname,
-                                                           field_dict)
-        elif anonymizer_tool == "DICOM_toolkit":
-            field_dict = methods.Grep_DICOM_values(self.dirname, field_dict)
+        field_dict = methods.grep_dicom_values(self.dirname, field_dict)
 
         fields_keys = list(field_dict.keys())
         keys_length = len(fields_keys) + 1
@@ -222,10 +218,10 @@ class dicom_anonymizer(Frame):
         # Edit DICOM field values to anonymize the dataset
         # (anonymize_dcm, original_dcm) = ''
         if anonymizer_tool == "PyDICOM":
-            (anonymize_dcm, original_dcm) = methods.Dicom_zapping_PyDicom(
+            (anonymize_dcm, original_dcm) = methods.dicom_zapping_pydicom(
                 self.dirname, self.field_dict)
         elif anonymizer_tool == "DICOM_toolkit":
-            (anonymize_dcm, original_dcm) = methods.Dicom_zapping(
+            (anonymize_dcm, original_dcm) = methods.dicom_zapping(
                 self.dirname,
                 self.field_dict)
 

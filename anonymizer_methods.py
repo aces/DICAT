@@ -17,12 +17,12 @@ Notes:
 # otherwise
 use_pydicom = False
 try:
-    import pydicom as dicom
+    import pydicom_GF as dicom
 
     use_pydicom = True  # set to true as PyDICOM was found and imported
 except ImportError:
     try:  # try importing newer versions of PyDICOM
-        import dicom
+        import dicom_GF
 
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
@@ -74,7 +74,7 @@ def test_executable(executable):
         return False
 
 
-def GrepDicomsFromFolder(dicom_folder):
+def grep_dicoms_from_folder(dicom_folder):
     """
     Grep recursively all DICOMs from folder
 
@@ -109,7 +109,7 @@ def GrepDicomsFromFolder(dicom_folder):
     return dicoms_list, subdirs_list
 
 
-def Grep_DICOM_fields(xml_file):
+def grep_dicom_fields(xml_file):
     """
     Read DICOM fields from XML file called "fields_to_zap.xml"
 
@@ -132,9 +132,9 @@ def Grep_DICOM_fields(xml_file):
     return dicom_fields
 
 
-def Grep_DICOM_values_PyDicom(dicom_folder, dicom_fields):
+def grep_dicom_values(dicom_folder, dicom_fields):
     """
-    Grep value from DICOM fields using PyDICOM.
+    Grep the value from the different DICOM fields.
 
     :param dicom_folder: folder with DICOMs
      :type dicom_folder: str
@@ -148,10 +148,33 @@ def Grep_DICOM_values_PyDicom(dicom_folder, dicom_fields):
 
     # Grep first DICOM of the directory
     # TODO: Need to check if file is DICOM though, otherwise go to next one
-    (dicoms_list, subdirs_list) = GrepDicomsFromFolder(dicom_folder)
+    (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
     dicom_file = dicoms_list[0]
 
     # Read DICOM file using PyDICOM
+    if (use_pydicom):
+        (dicom_fields) = read_dicom_with_pydicom(dicom_file, dicom_fields)
+    else:
+        (dicom_fields) = read_dicom_with_dcmdump(dicom_file, dicom_fields)
+
+    return dicom_fields
+
+
+def read_dicom_with_pydicom(dicom_file, dicom_fields):
+    """
+    Read DICOM file using PyDICOM python library.
+
+    :param dicom_file: DICOM file to read
+     :type dicom_file: str
+    :param dicom_fields: Dictionary containing DICOM fields and values
+     :type dicom_fields: dict
+
+    :return: updated dictionary of DICOM fields and values
+     :rtype : dict
+
+    """
+
+    # Read DICOM file
     dicom_dataset = dicom.read_file(dicom_file)
 
     # Grep information from DICOM header and store them
@@ -168,24 +191,19 @@ def Grep_DICOM_values_PyDicom(dicom_folder, dicom_fields):
     return dicom_fields
 
 
-def Grep_DICOM_values(dicom_folder, dicom_fields):
+def read_dicom_with_dcmdump(dicom_file, dicom_fields):
     """
-    Grep value from DICOM fields using dcmdump from the DICOM toolkit
+    Read DICOM file using dcmdump from the DICOM toolkit.
 
-    :param dicom_folder: folder with DICOMs
-     :type dicom_folder: str
-    :param dicom_fields: dictionary of DICOM fields
+    :param dicom_file: DICOM file to read
+     :type dicom_file: str
+    :param dicom_fields: Dictionary containing DICOM fields and values
      :type dicom_fields: dict
 
-    :return: updated dictionary of DICOM fields with their DICOM values
-     :rtype: dict
+    :return: updated dictionary of DICOM fields and values
+     :rtype : dict
 
     """
-
-    # Grep first DICOM of the directory
-    # TODO: Need to check if file is DICOM though, otherwise go to next one
-    (dicoms_list, subdirs_list) = GrepDicomsFromFolder(dicom_folder)
-    dicom_file = dicoms_list[0]
 
     # Grep information from DICOM header and store them
     # into dicom_fields dictionary under flag Value
@@ -200,7 +218,7 @@ def Grep_DICOM_values(dicom_folder, dicom_fields):
     return dicom_fields
 
 
-def Dicom_zapping_PyDicom(dicom_folder, dicom_fields):
+def dicom_zapping_pydicom(dicom_folder, dicom_fields):
     """
     Run dcmodify on all fields to zap using PyDICOM recursive wrapper
 
@@ -217,11 +235,11 @@ def Dicom_zapping_PyDicom(dicom_folder, dicom_fields):
     """
 
     # Grep all DICOMs present in directory
-    (dicoms_list, subdirs_list) = GrepDicomsFromFolder(dicom_folder)
+    (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
 
     # Create an original_dcm and anonymized_dcm directory in the DICOM folder,
     # as well as subdirectories
-    (original_dir, anonymize_dir) = createDirectories(dicom_folder,
+    (original_dir, anonymize_dir) = create_directories(dicom_folder,
                                                       dicom_fields,
                                                       subdirs_list)
 
@@ -239,10 +257,10 @@ def Dicom_zapping_PyDicom(dicom_folder, dicom_fields):
         # copy files from original folder to anonymize folder
         shutil.copy(original_dcm, anonymize_dcm)
         # Zap the DICOM fields in the file that needs to be anonymized
-        actual_PyDICOM_zapping(os.path.join(anonymize_dcm), dicom_fields)
+        actual_pydicom_zapping(os.path.join(anonymize_dcm), dicom_fields)
 
     # Zip the anonymize and original DICOM folders
-    (anonymize_zip, original_zip) = zip_DICOM_directories(anonymize_dir,
+    (anonymize_zip, original_zip) = zip_dicom_directories(anonymize_dir,
                                                           original_dir,
                                                           subdirs_list,
                                                           dicom_folder)
@@ -251,7 +269,7 @@ def Dicom_zapping_PyDicom(dicom_folder, dicom_fields):
     return anonymize_zip, original_zip
 
 
-def actual_PyDICOM_zapping(dicom_file, dicom_fields):
+def actual_pydicom_zapping(dicom_file, dicom_fields):
     """
     Actual zapping method for PyDICOM
 
@@ -286,7 +304,7 @@ def actual_PyDICOM_zapping(dicom_file, dicom_fields):
     dicom_dataset.save_as(dicom_file)
 
 
-def zip_DICOM_directories(anonymize_dir, original_dir, subdirs_list, root_dir):
+def zip_dicom_directories(anonymize_dir, original_dir, subdirs_list, root_dir):
     """
     Zip the anonymize and origin DICOM directories.
 
@@ -309,8 +327,8 @@ def zip_DICOM_directories(anonymize_dir, original_dir, subdirs_list, root_dir):
 
     # If anonymize and original folders exist, zip them
     if os.path.exists(anonymize_dir) and os.path.exists(original_dir):
-        original_zip = zipDicom(original_dir)
-        anonymize_zip = zipDicom(anonymize_dir)
+        original_zip = zip_dicom(original_dir)
+        anonymize_zip = zip_dicom(anonymize_dir)
     else:
         sys.exit('Failed to find original and anonymize data folders')
 
@@ -326,7 +344,7 @@ def zip_DICOM_directories(anonymize_dir, original_dir, subdirs_list, root_dir):
     return anonymize_zip, original_zip
 
 
-def Dicom_zapping(dicom_folder, dicom_fields):
+def dicom_zapping(dicom_folder, dicom_fields):
     """
     Run dcmodify on all DICOM fields to zap.
 
@@ -343,11 +361,11 @@ def Dicom_zapping(dicom_folder, dicom_fields):
     """
 
     # Grep all DICOMs present in directory
-    (dicoms_list, subdirs_list) = GrepDicomsFromFolder(dicom_folder)
+    (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
 
     # Create an original_dcm and anonymized_dcm directory in the DICOM folder,
     # as well as subdirectories
-    (original_dir, anonymize_dir) = createDirectories(dicom_folder,
+    (original_dir, anonymize_dir) = create_directories(dicom_folder,
                                                       dicom_fields,
                                                       subdirs_list)
 
@@ -387,7 +405,7 @@ def Dicom_zapping(dicom_folder, dicom_fields):
             move(dicom, original_dcm)
 
      # Zip the anonymize and original DICOM folders
-    (anonymize_zip, original_zip) = zip_DICOM_directories(anonymize_dir,
+    (anonymize_zip, original_zip) = zip_dicom_directories(anonymize_dir,
                                                           original_dir,
                                                           subdirs_list,
                                                           dicom_folder)
@@ -395,7 +413,7 @@ def Dicom_zapping(dicom_folder, dicom_fields):
     return original_zip, anonymize_zip
 
 
-def createDirectories(dicom_folder, dicom_fields, subdirs_list):
+def create_directories(dicom_folder, dicom_fields, subdirs_list):
     """
     Create two directories in the main DICOM folder:
         - one to copy over the original DICOM sub-folders and files
@@ -432,7 +450,7 @@ def createDirectories(dicom_folder, dicom_fields, subdirs_list):
     return original_dir, anonymize_dir
 
 
-def zipDicom(directory):
+def zip_dicom(directory):
     """
     Function that zip a directory.
 
