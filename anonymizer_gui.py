@@ -3,14 +3,10 @@
 import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
 import anonymizer_methods as methods
 import os
-
-
 from Tkinter import *
-from shutil import make_archive
-
 
 # Determine which anonymizer tool to use (PyDICOM or DICOM toolkit)
-anonymizer_tool = methods.FindAnonymizerTool()
+anonymizer_tool = methods.find_anonymizer_tool()
 # exit with an error message if neither PyDICOM or DICOM toolkit were found
 if anonymizer_tool == False:
     tkMessageBox.showinfo("Message", "Error: no tool was found to read or anonymizer DICOM files.")
