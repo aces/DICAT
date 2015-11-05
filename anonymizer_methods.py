@@ -17,12 +17,12 @@ Notes:
 # otherwise
 use_pydicom = False
 try:
-    import pydicom_GF as dicom
+    import pydicom as dicom
 
     use_pydicom = True  # set to true as PyDICOM was found and imported
 except ImportError:
     try:  # try importing newer versions of PyDICOM
-        import dicom_GF
+        import dicom
 
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
@@ -218,7 +218,7 @@ def read_dicom_with_dcmdump(dicom_file, dicom_fields):
     return dicom_fields
 
 
-def dicom_zapping_pydicom(dicom_folder, dicom_fields):
+def dicom_zapping(dicom_folder, dicom_fields):
     """
     Run dcmodify on all fields to zap using PyDICOM recursive wrapper
 
@@ -252,12 +252,21 @@ def dicom_zapping_pydicom(dicom_folder, dicom_fields):
         anonymize_dcm = dicom.replace(dicom_folder, anonymize_dir)
         # set path to original DICOM file
         original_dcm = dicom.replace(dicom_folder, original_dir)
-        # Move DICOM files from root folder to original folder created
-        move(dicom, original_dcm)
-        # copy files from original folder to anonymize folder
-        shutil.copy(original_dcm, anonymize_dcm)
-        # Zap the DICOM fields in the file that needs to be anonymized
-        actual_pydicom_zapping(os.path.join(anonymize_dcm), dicom_fields)
+        # Move DICOM files from root folder to anonymize folder created
+        move(dicom, anonymize_dcm)
+        if use_pydicom:
+            # copy files from original folder to anonymize folder
+            shutil.copy(anonymize_dcm, original_dcm)
+            # Zap the DICOM fields from DICOM file using PyDICOM
+            pydicom_zapping(anonymize_dcm, dicom_fields)
+        else:
+            # Zap the DICOM fields from DICOM file using dcmodify
+            dcmodify_zapping(anonymize_dcm, dicom_fields)
+            # Grep the .bak files created by dcmdump and move it to original
+            # DICOM folder
+            orig_bak_dcm = anonymize_dcm + ".bak"
+            if os.path.exists(orig_bak_dcm):
+                move(orig_bak_dcm, original_dcm)
 
     # Zip the anonymize and original DICOM folders
     (anonymize_zip, original_zip) = zip_dicom_directories(anonymize_dir,
@@ -269,7 +278,7 @@ def dicom_zapping_pydicom(dicom_folder, dicom_fields):
     return anonymize_zip, original_zip
 
 
-def actual_pydicom_zapping(dicom_file, dicom_fields):
+def pydicom_zapping(dicom_file, dicom_fields):
     """
     Actual zapping method for PyDICOM
 
@@ -302,6 +311,43 @@ def actual_pydicom_zapping(dicom_file, dicom_fields):
             except:
                 continue
     dicom_dataset.save_as(dicom_file)
+
+
+def dcmodify_zapping(dicom_file, dicom_fields):
+    """
+    Run dcmodify on all DICOM fields to zap.
+
+    :param dicom_file: DICOM file to zap
+     :type dicom_file: str
+    :param dicom_fields: dictionary of DICOM fields and values
+     :type dicom_fields: dict
+
+    :returns:
+      original_zip  -> Path to the zip file containing original DICOM files
+      anonymize_zip -> Path to the zip file containing anonymized DICOM files
+     :rtype: str
+
+    """
+
+    # Initialize the dcmodify command
+    modify_cmd = "dcmodify "
+    changed_fields_nb = 0
+    for name in dicom_fields:
+        # Grep the new values
+        new_val = ""
+        if 'Value' in dicom_fields[name]:
+            new_val = dicom_fields[name]['Value']
+
+        # Run dcmodify if update is set to True
+        if not dicom_fields[name]['Editable'] and 'Value' in dicom_fields[name]:
+            modify_cmd += " -ma \"(" + name + ")\"=\" \" "
+            changed_fields_nb += 1
+        else:
+            if dicom_fields[name]['Update'] == True:
+                modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
+                changed_fields_nb += 1
+
+    subprocess.call(modify_cmd + dicom_file, shell=True)
 
 
 def zip_dicom_directories(anonymize_dir, original_dir, subdirs_list, root_dir):
@@ -342,75 +388,6 @@ def zip_dicom_directories(anonymize_dir, original_dir, subdirs_list, root_dir):
 
     # Return zip files
     return anonymize_zip, original_zip
-
-
-def dicom_zapping(dicom_folder, dicom_fields):
-    """
-    Run dcmodify on all DICOM fields to zap.
-
-    :param dicom_folder: folder with DICOMs
-     :type dicom_folder: str
-    :param dicom_fields: dictionary of DICOM fields and values
-     :type dicom_fields: dict
-
-    :returns:
-      original_zip  -> Path to the zip file containing original DICOM files
-      anonymize_zip -> Path to the zip file containing anonymized DICOM files
-     :rtype: str
-
-    """
-
-    # Grep all DICOMs present in directory
-    (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
-
-    # Create an original_dcm and anonymized_dcm directory in the DICOM folder,
-    # as well as subdirectories
-    (original_dir, anonymize_dir) = create_directories(dicom_folder,
-                                                      dicom_fields,
-                                                      subdirs_list)
-
-    # Initialize the dcmodify command
-    modify_cmd = "dcmodify "
-    changed_fields_nb = 0
-    for name in dicom_fields:
-        # Grep the new values
-        new_val = ""
-        if 'Value' in dicom_fields[name]:
-            new_val = dicom_fields[name]['Value']
-
-        # Run dcmodify if update is set to True
-        if not dicom_fields[name]['Editable'] and 'Value' in dicom_fields[name]:
-            modify_cmd += " -ma \"(" + name + ")\"=\" \" "
-            changed_fields_nb += 1
-        else:
-            if dicom_fields[name]['Update'] == True:
-                modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
-                changed_fields_nb += 1
-
-    # Loop through DICOMs and
-    # 1. move DICOM files into anonymized_dir (we'll move the .bak file into
-        # original_dcm once dcmodify has been run)
-    # 2. run dcmodify
-    # 3. move .bak file into original directory
-    for dicom in dicoms_list:
-        original_dcm = dicom.replace(dicom_folder, original_dir)
-        anonymize_dcm = dicom.replace(dicom_folder, anonymize_dir)
-        orig_bak_dcm = anonymize_dcm + ".bak"
-        if changed_fields_nb > 0:
-            move(dicom, anonymize_dcm)
-            subprocess.call(modify_cmd + anonymize_dcm, shell=True)
-            if os.path.exists(orig_bak_dcm):
-                move(orig_bak_dcm, original_dcm)
-        else:
-            move(dicom, original_dcm)
-
-     # Zip the anonymize and original DICOM folders
-    (anonymize_zip, original_zip) = zip_dicom_directories(anonymize_dir,
-                                                          original_dir,
-                                                          subdirs_list,
-                                                          dicom_folder)
-
-    return original_zip, anonymize_zip
 
 
 def create_directories(dicom_folder, dicom_fields, subdirs_list):

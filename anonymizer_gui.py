@@ -217,13 +217,8 @@ class dicom_anonymizer(Frame):
 
         # Edit DICOM field values to anonymize the dataset
         # (anonymize_dcm, original_dcm) = ''
-        if anonymizer_tool == "PyDICOM":
-            (anonymize_dcm, original_dcm) = methods.dicom_zapping_pydicom(
-                self.dirname, self.field_dict)
-        elif anonymizer_tool == "DICOM_toolkit":
-            (anonymize_dcm, original_dcm) = methods.dicom_zapping(
-                self.dirname,
-                self.field_dict)
+        (anonymize_dcm, original_dcm) = methods.dicom_zapping(
+            self.dirname, self.field_dict)
 
         self.field_edit_win.destroy()
         if os.path.exists(anonymize_dcm) != [] and os.path.exists(
