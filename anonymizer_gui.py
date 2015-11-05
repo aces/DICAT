@@ -86,8 +86,11 @@ class dicom_anonymizer(Frame):
     def anonymize(self):
         # Read the XML file with the identifying DICOM fields
         XML_filename = "fields_to_zap.xml"
-        XML_filepath = os.path.dirname(os.path.abspath(__file__))
-        XML_file = XML_filepath + "/" + XML_filename
+        if os.path.isfile(XML_filename):
+            XML_file = XML_filename
+        else:
+            XML_filepath = os.path.dirname(os.path.abspath(__file__))
+            XML_file = XML_filepath + "/" + XML_filename
         field_dict = methods.grep_dicom_fields(XML_file)
 
         # Read DICOM header and grep identifying DICOM field values
