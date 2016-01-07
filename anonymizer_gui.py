@@ -27,7 +27,7 @@ class dicom_anonymizer(Frame):
         self.field_dict = {}
 
     def initialize(self):
-        self.parent.title("DICOM-anonymizer")
+        self.parent.title("DicAT")
         self.parent.columnconfigure(0, weight=1)
         self.parent.rowconfigure(0, weight=1)
 
@@ -38,7 +38,7 @@ class dicom_anonymizer(Frame):
         self.frame.columnconfigure(1, weight=1)
 
         self.entryVariable = Tkinter.StringVar()
-        self.entryVariable.set("Select the DICOM directory")
+        self.entryVariable.set("Select a DICOM directory")
 
         self.entry = Entry(self.frame,
                            width=40,
@@ -226,10 +226,10 @@ class dicom_anonymizer(Frame):
         self.field_edit_win.destroy()
         if os.path.exists(anonymize_dcm) != [] and os.path.exists(
                 original_dcm) != []:
-            message = "Congrats! Your have successfully anonymized your files!"
+            message = "Booya! It's anonymized!"
             tkMessageBox.showinfo("Message", message)
         else:
-            message = "There was an error when processing files"
+            message = "Oh no, there was an error when processing files"
             tkMessageBox.showinfo("Message", message)
 
 
