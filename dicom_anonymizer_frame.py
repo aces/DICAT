@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
-import anonymizer_methods as methods
+import dicom_anonymizer_methods as methods
 import os
 from Tkinter import *
 
@@ -17,7 +17,7 @@ if not anonymizer_tool:
     exit()
 
 
-class dicom_anonymizer(Frame):
+class dicom_anonymizer_frame_gui(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.parent = parent
@@ -27,9 +27,6 @@ class dicom_anonymizer(Frame):
         self.field_dict = {}
 
     def initialize(self):
-        self.parent.title("DicAT")
-        self.parent.columnconfigure(0, weight=1)
-        self.parent.rowconfigure(0, weight=1)
 
         self.frame = Frame(self.parent)
         self.frame.grid(column=0, row=0, padx=10, pady=5, sticky=N + S + E + W)
@@ -73,7 +70,7 @@ class dicom_anonymizer(Frame):
         height = win.winfo_height()
         x = (win.winfo_screenwidth() // 2) - (width // 2)
         y = (win.winfo_screenheight() // 2) - (height // 2)
-        win.geometry('%dx%d+%d+%d' % (width, height, x, y))
+#        win.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
     def askdirectory(self):
 
