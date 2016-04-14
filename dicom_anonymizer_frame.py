@@ -39,13 +39,15 @@ class dicom_anonymizer_frame_gui(Frame):
 
         self.entry = Entry(self.frame,
                            width=40,
-                           textvariable=self.entryVariable)
+                           textvariable=self.entryVariable
+                          )
         self.entry.focus_set()
         self.entry.selection_range(0, Tkinter.END)
 
         self.buttonSelect = Button(self.frame,
                                    text=u"Select",
-                                   command=self.askdirectory)
+                                   command=self.askdirectory
+                                  )
         self.buttonsPanel = Frame(self.frame)
 
         self.entry.grid(row=0, column=0, padx=15, pady=10, sticky=E + W)

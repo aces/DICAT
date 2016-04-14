@@ -33,7 +33,7 @@ class DicAT_application():
         self.page4 = ttk.Frame(self.nb)
 
         # Add the pages to the notebook
-        self.nb.add(self.page1, text='Welcome to DicAT')
+        self.nb.add(self.page1, text='Welcome to DicAT!')
         self.nb.add(self.page2, text='DICOM anonymizer')
         self.nb.add(self.page3, text='Scheduler', state='hidden') # hide scheduler for now
         self.nb.add(self.page4, text='ID key')
@@ -45,9 +45,27 @@ class DicAT_application():
         dicom_anonymizer_frame_gui(self.page2)
         #TODO: create a ID_key_GUI class
         self.id_key_frame()
+        self.welcome_page()
 
     def id_key_frame(self):
         print "ID key in function"
+
+    def welcome_page(self):
+
+        message = '''
+        DicAT is a simple tool for anonymization of DICOM datasets.
+
+        The DICOM anonymizer tab allows you to select a DICOM directory, view the DICOM headers and run the anonymization tool.
+        The ID key tab allows to see easily what ID is used for a given participant/patient to replaces their name information.
+        '''
+        welcome_message = Label(self.page1,
+                                text=message,
+                                anchor=NW,
+                                justify=LEFT
+                               )
+        welcome_message.pack(expand=1, fill='both')
+
+
 
 if __name__ == "__main__":
 
