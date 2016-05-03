@@ -346,7 +346,7 @@ def dcmodify_zapping(dicom_file, dicom_fields):
             if dicom_fields[name]['Update'] == True:
                 modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
                 changed_fields_nb += 1
-    modify_cmd += " \"dicom_file\" "
+    modify_cmd += " \"" + dicom_file + "\" "
     subprocess.call(modify_cmd, shell=True)
 
 
