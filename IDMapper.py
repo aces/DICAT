@@ -21,7 +21,7 @@ def sortby(tree, col, descending):
         command=lambda col=col: sortby(tree, col, int(not descending)))
 
   
-class TunahackIDMapper(Frame):
+class IDMapper_frame_gui(Frame):
     
     def __init__(self, parent):
         """Initialize the application"""
@@ -40,12 +40,12 @@ class TunahackIDMapper(Frame):
      
     def InitUI(self):
         
-        self.parent.title('Hack-a-Tuna ID Mapper')
-        self.parent.columnconfigure(0, weight=1)
-        self.parent.rowconfigure(0, weight=1)
+        #self.parent.title('ID Mapper')
+        #self.parent.columnconfigure(0, weight=1)
+        #self.parent.rowconfigure(0, weight=1)
 
         self.frame = Frame(self.parent)
-        self.frame.grid(column=0, row=0, padx=10, pady=5, sticky=N+S+E+W)
+        self.frame.grid(column=0, row=0, padx=0, pady=0, sticky=N+S+E+W)
  
         for i in range(0, 3):
             self.frame.columnconfigure(i, weight=6)
@@ -95,18 +95,6 @@ class TunahackIDMapper(Frame):
           
         self.datatable.grid(row=3, column=0, columnspan=3, pady=10, sticky='nsew')
         self.error.grid(row=3, column=3)
-     
-        self.center(self.parent)
-
- 
-    def center(self, win):
-        
-        win.update_idletasks()
-        width = win.winfo_width()
-        height = win.winfo_height()
-        x = (win.winfo_screenwidth() // 2) - (width // 2)
-        y = (win.winfo_screenheight() // 2) - (height // 2)
-        win.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
 
     def LoadXML(self, file):
@@ -196,7 +184,7 @@ class TunahackIDMapper(Frame):
 def main():
        
     root = Tk()
-    app = TunahackIDMapper(root)
+    app = IDMapper_frame_gui(root)
     root.mainloop()
  
 
