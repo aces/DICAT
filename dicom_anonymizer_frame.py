@@ -28,15 +28,19 @@ class dicom_anonymizer_frame_gui(Frame):
 
     def initialize(self):
 
+        # initialize main Frame
         self.frame = Frame(self.parent)
-        self.frame.grid(column=0, row=0, padx=10, pady=5, sticky=N + S + E + W)
+        self.frame.grid(column=0, row=0, padx=0, pady=0, sticky=N + S + E + W)
 
         self.frame.columnconfigure(0, weight=6)
         self.frame.columnconfigure(1, weight=1)
 
+        # Initialize default text that will be in self.entry
         self.entryVariable = Tkinter.StringVar()
         self.entryVariable.set("Select a DICOM directory")
 
+        # Create an entry with a default text that will be replaced by the path
+        # to the directory once directory selected
         self.entry = Entry(self.frame,
                            width=40,
                            textvariable=self.entryVariable
@@ -44,6 +48,7 @@ class dicom_anonymizer_frame_gui(Frame):
         self.entry.focus_set()
         self.entry.selection_range(0, Tkinter.END)
 
+        # Create a select button to use to select a DICOM directory
         self.buttonSelect = Button(self.frame,
                                    text=u"Select",
                                    command=self.askdirectory
@@ -64,15 +69,6 @@ class dicom_anonymizer_frame_gui(Frame):
         self.buttonView.grid(row=0, column=0, padx=(0, 10), sticky=E + W)
         self.buttonView.configure(state=DISABLED)
 
-        self.center(self.parent)
-
-    def center(self, win):
-        win.update_idletasks()
-        width = win.winfo_width()
-        height = win.winfo_height()
-        x = (win.winfo_screenwidth() // 2) - (width // 2)
-        y = (win.winfo_screenheight() // 2) - (height // 2)
-#        win.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
     def askdirectory(self):
 
@@ -99,8 +95,7 @@ class dicom_anonymizer_frame_gui(Frame):
         keys_length = len(fields_keys) + 1
         self.edited_entries = [Tkinter.StringVar() for i in range(keys_length)]
         if len(field_dict) != 0:
-            self.field_edit_win = Tkinter.Toplevel()
-            self.field_edit_win.title('Fields to Edit')
+            self.field_edit_win = Frame(self.parent)
             self.field_edit_win.grid()
             self.field_edit_win.columnconfigure(0, weight=1)
             self.field_edit_win.columnconfigure(1, weight=1)
@@ -188,7 +183,6 @@ class dicom_anonymizer_frame_gui(Frame):
                                                              command=self.clear,
                                                              width=8)
             self.field_edit_win.buttonClear.grid(column=1, row=0, padx=20)
-        self.center(self.field_edit_win)
 
     def clear(self):
         for items in self.edited_entries:

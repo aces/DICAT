@@ -42,10 +42,17 @@ class DicAT_application():
         self.nb.pack(expand=1, fill='both')
 
         # Draw content of the different tabs' frame
-        dicom_anonymizer_frame_gui(self.page2)
+        self.dicom_anonymizer_tab()
         #TODO: create a ID_key_GUI class
         self.id_key_frame()
         self.welcome_page()
+
+    #TODO: have header window display within the application, not a TopLevel window
+    def dicom_anonymizer_tab(self):
+
+        # start dicom_anonymizer_frame_gui method
+        dicom_anonymizer_frame_gui(self.page2)
+
 
     def id_key_frame(self):
         print "ID key in function"
@@ -55,8 +62,14 @@ class DicAT_application():
         message = '''
         DicAT is a simple tool for anonymization of DICOM datasets.
 
-        The DICOM anonymizer tab allows you to select a DICOM directory, view the DICOM headers and run the anonymization tool.
-        The ID key tab allows to see easily what ID is used for a given participant/patient to replaces their name information.
+        The DICOM anonymizer tab allows you to:
+            1) select a DICOM directory
+            2) view the DICOM headers information
+            3) run the anonymization tool on all DICOMs of the directory
+
+        The ID key tab allows to:
+            1) store ID information for a given participant/patient
+            2) look for ID information from a given participant/patient
         '''
         welcome_message = Label(self.page1,
                                 text=message,
