@@ -40,10 +40,6 @@ class IDMapper_frame_gui(Frame):
      
     def InitUI(self):
         
-        #self.parent.title('ID Mapper')
-        #self.parent.columnconfigure(0, weight=1)
-        #self.parent.rowconfigure(0, weight=1)
-
         self.frame = Frame(self.parent)
         self.frame.grid(column=0, row=0, padx=0, pady=0, sticky=N+S+E+W)
  
@@ -54,25 +50,51 @@ class IDMapper_frame_gui(Frame):
         for i in range(3, 4):
             self.frame.rowconfigure(i, weight=1)
 
-        self.labelID = Label(self.frame, text=u'Identifier')
+        self.labelID   = Label(self.frame, text=u'Identifier')
         self.labelName = Label(self.frame, text=u'Real Name')
-        self.labelDoB = Label(self.frame, text=u'Date of Birth')
+        self.labelDoB  = Label(self.frame, text=u'Date of Birth')
 
-        self.buttonAdd = Button(self.frame, width=12, text=u'Add candidate', command=self.AddIdentifierEvent) 
-        self.buttonClear = Button(self.frame, width=12, text=u'Clear', command=self.clear)
+        self.buttonAdd    = Button(self.frame, width=12,
+                                   text=u'Add candidate',
+                                   command=self.AddIdentifierEvent
+                                  )
+        self.buttonClear  = Button(self.frame, width=12,
+                                   text=u'Clear fields',
+                                   command=self.clear
+                                  )
+        self.buttonSearch = Button(self.frame, width=12,
+                                   text=u'Search candidate',
+                                   command=self.search
+                                  )
+        self.buttonEdit   = Button(self.frame, width=12,
+                                   text=u'Edit candidate',
+                                   command=self.edit
+                                  )
 
-        self.textCandId = StringVar()
-        self.candidateid = Entry(self.frame, textvariable=self.textCandId, width=20)
+        self.textCandId  = StringVar()
+        self.candidateid = Entry(self.frame,
+                                 textvariable=self.textCandId,
+                                 width=20
+                                )
         self.candidateid.focus_set()
 
-        self.textCandName = StringVar()
-        self.candidatename = Entry(self.frame, textvariable=self.textCandName, width=20)
+        self.textCandName  = StringVar()
+        self.candidatename = Entry(self.frame,
+                                   textvariable=self.textCandName,
+                                   width=20
+                                  )
 
-        self.textCandDoB = StringVar() 
-        self.candidateDoB = Entry(self.frame, textvariable=self.textCandDoB, width=20)
+        self.textCandDoB  = StringVar()
+        self.candidateDoB = Entry(self.frame,
+                                  textvariable=self.textCandDoB,
+                                  width=20
+                                 )
 
         self.tableColumns = ("Identifier", "Real Name", "Date of Birth")
-        self.datatable = ttk.Treeview(self.frame, selectmode='browse', columns=self.tableColumns, show="headings")
+        self.datatable    = ttk.Treeview(self.frame,
+                                         selectmode='browse',
+                                         columns=self.tableColumns,
+                                         show="headings")
         for col in self.tableColumns:
             self.datatable.heading(col, text=col.title(), 
                                    command=lambda c=col: sortby(self.datatable, c, 0))
@@ -90,20 +112,23 @@ class IDMapper_frame_gui(Frame):
         self.candidatename.grid(row=1, column=1, padx=(4,4), pady=(0,10), sticky=E+W)
         self.candidateDoB.grid(row=1, column=2, padx=(4,4), pady=(0,10), sticky=E+W)
  
-        self.buttonAdd.grid(row=0, column=3, padx=(4,0), sticky=E+W)
+        self.buttonAdd.grid(row=2, column=1, padx=(4,0), sticky=E+W)
         self.buttonClear.grid(row=1, column=3, padx=(4,0), sticky=E+W)
-          
+        self.buttonSearch.grid(row=2, column=0, padx=(4,0), sticky=E+W)
+        self.buttonEdit.grid(row=2, column=2, padx=(4,0), sticky=E+W)
+
         self.datatable.grid(row=3, column=0, columnspan=3, pady=10, sticky='nsew')
         self.error.grid(row=3, column=3)
 
 
     def LoadXML(self, file):
+        global xmlitemlist
         
         """Parses the XML file and loads the data into the current window"""
         try:
-            xmldoc = minidom.parse(file)
-            itemlist = xmldoc.getElementsByTagName('Candidate')
-            for s in itemlist:
+            xmldoc   = minidom.parse(file)
+            xmlitemlist = xmldoc.getElementsByTagName('Candidate')
+            for s in xmlitemlist:
                 identifier = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
                 realname = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
                 dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
@@ -148,7 +173,7 @@ class IDMapper_frame_gui(Frame):
         """
         self.ErrorMessage.set("")
         if candid in self.IDMap:
-            self.ErrorMessage.set("ERROR: Candidate\nkey already exists")
+            self.ErrorMessage.set("ERROR: Candidate\nID key already exists")
             return
 
         mapList = [candid, realname, dob]
@@ -160,7 +185,7 @@ class IDMapper_frame_gui(Frame):
         
         if(save):
             self.SaveMapAction()
-                     
+
 
     def OnRowClick(self, event):
         
@@ -179,6 +204,53 @@ class IDMapper_frame_gui(Frame):
         self.textCandName.set("")
         self.textCandDoB.set("")
         self.candidateid.focus_set()
+
+    def search(self):
+        #  Find a candidate based on its ID if it is set in text box
+        if not self.textCandId.get:
+            (candid, name, dob) = self.FindCandidate("candid",
+                                                     self.textCandId.get()
+                                                    )
+        # or based on its name if it is set in text box
+        elif not self.textCandName.get:
+            print "Yes"
+            (candid, name, dob) = self.FindCandidate("name",
+                                                     self.textCandName.get()
+                                                    )
+        # print the values in the text box
+        self.textCandId.set(candid)
+        self.textCandName.set(name)
+        self.textCandDoB.set(dob)
+
+    def edit(self):
+        #TODO develop the edit functionality
+        # Find a candidate based on its ID
+        self.FindCandidate("candid", self.textCandId.get())
+        pass
+
+    def EditIdentifierAction(self, realname, dob, edit=True):
+
+        candid = self.textCandID.get()
+
+    def FindCandidate(self, key, value):
+        # Loop through the candidate tree and return the candid, name and dob
+        # that matches a given value
+        for s in xmlitemlist:
+            candid = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
+            name = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
+            dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
+            if (key == "candid" and value == candid):
+                return (candid, name, dob)
+            elif (key == "name" and value == name):
+                return (candid, name, dob)
+            elif (key == "dob" and value == dob):
+                return (candid, name, dob)
+            else:
+                continue
+        # if candidate was not found, return empty strings
+        return ("", "", "")
+
+
 
 
 def main():
