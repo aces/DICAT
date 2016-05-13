@@ -123,6 +123,7 @@ class IDMapper_frame_gui(Frame):
 
     def LoadXML(self, file):
         global xmlitemlist
+        global xmldoc
         
         """Parses the XML file and loads the data into the current window"""
         try:
@@ -205,15 +206,15 @@ class IDMapper_frame_gui(Frame):
         self.textCandDoB.set("")
         self.candidateid.focus_set()
 
+
     def search(self):
         #  Find a candidate based on its ID if it is set in text box
-        if not self.textCandId.get:
+        if self.textCandId.get():
             (candid, name, dob) = self.FindCandidate("candid",
                                                      self.textCandId.get()
                                                     )
         # or based on its name if it is set in text box
-        elif not self.textCandName.get:
-            print "Yes"
+        elif self.textCandName.get():
             (candid, name, dob) = self.FindCandidate("name",
                                                      self.textCandName.get()
                                                     )
@@ -222,15 +223,6 @@ class IDMapper_frame_gui(Frame):
         self.textCandName.set(name)
         self.textCandDoB.set(dob)
 
-    def edit(self):
-        #TODO develop the edit functionality
-        # Find a candidate based on its ID
-        self.FindCandidate("candid", self.textCandId.get())
-        pass
-
-    def EditIdentifierAction(self, realname, dob, edit=True):
-
-        candid = self.textCandID.get()
 
     def FindCandidate(self, key, value):
         # Loop through the candidate tree and return the candid, name and dob
@@ -249,6 +241,48 @@ class IDMapper_frame_gui(Frame):
                 continue
         # if candidate was not found, return empty strings
         return ("", "", "")
+
+
+    def edit(self):
+        self.EditIdentifierAction(self.textCandId.get(),
+                                  self.textCandName.get(),
+                                  self.textCandDoB.get()
+                                 )
+
+    def EditIdentifierAction(self, identifier, realname, realdob, edit=True):
+        # Loop through the candidate tree, find a candidate based on its ID
+        # and check if name or DoB needs to be updated
+        for s in xmlitemlist:
+            candid = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
+            name = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
+            dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
+
+            # if name of candidate is changed
+            if (candid == identifier) and not (realname == name):
+                # update in the XML file
+                s.getElementsByTagName("RealName")[0].firstChild.nodeValue = realname
+                f = open("candidates.xml", "w")
+                xmldoc.writexml(f)
+
+                # update IDMap dictionary
+                mapList = [candid, realname, dob]
+                self.IDMap[candid] = mapList
+
+                insertedList = [(candid, realname, dob)]
+                print self.datatable.__dict__
+                for item in insertedList:
+                    #self.datatable.delete([candid, name, dob])
+                    self.datatable.insert('', 'end', values=item)
+                    print self.datatable
+
+
+
+            # if candidate's date of birth is changed
+            if (candid == identifier) and not (realdob == dob):
+                # update in the XML file
+                s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue = realdob
+                f = open("candidates.xml", "w")
+                xmldoc.writexml(f)
 
 
 
