@@ -253,6 +253,10 @@ class IDMapper_frame_gui(Frame):
         # Loop through the candidate tree, find a candidate based on its ID
         # and check if name or DoB needs to be updated
         for s in xmlitemlist:
+            # initialize update variable
+            update = False
+
+            # get the candid, name and dob stored in the XML file
             candid = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
             name = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
             dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
@@ -261,29 +265,27 @@ class IDMapper_frame_gui(Frame):
             if (candid == identifier) and not (realname == name):
                 # update in the XML file
                 s.getElementsByTagName("RealName")[0].firstChild.nodeValue = realname
-                f = open("candidates.xml", "w")
-                xmldoc.writexml(f)
-
-                # update IDMap dictionary
-                mapList = [candid, realname, dob]
-                self.IDMap[candid] = mapList
-
-                insertedList = [(candid, realname, dob)]
-                print self.datatable.__dict__
-                for item in insertedList:
-                    #self.datatable.delete([candid, name, dob])
-                    self.datatable.insert('', 'end', values=item)
-                    print self.datatable
-
-
+                update = True   # set update to True
 
             # if candidate's date of birth is changed
             if (candid == identifier) and not (realdob == dob):
                 # update in the XML file
                 s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue = realdob
+                update = True   # set update to True
+
+            if (update):
+                # update the XML file
                 f = open("candidates.xml", "w")
                 xmldoc.writexml(f)
 
+                # update IDMap dictionary
+                mapList = [candid, realname, realdob]
+                self.IDMap[candid] = mapList
+
+                # update datatable
+                item = self.datatable.selection()
+                updatedList = (candid, realname, realdob)
+                self.datatable.item(item, values=updatedList)
 
 
 
