@@ -18,29 +18,31 @@ class UserInterface(Frame):
         self.initialize()
 
     def initialize(self):
+
+        # initialize frame
         self.frame = Frame(self.parent)
         self.frame.pack(side=TOP, expand=YES, fill=BOTH, padx=10, pady=10)
         # TODO create classe for project info pane
-        self.frame.project_infopane = Labelframe(self, text=MultiLanguage.project_info_pane, width=250, height=350,
+        self.project_infopane = Labelframe(self.frame, text=MultiLanguage.project_info_pane, width=250, height=350,
                                           borderwidth=10)  # TODO add dynamic resize
-        self.frame.project_infopane.pack(side=LEFT, expand=NO, fill=BOTH)
+        self.project_infopane.pack(side=LEFT, expand=NO, fill=BOTH)
         # This area (datapane) is composed of one Panedwindow containing two Labelframe
-        self.frame.data_pane = Panedwindow(self, width=1000, height=500, orient=HORIZONTAL)  # TODO add dynamic resize
-        self.frame.data_pane.pack(side=RIGHT, expand=YES, fill=BOTH)
-        self.frame.candidate_pane = Labelframe(self.frame.data_pane, text=MultiLanguage.candidate_pane, width=100, height=450,
+        self.data_pane = Panedwindow(self.frame, width=1000, height=500, orient=HORIZONTAL)  # TODO add dynamic resize
+        self.data_pane.pack(side=RIGHT, expand=YES, fill=BOTH)
+        self.candidate_pane = Labelframe(self.data_pane, text=MultiLanguage.candidate_pane, width=100, height=450,
                                         borderwidth=10)  # TODO add dynamic resize
-        self.frame.visit_pane = Labelframe(self.frame.data_pane, text=MultiLanguage.calendar_pane, width=100, height=350,
+        self.visit_pane = Labelframe(self.data_pane, text=MultiLanguage.calendar_pane, width=100, height=350,
                                     borderwidth=10)  # TODO add dynamic resize
-        self.frame.data_pane.add(self.frame.candidate_pane)
-        self.frame.data_pane.add(self.frame.visit_pane)
+        self.data_pane.add(self.candidate_pane)
+        self.data_pane.add(self.visit_pane)
 
         # create data tables (treeview)
         visit_column_headers = ('candidate', 'visitlabel', 'when', 'where', 'status')
-        self.frame.visit_table = DataTable.VisitList(self.frame.visit_pane, visit_column_headers)
-        self.frame.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
+        self.visit_table = DataTable.VisitList(self.visit_pane, visit_column_headers)
+        self.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
         column_header = ('firstname', 'lastname', 'phone', 'status')
-        self.frame.data_table = DataTable.ParticipantsList(self.frame.candidate_pane, column_header)
-        self.frame.data_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
+        self.data_table = DataTable.ParticipantsList(self.candidate_pane, column_header)
+        self.data_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
 
         """
         #create a filter section in each data_pane(not implemented yet)
@@ -70,5 +72,5 @@ if __name__ == "__main__":
     app.mainloop()
 """
 #Application main loop
-app=Application()
-app.mainloop()
+#app=Application()
+#app.mainloop()
