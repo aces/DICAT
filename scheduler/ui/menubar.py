@@ -2,7 +2,7 @@
 import Tkinter
 #import internal packages
 import lib.multilanguage as MultiLanguage
-import ui.dialogbox as DialogBox
+import ui.datawindow as DataWindow
 
 class MenuBar(Tkinter.Menu):
     def __init__(self, parent):
@@ -43,15 +43,9 @@ class MenuBar(Tkinter.Menu):
         pass
 
     def quit_application(self):
-        # TODO Mac instance has a Python->quit menu on top of Application->Quitter
-        parent     = Tkinter.Frame(self)
-        button_yes = MultiLanguage.dialog_yes
-        button_no  = MultiLanguage.dialog_no
-        newwin     = DialogBox.ConfirmYesNo(parent, MultiLanguage.dialog_quit)
-        if newwin.buttonvalue == 1:
-            self.quit()
-        else:
-            return
+        #TODO implement quit_application()
+        print 'running quit_application'
+        self.quit()
         pass
 
     def open_calendar(self):
@@ -66,6 +60,7 @@ class MenuBar(Tkinter.Menu):
 
     def add_candidate(self):
         #TODO implement add_candidate()
+        DataWindow.DataWindow(self, "new")
         print 'running add_candidate'
         pass
 

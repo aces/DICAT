@@ -1,20 +1,24 @@
-#import standard packages
+# import standard packages
 from Tkinter import *
 from ttk import *
-#import internal packages
+# import internal packages
 from visit import Visit
+import candidate as Candidate
 import ui.dialogbox as DialogBox
 import lib.utilities as Utilities
 import lib.multilanguage as MultiLanguage
 import lib.datamanagement as DataManagement
 
-#ref: http://effbot.org/tkinterbook/tkinter-newDialog-windows.htm
-#TODO this class needs a major clean-up    
+
+
+# ref: http://effbot.org/tkinterbook/tkinter-newDialog-windows.htm
+# TODO this class needs a major clean-up
+
+
 class DataWindow(Toplevel):
-    def __init__(self, parent, candidate_uuid):
+    def __init__(self, parent, candidate_uuid='new'):
         Toplevel.__init__(self, parent)
-        #create a transient window on top of parent window
-        print "running DataWindow(Toplevel) " + str(candidate_uuid)  #TODO remove when done
+        # create a transient window on top of parent window
         self.transient(parent) 
         self.parent = parent
         self.title(MultiLanguage.data_window_title)  #TODO find a better title for the thing
@@ -29,47 +33,50 @@ class DataWindow(Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.closedialog)
         Utilities.center_window(self)
         self.initial_focus.focus_set()
-        #self.deiconify()
+        # self.deiconify()
         self.wait_window(self)
 
     def body(self, master, candidate):
+        """Creates the body of 'datawindow'.  param candidate is the candidate.uuid"""
         try:
-            data = dict(DataManagement.read_candidate_data()) #TODO better way to do this
+            data = dict(DataManagement.read_candidate_data())  # TODO better way to do this
             candidate = data.get(candidate)
         except Exception as e:
-            print str(e) #TODO manage exceptions
-        #Candidate section
+            print "datawindow.body ", str(e)  # TODO manage exceptions
+        # Candidate section
         self.candidate_pane = Labelframe(self, text=MultiLanguage.candidate_pane, width=250, height=350, borderwidth=10)
         self.candidate_pane.pack(side=TOP, expand=YES, fill=BOTH, padx=5, pady=5)
-        #PSCID
+        # object unique id - does not appear on gui but needed to keep track of this candidate
+        self.candidate_uid = candidate.uid
+        # PSCID
         self.label_pscid = Label(self.candidate_pane, text=MultiLanguage.candidate_pscid)
         self.label_pscid.grid(column=0, row=0, padx=10, pady=5, sticky=N+S+E+W)
         self.text_pscid_var = StringVar()
         self.text_pscid_var.set(candidate.pscid)
         self.text_pscid = Entry(self.candidate_pane, textvariable=self.text_pscid_var)
         self.text_pscid.grid(column=0, row=1, padx=10, pady=5, sticky=N+S+E+W)
-        #status
+        # status
         self.label_status = Label(self.candidate_pane, text=MultiLanguage.candidate_status)
         self.label_status.grid(column=1, row=0, padx=10, pady=5, sticky=N+S+E+W)
         self.text_status_var = StringVar()
         self.text_status_var.set(candidate.status)
         self.text_status = Entry(self.candidate_pane, textvariable=self.text_status_var)
         self.text_status.grid(column=1, row=1, padx=10, pady=5, sticky=N+S+E+W)
-        #firstname
+        # firstname
         self.label_firstname = Label(self.candidate_pane, text=MultiLanguage.candidate_firstname)
         self.label_firstname.grid(column=0, row=2, padx=10, pady=5, sticky=N+S+E+W)
         self.text_firstname_var = StringVar()
         self.text_firstname_var.set(candidate.firstname)
         self.text_firstname = Entry(self.candidate_pane, textvariable=self.text_firstname_var)
         self.text_firstname.grid(column=0, row=3, padx=10, pady=5, sticky=N+S+E+W)
-        #lastname
+        # lastname
         self.label_lastname = Label(self.candidate_pane, text=MultiLanguage.candidate_lastname)
         self.label_lastname.grid(column=1, row=2, padx=10, pady=5, sticky=N+S+E+W)
         self.text_lastname_var = StringVar()
         self.text_lastname_var.set(candidate.lastname)
         self.text_lastname = Entry(self.candidate_pane, textvariable=self.text_lastname_var)
         self.text_lastname.grid(column=1, row=3, padx=10, pady=5, sticky=N+S+E+W)
-        #phone number
+        # phone number
         self.label_phone = Label(self.candidate_pane, text=MultiLanguage.candidate_phone)
         self.label_phone.grid(column=2, row=2, padx=10, pady=5, sticky=N+S+E+W)
         self.text_phone_var = StringVar()
@@ -77,10 +84,10 @@ class DataWindow(Toplevel):
         self.text_phone = Entry(self.candidate_pane, textvariable=self.text_phone_var)
         self.text_phone.grid(column=2, row=3, padx=10, pady=5, sticky=N+S+E+W)
 
-        #Schedule Section - displayed as a table
+        # Schedule Section - displayed as a table
         self.schedule_pane = Labelframe(self, text=MultiLanguage.schedule_pane, width=250, height=350, borderwidth=10)
         self.schedule_pane.pack(side=TOP, expand=YES, fill=BOTH, padx=5, pady=5)
-        #top row (header)
+        # top row (header)
         self.label_visit_rank = Label(self.schedule_pane, text=MultiLanguage.schedule_visit_rank)
         self.label_visit_rank.grid(column=0, row=0, padx=5, pady=5, sticky=N+S+E+W)
         self.label_visit_label = Label(self.schedule_pane, text=MultiLanguage.col_visitlabel)
@@ -97,8 +104,8 @@ class DataWindow(Toplevel):
         """
         PSEUDOCODE
         1. Get candidate.visitset
-        2. Parse into a sorted (on visit.rank) list
-        3. Print data on scree
+        2. Parse into a sorted list (sorted on visit.rank)
+        3. Print data on screen
 
 
         visit_set = candidate.visitset
@@ -109,9 +116,9 @@ class DataWindow(Toplevel):
         for key, value in visit_list.iteritems():
 
         """
-        #TODO add logic "foreach" to create a table showing each visit
-        import lib.utilities as Utilities #TODO delete when done
-        #1- Get candidate visitset and parse into a list
+        # TODO add logic "foreach" to create a table showing each visit
+        import lib.utilities as Utilities # TODO delete when done
+        # 1- Get candidate visitset and parse into a list
         visit_list = []
         visitset = candidate.visitset
         if visitset is None:
@@ -119,35 +126,33 @@ class DataWindow(Toplevel):
         else:
             for key, value in visitset.iteritems():
                 visit_list.append(visitset[key])
-            #2- Sort list on visit.rank
+            # 2- Sort list on visit.rank
             visit_list = sorted(visit_list, key=lambda visit: visit.rank)
-            #3- 'print' values on ui
-            import lib.entrybox as EntryBox  #TODO relocate when done
+            # 3- 'print' values on ui
             x = 0
             for x in range(len(visit_list)):
-                #rank
+                # rank
                 label_visit_rank = Label(self.schedule_pane, text=visit_list[x].rank)
                 label_visit_rank.grid(column=0, row=x+1, padx=5, pady=5, sticky=N+S+E+W)
-                #visitlabel
+                # visitlabel
                 label_visit_label = Label(self.schedule_pane, text=visit_list[x].visitlabel)
                 label_visit_label.grid(column=1, row=x+1, padx=5, pady=5, sticky=N+S+E+W)
-                #when
+                # when
                 if visit_list[x].when == None:
                     visit = visit_list[x]
                     date_range = Visit.visit_date_range(visit)
-                    print date_range
                     label_visit_when = Label(self.schedule_pane, text=date_range)
                     label_visit_when.grid(column=2, row=x+1, padx=5, pady=5, sticky=N+S+E+W)
                 else:
                     label_visit_when = Label(self.schedule_pane, text=visit_list[x].when)
                     label_visit_when.grid(column=2, row=x+1, padx=5, pady=5, sticky=N+S+E+W)
-                #where
+                # where
                 label_visit_where = Label(self.schedule_pane, text=visit_list[x].where)
                 label_visit_where.grid(column=3, row=x+1, padx=5, pady=5, sticky=N+S+E+W)
-                #withwhom
+                # withwhom
                 label_visit_where = Label(self.schedule_pane, text=visit_list[x].withwhom)
                 label_visit_where.grid(column=4, row=x+1, padx=5, pady=5, sticky=N+S+E+W)
-                #status
+                # status
                 label_visit_where = Label(self.schedule_pane, text=visit_list[x].status)
                 label_visit_where.grid(column=5, row=x+1, padx=5, pady=5, sticky=N+S+E+W)
 
@@ -165,10 +170,12 @@ class DataWindow(Toplevel):
         box.pack()
 
     def ok_button(self, event=None):
-        print "saving data and closing"  #TODO remove when done
+        print "saving data and closing"  # TODO remove when done
+        self.capture_data()
         if not self.validate():
             self.initial_focus.focus_set() # put focus back
             return
+        #need to call treeview update here
         self.withdraw()
         self.closedialog()
         
@@ -182,8 +189,26 @@ class DataWindow(Toplevel):
             return
         
     def closedialog(self, event=None):
-        self.parent.focus_set() #put focus back to parent window before destroying the window
+        self.parent.focus_set() # put focus back to parent window before destroying the window
         self.destroy()
 
     def validate(self):
         return 1
+
+    def capture_data(self):
+        """
+        Grap the information from the window's text field and save the candidate information based on candidate_uid.
+        """
+        # open the 'database'
+        db = dict(DataManagement.read_candidate_data())
+        # and find candidate based on uid
+        uid = self.candidate_uid
+        candidate = db[uid]
+        # capture data from fields
+        candidate.pscid = self.text_pscid.get()
+        candidate.status = self.text_status.get()
+        candidate.firstname =  self.text_firstname.get()
+        candidate.lastname = self.text_lastname.get()
+        candidate.phone = self.text_phone.get()
+        # save data
+        DataManagement.save_candidate_data(db)

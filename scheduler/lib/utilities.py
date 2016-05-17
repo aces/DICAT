@@ -32,7 +32,7 @@ def describe(something):
     #will return a list of all non"__" attributes, including use defined ones (**kwargs)
     attributes = str(filter(lambda a: not a.startswith('__'), dir(something)))
     returnvalue = objectclass, " (", objecttype, "): ", attributes
-    return returnvalue
+    print returnvalue
 
 def get_current_date():
     """
@@ -106,6 +106,9 @@ def print_object(something):
             for attr, value in c.__dict__.iteritems():
                 print attr,": ", value
             print "\n"
+    elif type(something) is list:
+        for item in something:
+            print item
     else:  #and this for the class instance
         for attr, value in something.__dict__.iteritems():
             print attr, value

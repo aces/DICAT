@@ -1,14 +1,15 @@
-#import standard packages
+# import standard packages
 import datetime
 import visit
-#import internal packages
+# import internal packages
 import lib.datamanagement as DataManagement
 import lib.multilanguage as MultiLanguage
 import lib.utilities as Utilities
 
-class Candidate():
+
+class Candidate:
     """
-    The Candidate() class defines the candidates/participants of the study
+    The Candidate class defines the candidates/participants of the study
 
     Attributes:
         uid:        A unique identifier using python's uuid1 method. Used as key to store and retrieve objects from

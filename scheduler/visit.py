@@ -75,11 +75,17 @@ class Visit(VisitSetup):
         self.status = status
 
     def visit_date_range(self):
-        print 'I get here'
-        early_date = datetime.datetime.date(self.whenearliest)
-        late_date = datetime.datetime.date(self.whenlatest)
-        date_range = str(early_date), '<>', str(late_date)
+        #need to handle the case where a visit has no dates
+        #this works but Exception handling seems to broad
+        try:
+            early_date = datetime.datetime.date(self.whenearliest)
+            late_date = datetime.datetime.date(self.whenlatest)
+            date_range = str(early_date), '<>', str(late_date)
+        except Exception as e:
+            #print e
+            date_range = ""
         return date_range
+
 
 
 

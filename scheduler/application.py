@@ -7,10 +7,10 @@ from ttk import *
 import ui.menubar as MenuBar
 import ui.datatable as DataTable
 import lib.multilanguage as MultiLanguage
-import lib.datamanagement as DataManagement
-import ui.projectpane as ProjectPane  #TODO create classe for project info pane
+
 
 class UserInterface(Frame):
+
     def __init__(self, parent):
         Frame.__init__(self)
         self.parent = parent
@@ -30,6 +30,15 @@ class UserInterface(Frame):
         self.data_pane.add(self.candidate_pane)
         self.data_pane.add(self.visit_pane)
 
+        # create data tables (treeview)
+        visit_column_headers = ('candidate', 'visitlabel', 'when', 'where', 'status')
+        self.visit_table = DataTable.VisitList(self.visit_pane, visit_column_headers)
+        self.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
+        column_header = ('firstname', 'lastname', 'phone', 'status')
+        self.data_table = DataTable.ParticipantsList(self.candidate_pane, column_header)
+        self.data_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
+
+        """
         #create a filter section in each data_pane(not implemented yet)
         #TODO This whole section needs to be replaced by REAL CODE actively filtering the data
         self.filter_candidate = Labelframe(self.candidate_pane, text='Filters', width=220, height=50, borderwidth=10)
@@ -40,17 +49,8 @@ class UserInterface(Frame):
         self.filter_visit.pack(side=TOP, expand=NO, fill=BOTH, pady=5)
         self.filter_candidate_label = Label(self.filter_visit, text='Filters for Active / Tentative / Closed ...')
         self.filter_candidate_label.pack(side=TOP, expand=NO, fill=BOTH)
+        """
 
-        # get data from shelve files
-        data = dict(DataManagement.read_candidate_data())  # TODO place data management elsewhere
-
-        # create data tables (treeview)
-        visit_column_headers = ('candidate', 'visitlabel', 'when', 'where', 'status')
-        self.visit_table = DataTable.DataTable(self.visit_pane, data, visit_column_headers)
-        self.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
-        column_header = ('firstname', 'lastname', 'phone', 'status')
-        self.data_table = DataTable.DataTable(self.candidate_pane, data, column_header)
-        self.data_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
 
 class Application(Tk):
     def __init__(self):
@@ -59,7 +59,12 @@ class Application(Tk):
         self.config(menu=menu)
         frame = UserInterface(self)
 
+"""
 #Application main loop
 if __name__ == "__main__":
     app=Application()
     app.mainloop()
+"""
+#Application main loop
+app=Application()
+app.mainloop()
