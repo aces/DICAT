@@ -1,7 +1,4 @@
-import candidate
-import visit
-import datetime
-import lib.datamanagement as datamanagement
+import lib as datamanagement
 
 #loading data
 candidatedb = dict(datamanagement.read_candidate_data())

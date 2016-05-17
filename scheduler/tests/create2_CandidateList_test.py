@@ -1,5 +1,5 @@
-import candidate
-import lib.datamanagement as datamanagement
+from scheduler import candidate
+import lib as datamanagement
 
 
 #GUI:  Setting up a list of candidate

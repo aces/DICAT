@@ -1,5 +1,5 @@
-import visit
-import lib.datamanagement as datamanagement
+from scheduler import visit
+import lib as datamanagement
 
 #GUI: Setting up the sequence of visit - must be done prior to anything else  
 #setup the VisitSetup instances to match the study visit sequence

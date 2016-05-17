@@ -5,6 +5,7 @@ from Tkinter import *
 
 from dicom_anonymizer_frame import dicom_anonymizer_frame_gui
 from IDMapper import IDMapper_frame_gui
+from scheduler_application import UserInterface
 
 class DicAT_application():
 
@@ -36,7 +37,7 @@ class DicAT_application():
         # Add the pages to the notebook
         self.nb.add(self.page1, text='Welcome to DicAT!')
         self.nb.add(self.page2, text='DICOM anonymizer')
-        self.nb.add(self.page3, text='Scheduler', state='hidden') # hide scheduler for now
+        self.nb.add(self.page3, text='Scheduler') # hide scheduler for now
         self.nb.add(self.page4, text='ID key')
 
         # Draw
@@ -47,6 +48,8 @@ class DicAT_application():
         #TODO: create a ID_key_GUI class
         self.id_key_frame()
         self.welcome_page()
+        self.scheduler_page()
+
 
     #TODO: have header window display within the application, not a TopLevel window
     def dicom_anonymizer_tab(self):
@@ -82,7 +85,10 @@ class DicAT_application():
                                )
         welcome_message.pack(expand=1, fill='both')
 
+    def scheduler_page(self):
 
+        # start the scheduler frame
+        UserInterface(self.page3)
 
 if __name__ == "__main__":
 

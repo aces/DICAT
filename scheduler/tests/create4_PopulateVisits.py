@@ -6,10 +6,7 @@ a045a532-a31f-11e4-96a6-fc4dd4d3c3f3
 a045a531-a31f-11e4-a1c4-fc4dd4d3c3f3
 """
 
-import visit
-import candidate
-import lib.datamanagement as datamanagement
-import lib.utilities as utilities
+import lib as datamanagement
 
 db = dict(datamanagement.read_candidate_data())
 

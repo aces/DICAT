@@ -1,7 +1,7 @@
 # import standard packages
 import datetime
 
-import visit
+from scheduler import visit
 
 # import internal packages
 import lib.datamanagement as DataManagement

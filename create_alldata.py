@@ -1,5 +1,5 @@
-import visit
-import candidate
+import scheduler_candidate as candidate
+import scheduler_visit as visit
 import lib.datamanagement as DataManagement
 import lib.utilities as Utilities
 
