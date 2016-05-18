@@ -208,7 +208,7 @@ def read_dicom_with_dcmdump(dicom_file, dicom_fields):
     # Grep information from DICOM header and store them
     # into dicom_fields dictionary under flag Value
     for name in dicom_fields:
-        dump_cmd = "dcmdump -ml +P " + name + " -q " + dicom_file
+        dump_cmd = "dcmdump -ml +P \"" + name + "\" -q \"" + dicom_file + "\""
         result = subprocess.check_output(dump_cmd, shell=True)
         tmp_val = re.match(".+\[(.+)\].+", result)
         if tmp_val:
@@ -346,8 +346,8 @@ def dcmodify_zapping(dicom_file, dicom_fields):
             if dicom_fields[name]['Update'] == True:
                 modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
                 changed_fields_nb += 1
-
-    subprocess.call(modify_cmd + dicom_file, shell=True)
+    modify_cmd += " \"" + dicom_file + "\" "
+    subprocess.call(modify_cmd, shell=True)
 
 
 def zip_dicom_directories(anonymize_dir, original_dir, subdirs_list, root_dir):
