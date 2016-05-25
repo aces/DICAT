@@ -1,12 +1,11 @@
 # DicAT (DICOM Anonymization Tool)
 
-DicAT is a simple graphical tool that facilitates DICOM de-identification directly on a local workstation.
+DicAT is a simple graphical tool that facilitates DICOM (Digital Imaging and Communications in Medicine) de-identification directly on a local workstation.
 It works on all major operating systems (Windows, Linux and OSX) and is very light in terms of dependencies.
 
 With the increasing use of web-based database systems, such as [LORIS](http://www.loris.ca) ([Das *et al.*, 2011](http://journal.frontiersin.org/article/10.3389/fninf.2011.00037/full), [Das *et al.*, 2016](http://www.sciencedirect.com/science/article/pii/S1053811915008009)), for large scale imaging studies, de-identification of DICOM datasets becomes a requirement before they can be uploaded in such databases.
 
 ![Flow Chart](images/TypicFlowChartOfDICOMdeidentification.png)
-==Change LORIS logo==
 
 ***Typical Flow Chart of DICOM de-identification.***
 
@@ -14,9 +13,9 @@ Before DICOM datasets can be uploaded into a web-based database, identifying inf
 
 DicAT produces two archival outputs: a back-up of the original DICOM files, and a de-identified DICOM dataset that can then be uploaded or transferred to other systems.
 
-It features an ==ID mapper== that saves a key of the ==candidate (e.g. study participant/patient)== name and its identifier for reference by study coordinators. 
+DicAT also features an ID key log that can be used to keep a record of the original candidate name (participant/patient) linked to their anonymized study identifier, for reference by study coordinators. 
 
-DicAT was first developed during the ==2014== and ==2015 OHBM Hackathons==.
+DicAT was first developed during the [2014 and 2015 brainhacks](http://brainhack.org) held at the [Organization of Human Brain Mapping (OHBM)](http://www.humanbrainmapping.org/i4a/pages/index.cfm?pageid=1) conferences.
 
 ## How to install and run DicAT
 
@@ -73,7 +72,7 @@ Finally, once the user has finalized the edits, clicking on the *“Anonymize”
 
 ## How to use the ID Key of DicAT
 
-The ID Key feature of DicAT allows storage of the key between identifiable candidates's information (*Real Name* and *Date of Birth*) and its study’s identifier. This information will be stored ==in an XML file locally== on the workstation. See the following figure for detailed information on how to use this feature.
+The ID Key feature of DicAT allows storage of the key between identifiable candidates's information (*Real Name* and *Date of Birth*) and its study’s identifier. This information will be stored locally on the workstation within an XML file (candidate.xml) in DicAT's directory. See the following figure for detailed information on how to use this feature.
 
 ![ID Key](images/ID_Mapper.png)
 
@@ -81,7 +80,7 @@ The ID Key feature of DicAT allows storage of the key between identifiable candi
 
 This feature allows storage of the mapping information between candidates’s information and study IDs. 
 
-A candidate (==*e.g.*== a study participant/patient) can be looked up using the *“Search candidate”* button (2) after having entered either the *“Identifier”* or the *“Real Name”* text fields available in the top row (1). 
+A candidate (participant/patient) can be looked up using the *“Search candidate”* button (2) after having entered either the *“Identifier”* or the *“Real Name”* text fields available in the top row (1). 
 
 The *“Clear fields”* button (3) allows clearing the text in those text fields. 
 
