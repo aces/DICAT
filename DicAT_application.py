@@ -45,11 +45,9 @@ class DicAT_application():
 
         # Draw content of the different tabs' frame
         self.dicom_anonymizer_tab()
-        #TODO: create a ID_key_GUI class
         self.id_key_frame()
         self.welcome_page()
 
-    #TODO: have header window display within the application, not a TopLevel window
     def dicom_anonymizer_tab(self):
 
         # start dicom_anonymizer_frame_gui method
