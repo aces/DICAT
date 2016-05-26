@@ -5,6 +5,7 @@ from Tkinter import *
 
 from dicom_anonymizer_frame import dicom_anonymizer_frame_gui
 from IDMapper import IDMapper_frame_gui
+from welcome_frame import welcome_frame_gui
 
 class DicAT_application():
 
@@ -20,9 +21,13 @@ class DicAT_application():
 
         # Use notebook (nb) from ttk from Tkinter to create tabs
         self.nb = ttk.Notebook(master)
+        style   = ttk.Style()
+        style.configure('TFrame', background="red")
+
 
         # Add frames as pages for ttk.Notebook
         self.page1 = ttk.Frame(self.nb)
+        print self.page1.winfo_class()
 
         # Second page, DICOM anonymizer
         self.page2 = ttk.Frame(self.nb)
@@ -63,24 +68,27 @@ class DicAT_application():
 
     def welcome_page(self):
 
-        message = '''
-        DicAT is a simple tool for anonymization of DICOM datasets.
+        # start the Welcome page
+        welcome_frame_gui(self.page1)
 
-        The DICOM anonymizer tab allows you to:
-            1) select a DICOM directory
-            2) view the DICOM headers information
-            3) run the anonymization tool on all DICOMs of the directory
-
-        The ID key tab allows to:
-            1) store ID information for a given participant/patient
-            2) look for ID information from a given participant/patient
-        '''
-        welcome_message = Label(self.page1,
-                                text=message,
-                                anchor=NW,
-                                justify=LEFT
-                               )
-        welcome_message.pack(expand=1, fill='both')
+        # message = '''
+        # DicAT is a simple tool for anonymization of DICOM datasets.
+        #
+        # The DICOM anonymizer tab allows you to:
+        #     1) select a DICOM directory
+        #     2) view the DICOM headers information
+        #     3) run the anonymization tool on all DICOMs of the directory
+        #
+        # The ID key tab allows to:
+        #     1) store ID information for a given participant/patient
+        #     2) look for ID information from a given participant/patient
+        # '''
+        # welcome_message = Label(self.page1,
+        #                         text=message,
+        #                         anchor=NW,
+        #                         justify=LEFT
+        #                        )
+        # welcome_message.pack(expand=1, fill='both')
 
 
 

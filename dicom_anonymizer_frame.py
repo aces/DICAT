@@ -30,7 +30,7 @@ class dicom_anonymizer_frame_gui(Frame):
 
         # initialize main Frame
         self.frame = Frame(self.parent)
-        self.frame.grid(column=0, row=0, padx=0, pady=0, sticky=N + S + E + W)
+        self.frame.pack(expand=1, fill='both')
 
         self.frame.columnconfigure(0, weight=6)
         self.frame.columnconfigure(1, weight=1)

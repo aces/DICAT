@@ -41,8 +41,8 @@ class IDMapper_frame_gui(Frame):
     def InitUI(self):
         
         self.frame = Frame(self.parent)
-        self.frame.grid(column=0, row=0, padx=0, pady=0, sticky=N+S+E+W)
- 
+        self.frame.pack(expand=1, fill='both')
+
         for i in range(0, 3):
             self.frame.columnconfigure(i, weight=6)
         self.frame.columnconfigure(3, weight=1)
