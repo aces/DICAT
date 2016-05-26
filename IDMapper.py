@@ -25,7 +25,6 @@ class IDMapper_frame_gui(Frame):
     
     def __init__(self, parent):
         """Initialize the application"""
-        Frame.__init__(self, parent)
         self.parent = parent
         
         # Initialize all the wxPython components

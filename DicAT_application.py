@@ -17,17 +17,13 @@ class DicAT_application():
         self.dir_opt = {}
 
         # Title of the application
-        master.title("DicAT")
+        master.title("DICAT")
 
         # Use notebook (nb) from ttk from Tkinter to create tabs
         self.nb = ttk.Notebook(master)
-        style   = ttk.Style()
-        style.configure('TFrame', background="red")
-
 
         # Add frames as pages for ttk.Notebook
         self.page1 = ttk.Frame(self.nb)
-        print self.page1.winfo_class()
 
         # Second page, DICOM anonymizer
         self.page2 = ttk.Frame(self.nb)

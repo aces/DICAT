@@ -11,24 +11,65 @@ class welcome_frame_gui(Frame):
         self.initialize()
 
     def initialize(self):
-        self.frame = Frame(self.parent, bg="red")
+        self.frame = Frame(self.parent)
         self.frame.pack(expand=1, fill='both')
 
-        message = '''
-        DicAT is a simple tool for anonymization of DICOM datasets.
 
-        The DICOM anonymizer tab allows you to:
-            1) select a DICOM directory
-            2) view the DICOM headers information
-            3) run the anonymization tool on all DICOMs of the directory
+        # Insert DICAT logo on the right side of the screen
+        imgPath = r"DICAT_logo.gif"
+        logo    = PhotoImage(file = imgPath)
+        logo_image = Label(self.frame,
+                           image = logo
+                          )
+        logo_image.image = logo
 
-        The ID key tab allows to:
-            1) store ID information for a given candidate
-            2) look for ID information from a given candidate
+        logo_image.pack(side='left')
+
+        # Create the Welcome to DICAT text variable
+        text   = Text(self.frame, padx=40, wrap='word')
+        scroll = Scrollbar(self.frame, command=text.yview)
+        text.configure(yscrollcommand=scroll.set)
+        text.tag_configure('title',
+                           font=('Verdana', 20, 'bold', 'italic'),
+                           justify='center'
+                          )
+        text.tag_configure('bold',    font=('Verdana', 12, 'bold'))
+        text.tag_configure('default', font=('Verdana', 12))
+
+        # Insert title into the text variable
+        title = "\nWelcome to DICAT!\n\n"
+        text.insert(END, title, 'title')
+
+        # Insert introduction of the tool into the text variable
+        intro  = "DICAT (DICOM Anonymization Tool) is a simple tool for "
+        intro += "de-identification of DICOM datasets. In addition to "
+        intro += "de-identifying DICOM files, this tool contains a feature "
+        intro += "that allows mapping the candidate's information to its "
+        intro += "study identifier.\n"
+        text.insert(END, intro, 'default')
+
+        # Insert explanation of the DICOM anonymizer tab into the text variable
+        tab1 = "\n\nThe DICOM anonymizer tab allows to:\n"
+        text.insert(END, tab1, 'bold')
+
+        anonymizer  = '''
+        1) select a DICOM directory
+        2) view the DICOM headers information
+        3) run the de-identifier tool on all DICOMs of the selected directory
         '''
-        welcome_message = Label(self.frame,
-                                text=message,
-                                anchor=NW,
-                                justify=LEFT
-                               )
-        welcome_message.pack(expand=1, fill='both')
+        text.insert(END, anonymizer, 'default')
+
+        # Insert explanation of the ID key tab into the text variable
+        tab2 = "\n\nThe ID key tab allows to:\n"
+        text.insert(END, tab2, 'bold')
+
+        IDkey  = '''
+        1) store ID information for a given candidate
+        2) look for ID information from a given candidate
+        '''
+        text.insert(END, IDkey, 'default')
+
+        # Display the text variable
+        text.pack(side='left', fill='both')
+        # Disable the edit functionality of the displayed text
+        text.config(state='disabled')

@@ -19,7 +19,6 @@ if not anonymizer_tool:
 
 class dicom_anonymizer_frame_gui(Frame):
     def __init__(self, parent):
-        Frame.__init__(self, parent)
         self.parent = parent
         self.dirname = ''
         self.dir_opt = {}
