@@ -65,25 +65,6 @@ class DicAT_application():
         # start the Welcome page
         welcome_frame_gui(self.page1)
 
-        # message = '''
-        # DicAT is a simple tool for anonymization of DICOM datasets.
-        #
-        # The DICOM anonymizer tab allows you to:
-        #     1) select a DICOM directory
-        #     2) view the DICOM headers information
-        #     3) run the anonymization tool on all DICOMs of the directory
-        #
-        # The ID key tab allows to:
-        #     1) store ID information for a given participant/patient
-        #     2) look for ID information from a given participant/patient
-        # '''
-        # welcome_message = Label(self.page1,
-        #                         text=message,
-        #                         anchor=NW,
-        #                         justify=LEFT
-        #                        )
-        # welcome_message.pack(expand=1, fill='both')
-
 
 
 if __name__ == "__main__":
