@@ -6,18 +6,18 @@ import os
 from Tkinter import *
 
 '''
-Determine which anonymizer tool to use (PyDICOM or DICOM toolkit) before
+Determine which de-identifier tool to use (PyDICOM or DICOM toolkit) before
 starting the program.
 Will exit with an error message if neither PyDICOM or DICOM toolkit were found.
 '''
-anonymizer_tool = methods.find_anonymizer_tool()
-if not anonymizer_tool:
-    message = "Error: no tool was found to read or anonymizer DICOM files."
+deidentifier_tool = methods.find_deidentifier_tool()
+if not deidentifier_tool:
+    message = "Error: no tool was found to read or de-identify DICOM files."
     tkMessageBox.showinfo("Message", message)
     exit()
 
 
-class dicom_anonymizer_frame_gui(Frame):
+class dicom_deidentifier_frame_gui(Frame):
     def __init__(self, parent):
         self.parent = parent
         self.dirname = ''
@@ -64,7 +64,7 @@ class dicom_anonymizer_frame_gui(Frame):
 
         self.buttonView = Button(self.buttonsPanel,
                                  text=u"View DICOM fields",
-                                 command=self.anonymize)
+                                 command=self.deidentify)
         self.buttonView.grid(row=0, column=0, padx=(0, 10), sticky=E + W)
         self.buttonView.configure(state=DISABLED)
 
@@ -77,7 +77,7 @@ class dicom_anonymizer_frame_gui(Frame):
         self.buttonView.configure(state=NORMAL)
         return self.dirname
 
-    def anonymize(self):
+    def deidentify(self):
         # Read the XML file with the identifying DICOM fields
         XML_filename = "fields_to_zap.xml"
         if os.path.isfile(XML_filename):
@@ -95,7 +95,7 @@ class dicom_anonymizer_frame_gui(Frame):
         self.edited_entries = [Tkinter.StringVar() for i in range(keys_length)]
         if len(field_dict) != 0:
             self.field_edit_win = Frame(self.parent)
-            self.field_edit_win.grid()
+            self.field_edit_win.pack(expand=1, fill='both')
             self.field_edit_win.columnconfigure(0, weight=1)
             self.field_edit_win.columnconfigure(1, weight=1)
             self.field_edit_win.rowconfigure(0, weight=1)
@@ -173,7 +173,7 @@ class dicom_anonymizer_frame_gui(Frame):
 
             self.field_edit_win.button_done = Tkinter.Button(
                 self.bottomPanel,
-                text=u"Anonymize",
+                text=u"De-identify",
                 command=self.collect_edited_data)
             self.field_edit_win.button_done.grid(column=0, row=0, padx=20)
 
@@ -210,15 +210,15 @@ class dicom_anonymizer_frame_gui(Frame):
                 self.field_dict[key]['Update'] = False
             key_nb += 1
 
-        # Edit DICOM field values to anonymize the dataset
-        # (anonymize_dcm, original_dcm) = ''
-        (anonymize_dcm, original_dcm) = methods.dicom_zapping(
+        # Edit DICOM field values to de-identify the dataset
+        # (deidentified_dcm, original_dcm) = ''
+        (deidentified_dcm, original_dcm) = methods.dicom_zapping(
             self.dirname, self.field_dict)
 
         self.field_edit_win.destroy()
-        if os.path.exists(anonymize_dcm) != [] and os.path.exists(
+        if os.path.exists(deidentified_dcm) != [] and os.path.exists(
                 original_dcm) != []:
-            message = "Booya! It's anonymized!"
+            message = "Booya! It's de-identified!"
             tkMessageBox.showinfo("Message", message)
         else:
             message = "Oh no, there was an error when processing files"
@@ -227,5 +227,5 @@ class dicom_anonymizer_frame_gui(Frame):
 
 if __name__ == "__main__":
     root = Tk()
-    app = dicom_anonymizer(root)
+    app = dicom_deidentifier(root)
     root.mainloop()

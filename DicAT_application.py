@@ -3,7 +3,7 @@
 import ttk
 from Tkinter import *
 
-from dicom_anonymizer_frame import dicom_anonymizer_frame_gui
+from dicom_anonymizer_frame import dicom_deidentifier_frame_gui
 from IDMapper import IDMapper_frame_gui
 from welcome_frame import welcome_frame_gui
 
@@ -36,7 +36,7 @@ class DicAT_application():
 
         # Add the pages to the notebook
         self.nb.add(self.page1, text='Welcome to DicAT!')
-        self.nb.add(self.page2, text='DICOM anonymizer')
+        self.nb.add(self.page2, text='DICOM de-identifier')
         self.nb.add(self.page3, text='Scheduler', state='hidden') # hide scheduler for now
         self.nb.add(self.page4, text='ID key')
 
@@ -44,14 +44,14 @@ class DicAT_application():
         self.nb.pack(expand=1, fill='both')
 
         # Draw content of the different tabs' frame
-        self.dicom_anonymizer_tab()
+        self.dicom_deidentifier_tab()
         self.id_key_frame()
         self.welcome_page()
 
-    def dicom_anonymizer_tab(self):
+    def dicom_deidentifier_tab(self):
 
         # start dicom_anonymizer_frame_gui method
-        dicom_anonymizer_frame_gui(self.page2)
+        dicom_deidentifier_frame_gui(self.page2)
 
 
     def id_key_frame(self):

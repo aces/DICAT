@@ -24,7 +24,7 @@ Installation instructions vary depending on the operating system used. See below
 Running DicAT will open a window with three different tabs:
 
 * A simple **"Welcome to DicAT"** tab giving a short description of the tool
-* A **"DICOM anonymizer"** tab, in which de-identification of DICOMs will take place 
+* A **"DICOM de-identifier"** tab, in which de-identification of DICOMs will take place 
 * An **"ID Key"** tab, containing the key between candidate's names and their IDs.
 
 ![Welcome page](images/Welcome_DicAT.png)
@@ -45,29 +45,29 @@ To install DicAT, download the following zip archive `Zip_file_with_Windows_exec
 
 Once the archive has been extracted, double-clicking on the ==anonymizer_gui.exe== executable will open the application.
 
-## How to use the DICOM anonymizer of DicAT?
+## How to use the DICOM de-identifier of DicAT?
 
-#### DICOM anonymizer tab of the application and selection of a directory containing DICOM files
+#### DICOM de-identifier tab of the application and selection of a directory containing DICOM files
 
-![DICOM anonymizer 1](images/DICOM_anonymizer1.png)
+![DICOM deidentifier 1](images/DICOM_anonymizer1.png)
 
-***DICOM anonymizer tab of DicAT.*** 
+***DICOM de-identifier tab of DicAT.*** 
 
-In the *"DICOM anonymizer"* tab (1), use the select button (2) to choose a directory containing DICOM files to anonymize.
+In the *"DICOM de-identifier"* tab (1), use the select button (2) to choose a directory containing DICOM files to de-identify.
 
 #### View/edit the DICOM fields and de-identify the DICOM files
 
-![DICOM anonymizer 2](images/DICOM_anonymizer2.png)
+![DICOM deidentifier 2](images/DICOM_anonymizer2.png)
 
-***View DICOM fields and anonymize the dataset.*** 
+***View DICOM fields and de-identify the dataset.*** 
 
 Once a directory containing DICOM files have been selected (as described in the above section), the DICOM fields can be viewed when clicking on the *“View DICOM fields”* button (1).
 
- The DICOM fields will be displayed in a table with editable fields in black (2) and non-editable fields greyed out (3). The non-editable fields will be replaced by empty strings in the DICOM files when running the anonymization, while the editable fields will be replaced by the value entered by the user. By default, editable fields are *“PatientName”*, *“PatientBirthDate”* and *“PatientSex”*. ==Mention how to configure editable fields== 
+ The DICOM fields will be displayed in a table with editable fields in black (2) and non-editable fields greyed out (3). The non-editable fields will be replaced by empty strings in the DICOM files when running the de-identification, while the editable fields will be replaced by the value entered by the user. By default, editable fields are *“PatientName”*, *“PatientBirthDate”* and *“PatientSex”*. ==Mention how to configure editable fields== 
  
 The *“Clear”* button (4) will erase values from all editable fields. 
 
-Finally, once the user has finalized the edits, clicking on the *“Anonymize”* button (5) will run the anonymization tool on the DICOM dataset. The non-editable fields will be replaced by empty strings in the DICOM files when running the anonymization, while the editable fields will be replaced by what is being entered by the user. 
+Finally, once the user has finalized the edits, clicking on the *“De-identify”* button (5) will run the de-identification tool on the DICOM dataset. The non-editable fields will be replaced by empty strings in the DICOM files when running the de-identification, while the editable fields will be replaced by what is being entered by the user. 
 
 
 ## How to use the ID Key of DicAT
@@ -78,19 +78,19 @@ The ID Key feature of DicAT allows storage of the key between identifiable candi
 
 ***ID key feature of DicAT.*** 
 
-This feature allows storage of the mapping information between candidates’s information and study IDs. 
+This feature (1) allows storage of the mapping information between candidates’s information and study IDs. 
 
-A candidate (participant/patient) can be looked up using the *“Search candidate”* button (2) after having entered either the *“Identifier”* or the *“Real Name”* text fields available in the top row (1). 
+A candidate (participant/patient) can be looked up using the *“Search candidate”* button (3) after having entered either the *“Identifier”* or the *“Real Name”* text fields available in the top row (2). 
 
-The *“Clear fields”* button (3) allows clearing the text in those text fields. 
+The *“Clear fields”* button (4) allows clearing the text in those text fields. 
 
-A new candidate can be registered using the *“Add candidate”* button (4) after having entered the *“Identifier”*, *“Real Name”* and *“Date of birth”* information in the text fields of the top row (1). 
+A new candidate can be registered using the *“Add candidate”* button (5) after having entered the *“Identifier”*, *“Real Name”* and *“Date of birth”* information in the text fields of the top row (1). 
 
-Clicking on a subject row (5) of the table displayed at the bottom of the application will automatically populate the text fields (1) with the information of the candidate. 
+Clicking on a subject row (6) of the table displayed at the bottom of the application will automatically populate the text fields (2) with the information of the candidate. 
 
-The *“Real Name”* or *“Date of birth”* of that candidate can be edited if needed by altering the field and clicking on the *“Edit candidate”* button (6). 
+The *“Real Name”* or *“Date of birth”* of that candidate can be edited if needed by altering the field and clicking on the *“Edit candidate”* button (7). 
 
-Finally, the data table of candidate is sortable by clicking on any of the column headers (7).
+Finally, the data table of candidate is sortable by clicking on any of the column headers (8).
 
 ## Authors
 

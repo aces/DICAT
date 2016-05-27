@@ -16,7 +16,7 @@ class welcome_frame_gui(Frame):
 
 
         # Insert DICAT logo on the right side of the screen
-        imgPath = r"DICAT_logo.gif"
+        imgPath = r"images/DICAT_logo.gif"
         logo    = PhotoImage(file = imgPath)
         logo_image = Label(self.frame,
                            image = logo
@@ -49,7 +49,7 @@ class welcome_frame_gui(Frame):
         text.insert(END, intro, 'default')
 
         # Insert explanation of the DICOM anonymizer tab into the text variable
-        tab1 = "\n\nThe DICOM anonymizer tab allows to:\n"
+        tab1 = "\n\nThe DICOM de-identifier tab allows to:\n"
         text.insert(END, tab1, 'bold')
 
         anonymizer  = '''
@@ -63,7 +63,7 @@ class welcome_frame_gui(Frame):
         tab2 = "\n\nThe ID key tab allows to:\n"
         text.insert(END, tab2, 'bold')
 
-        IDkey  = '''
+        IDkey = '''
         1) store ID information for a given candidate
         2) look for ID information from a given candidate
         '''
