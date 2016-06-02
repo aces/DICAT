@@ -1,9 +1,18 @@
 #!/usr/bin/python
 
 import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
-import dicom_anonymizer_methods as methods
 import os
 from Tkinter import *
+
+# Internal classes import
+import lib.dicom_anonymizer_methods as methods
+'''
+lib.resource_path_methods has been created for Pyinstaller.
+Need to load images or external files using these methods, otherwise the
+created application would not find them.
+'''
+import lib.resource_path_methods as PathMethods
+
 
 '''
 Determine which de-identifier tool to use (PyDICOM or DICOM toolkit) before
@@ -79,7 +88,9 @@ class dicom_deidentifier_frame_gui(Frame):
 
     def deidentify(self):
         # Read the XML file with the identifying DICOM fields
-        XML_filename = "fields_to_zap.xml"
+        load_xml = PathMethods.resource_path("fields_to_zap.xml")
+        XML_filename  = load_xml.return_path()
+
         if os.path.isfile(XML_filename):
             XML_file = XML_filename
         else:

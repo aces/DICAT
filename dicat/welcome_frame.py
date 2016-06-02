@@ -1,8 +1,13 @@
 #!/usr/bin/python
 
-import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
-import os
 from Tkinter import *
+
+'''
+lib.resource_path_methods has been created for Pyinstaller.
+Need to load images or external files using these methods, otherwise the
+created application would not find them.
+'''
+import lib.resource_path_methods as PathMethods
 
 class welcome_frame_gui(Frame):
 
@@ -16,8 +21,9 @@ class welcome_frame_gui(Frame):
 
 
         # Insert DICAT logo on the right side of the screen
-        imgPath = r"images/DICAT_logo.gif"
-        logo    = PhotoImage(file = imgPath)
+        load_img = PathMethods.resource_path("images/DICAT_logo.gif")
+        imgPath  = load_img.return_path()
+        logo     = PhotoImage(file = imgPath)
         logo_image = Label(self.frame,
                            image = logo
                           )

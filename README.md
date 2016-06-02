@@ -5,7 +5,7 @@ It works on all major operating systems (Windows, Linux and OSX) and is very lig
 
 With the increasing use of web-based database systems, such as [LORIS](http://www.loris.ca) ([Das *et al.*, 2011](http://journal.frontiersin.org/article/10.3389/fninf.2011.00037/full), [Das *et al.*, 2016](http://www.sciencedirect.com/science/article/pii/S1053811915008009)), for large scale imaging studies, de-identification of DICOM datasets becomes a requirement before they can be uploaded in such databases.
 
-![Flow Chart](images/TypicFlowChartOfDICOMdeidentification.png)
+![Flow Chart](dicat/images/TypicFlowChartOfDICOMdeidentification.png)
 
 ***Typical Flow Chart of DICOM de-identification.***
 
@@ -27,7 +27,7 @@ Running DicAT will open a window with three different tabs:
 * A **"DICOM de-identifier"** tab, in which de-identification of DICOMs will take place 
 * An **"ID Key"** tab, containing the key between candidate's names and their IDs.
 
-![Welcome page](images/Welcome_DicAT.png)
+![Welcome page](dicat/images/Welcome_DicAT.png)
 
 ***Welcome page of DicAT.***
 
@@ -49,7 +49,7 @@ Once the archive has been extracted, double-clicking on the ==anonymizer_gui.exe
 
 #### DICOM de-identifier tab of the application and selection of a directory containing DICOM files
 
-![DICOM deidentifier 1](images/DICOM_anonymizer1.png)
+![DICOM deidentifier 1](dicat/images/DICOM_anonymizer1.png)
 
 ***DICOM de-identifier tab of DicAT.*** 
 
@@ -57,7 +57,7 @@ In the *"DICOM de-identifier"* tab (1), use the select button (2) to choose a di
 
 #### View/edit the DICOM fields and de-identify the DICOM files
 
-![DICOM deidentifier 2](images/DICOM_anonymizer2.png)
+![DICOM deidentifier 2](dicat/images/DICOM_anonymizer2.png)
 
 ***View DICOM fields and de-identify the dataset.*** 
 
@@ -74,7 +74,7 @@ Finally, once the user has finalized the edits, clicking on the *“De-identify�
 
 The ID Key feature of DicAT allows storage of the key between identifiable candidates's information (*Real Name* and *Date of Birth*) and its study’s identifier. This information will be stored locally on the workstation within an XML file (candidate.xml) in DicAT's directory. See the following figure for detailed information on how to use this feature.
 
-![ID Key](images/ID_Mapper.png)
+![ID Key](dicat/images/ID_Mapper.png)
 
 ***ID key feature of DicAT.*** 
 
