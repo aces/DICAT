@@ -25,7 +25,8 @@ class welcome_frame_gui(Frame):
         imgPath  = load_img.return_path()
         logo     = PhotoImage(file = imgPath)
         logo_image = Label(self.frame,
-                           image = logo
+                           image = logo,
+                           bg='white'
                           )
         logo_image.image = logo
 
