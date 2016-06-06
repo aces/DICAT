@@ -77,6 +77,7 @@ class welcome_frame_gui(Frame):
         text.insert(END, IDkey, 'default')
 
         # Display the text variable
-        text.pack(side='left', fill='both')
+        text.pack(side='left', fill='both', expand=1)
+        scroll.pack(side="right", fill='y')
         # Disable the edit functionality of the displayed text
         text.config(state='disabled')

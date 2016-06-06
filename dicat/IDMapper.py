@@ -280,6 +280,8 @@ class IDMapper_frame_gui(Frame):
 
 
     def FindCandidate(self, key, value):
+        global xmlitemlist
+
         # Loop through the candidate tree and return the candid, name and dob
         # that matches a given value
         for s in xmlitemlist:
@@ -305,6 +307,7 @@ class IDMapper_frame_gui(Frame):
                                  )
 
     def EditIdentifierAction(self, identifier, realname, realdob, edit=True):
+        global xmlitemlist
         # Loop through the candidate tree, find a candidate based on its ID
         # and check if name or DoB needs to be updated
         for s in xmlitemlist:
@@ -330,7 +333,7 @@ class IDMapper_frame_gui(Frame):
 
             if (update):
                 # update the XML file
-                f = open("self.filename", "w")
+                f = open(self.filename, "w")
                 xmldoc.writexml(f)
 
                 # update IDMap dictionary
