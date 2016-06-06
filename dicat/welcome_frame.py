@@ -30,7 +30,7 @@ class welcome_frame_gui(Frame):
                           )
         logo_image.image = logo
 
-        logo_image.pack(side='left')
+        logo_image.pack(side='left', fill='both')
 
         # Create the Welcome to DICAT text variable
         text   = Text(self.frame, padx=40, wrap='word')
