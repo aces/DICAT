@@ -88,7 +88,7 @@ class dicom_deidentifier_frame_gui(Frame):
 
     def deidentify(self):
         # Read the XML file with the identifying DICOM fields
-        load_xml = PathMethods.resource_path("fields_to_zap.xml")
+        load_xml = PathMethods.resource_path("data/fields_to_zap.xml")
         XML_filename  = load_xml.return_path()
 
         if os.path.isfile(XML_filename):

@@ -8,9 +8,20 @@ Go into the `dicat` directory hosting the DICAT_application.py script and run th
 
 ```pyinstaller --onefile --windowed --icon=images/DICAT_logo.icns DICAT_application.py```
 
-This will create a `DICAT_application.spec` file in the same directory, as well as a `build` and `dist` directory. First, edit the `DICAT_application.spec` file to include the path to the image used by the application (a.k.a. `images/DICAT_logo.gif`). To do so, insert the following line after the Analysis block of the spec file.
+This will create a `DICAT_application.spec` file in the same directory, as well as a `build` and `dist` directory. First, edit the `DICAT_application.spec` file to include the path to the image and the XML files used by the application (a.k.a. `images/DICAT_logo.gif` and `data/fields_to_zap.xml`). To do so, insert the following after the Analysis block of the spec file (Note, the full path should be updated with the path on your computer).
 
-```a.datas += [('images/DICAT_logo.gif', '/Users/cmadjar/Sites/DICOM_anonymizer/dicat/images/DICAT_logo.gif', 'DATA')]```
+```
+a.datas += [
+    ( 'images/DICAT_logo.gif', 
+      '/Users/cmadjar/Sites/DICOM_anonymizer/dicat/images/DICAT_logo.gif', 
+      'DATA'
+    ),
+    ( 'data/fields_to_zap.xml', 
+      '/Users/cmadjar/Sites/DICOM_anonymizer/dicat/data/fields_to_zap.xml', 
+      'DATA'
+    )
+]
+```
 
 FYI, the analysis block of the spec file looks like:
 
