@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
 from Tkinter import *
 from xml.dom import minidom
 
@@ -26,17 +27,68 @@ class IDMapper_frame_gui(Frame):
     def __init__(self, parent):
         """Initialize the application"""
         self.parent = parent
-        
-        # Initialize all the wxPython components
-        self.InitUI()
-        
+
         # Set up the dictionary map
         self.IDMap = {}
 
-        # Load the data
-        self.LoadXML("candidates.xml")
+        # Initialize the frame
+        self.initialize()
 
-     
+
+    def initialize(self):
+
+        # initialize Frame
+        self.frame = Frame(self.parent)
+        self.frame.pack(expand=1, fill='both')
+        self.frame.columnconfigure(0, weight=1)
+        self.frame.columnconfigure(1, weight=1)
+        self.frame.columnconfigure(2, weight=6)
+
+
+        # select an existing candidate.xml file
+        # Initialize default text that will be in self.entry
+        self.entryVariable = Tkinter.StringVar()
+        self.entryVariable.set("Open an XML file with candidate's key")
+
+        # Create an entry with a default text that will be replaced by the path
+        # to the XML file once directory selected
+        self.entry = Entry(self.frame,
+                           width=40,
+                           textvariable=self.entryVariable
+                          )
+        self.entry.focus_set()
+        self.entry.selection_range(0, Tkinter.END)
+
+        # Create an open button to use to select an XML file with candidate's
+        # key info
+        self.buttonOpen = Button(self.frame,
+                                 text=u"Open an existing file",
+                                 command=self.openfilename
+                                )
+
+        self.buttonCreate = Button(self.frame,
+                                   text=u"Create a new file",
+                                   command=self.createfilename
+                                  )
+
+        self.buttonCreate.grid(row=0,
+                               column=0,
+                               padx=(0, 15),
+                               pady=10,
+                               sticky=E + W
+                              )
+        self.buttonOpen.grid(row=0,
+                             column=1,
+                             padx=(0, 15),
+                             pady=10,
+                             sticky=E + W
+                            )
+        self.entry.grid(row=0, column=2, padx=15, pady=10, sticky=E + W)
+
+        self.InitUI()
+
+
+
     def InitUI(self):
         
         self.frame = Frame(self.parent)
@@ -123,7 +175,11 @@ class IDMapper_frame_gui(Frame):
     def LoadXML(self, file):
         global xmlitemlist
         global xmldoc
-        
+
+        # empty the datatable and data dictionary before loading new file
+        self.datatable.delete(*self.datatable.get_children())
+        self.IDMap = {}
+
         """Parses the XML file and loads the data into the current window"""
         try:
             xmldoc   = minidom.parse(file)
@@ -140,7 +196,7 @@ class IDMapper_frame_gui(Frame):
     def SaveMapAction(self):
         
         """Function which performs the action of writing the XML file"""
-        f = open("candidates.xml", "w")
+        f = open(self.filename, "w")
         f.write("<?xml version=\"1.0\"?>\n<data>\n")
         for key in self.IDMap:
             f.write("\t<Candidate>\n")
@@ -274,7 +330,7 @@ class IDMapper_frame_gui(Frame):
 
             if (update):
                 # update the XML file
-                f = open("candidates.xml", "w")
+                f = open("self.filename", "w")
                 xmldoc.writexml(f)
 
                 # update IDMap dictionary
@@ -286,7 +342,35 @@ class IDMapper_frame_gui(Frame):
                 updatedList = (candid, realname, realdob)
                 self.datatable.item(item, values=updatedList)
 
+    def openfilename(self):
 
+        """Returns a selected file name."""
+        self.filename = tkFileDialog.askopenfilename(
+            filetypes=[("XML files", "*.xml")]
+        )
+        self.entryVariable.set(self.filename)
+
+        if self.filename:
+            # Load the data
+            self.LoadXML(self.filename)
+
+        return self.filename
+
+    def createfilename(self):
+
+        self.filename = tkFileDialog.asksaveasfilename(
+            defaultextension=[("*.xml")],
+            filetypes=[("XML files", "*.xml")]
+        )
+        self.entryVariable.set(self.filename)
+
+        if self.filename:
+            open(self.filename, 'w')
+
+            # Load the data
+            self.LoadXML(self.filename)
+
+        return self.filename
 
 def main():
        
