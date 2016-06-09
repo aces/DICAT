@@ -5,7 +5,7 @@ It works on all major operating systems (Windows, Linux and OSX) and is very lig
 
 With the increasing use of web-based database systems, such as [LORIS](http://www.loris.ca) ([Das *et al.*, 2011](http://journal.frontiersin.org/article/10.3389/fninf.2011.00037/full), [Das *et al.*, 2016](http://www.sciencedirect.com/science/article/pii/S1053811915008009)), for large scale imaging studies, de-identification of DICOM datasets becomes a requirement before they can be uploaded in such databases.
 
-![Flow Chart](DICAT/images/TypicFlowChartOfDICOMdeidentification.png)
+![Flow Chart](dicat/images/TypicFlowChartOfDICOMdeidentification.png)
 
 ***Typical Flow Chart of DICOM de-identification.***
 
@@ -41,56 +41,50 @@ DICAT can be started by executing `DICAT_application.py` script with a Python co
 
 ### On Windows operating system
 
-To install DICAT, download the following zip archive `Zip_file_with_Windows_executable.zip` containing the DICAT executable and libraries. Extract the content of the archive onto a workstation.
+==To install DICAT, download the following zip archive `Zip_file_with_Windows_executable.zip` containing the DICAT executable and libraries. Extract the content of the archive onto a workstation.==
 
 Once the archive has been extracted, double-clicking on the ==anonymizer_gui.exe== executable will open the application.
 
 ## How to use the DICOM de-identifier of DICAT?
 
-#### DICOM de-identifier tab of the application and selection of a directory containing DICOM files
 
-![DICOM deidentifier 1](DICAT/images/DICOM_anonymizer1.png)
 
-***DICOM de-identifier tab of DICAT.*** 
+![DICOM deidentifier 1](dicat/images/DICOM_deidentification.png)
+
+***DICOM de-identification with DICAT.*** 
 
 In the *"DICOM de-identifier"* tab (1), use the select button (2) to choose a directory containing DICOM files to de-identify.
 
-#### View/edit the DICOM fields and de-identify the DICOM files
+Once a directory containing DICOM files have been selected (as described in the above section), the DICOM fields can be viewed when clicking on the *“View DICOM fields”* button (3).
 
-![DICOM deidentifier 2](DICAT/images/DICOM_anonymizer2.png)
-
-***View DICOM fields and de-identify the dataset.*** 
-
-Once a directory containing DICOM files have been selected (as described in the above section), the DICOM fields can be viewed when clicking on the *“View DICOM fields”* button (1).
-
- The DICOM fields will be displayed in a table with editable fields in black (2) and non-editable fields greyed out (3). The non-editable fields will be replaced by empty strings in the DICOM files when running the de-identification, while the editable fields will be replaced by the value entered by the user. By default, editable fields are *“PatientName”*, *“PatientBirthDate”* and *“PatientSex”*. ==Mention how to configure editable fields== 
+ The DICOM fields will be displayed in a table with editable fields in black (4) and non-editable fields greyed out (5). The non-editable fields will be replaced by empty strings in the DICOM files when running the de-identification, while the editable fields will be replaced by the value entered by the user. By default, editable fields are *“PatientName”*, *“PatientBirthDate”* and *“PatientSex”*. ==Mention how to configure editable fields== 
  
-The *“Clear”* button (4) will erase values from all editable fields. 
+The *“Clear”* button (6) will erase values from all editable fields. 
 
-Finally, once the user has finalized the edits, clicking on the *“De-identify”* button (5) will run the de-identification tool on the DICOM dataset. The non-editable fields will be replaced by empty strings in the DICOM files when running the de-identification, while the editable fields will be replaced by what is being entered by the user. 
+Finally, once the user has finalized the edits, clicking on the *“De-identify”* button (7) will run the de-identification tool on the DICOM dataset. 
 
 
 ## How to use the ID Key of DICAT
 
 The ID Key feature of DICAT allows storage of the key between identifiable candidates's information (*Real Name* and *Date of Birth*) and its study’s identifier. This information will be stored locally on the workstation within an XML file (candidate.xml) in DICAT's directory. See the following figure for detailed information on how to use this feature.
 
-![ID Key](DICAT/images/ID_Mapper.png)
+![ID Key](dicat/images/ID_Mapper.png)
 
 ***ID key feature of DICAT.*** 
 
-This feature (1) allows storage of the mapping information between candidates’s information and study IDs. 
+This feature (1) allows storage of the mapping information between candidates’s information and study IDs. This information will be stored in an XML file that can be either created (2) or opened (3). Changes will be automatically saved. 
 
-A candidate (participant/patient) can be looked up using the *“Search candidate”* button (3) after having entered either the *“Identifier”* or the *“Real Name”* text fields available in the top row (2). 
+A candidate (participant/patient) can be looked up using the *“Search candidate”* button (5) after having entered either the *“Identifier”* or the *“Real Name”* text fields available in (4). 
 
-The *“Clear fields”* button (4) allows clearing the text in those text fields. 
+The *“Clear fields”* button (6) allows clearing the text in those text fields. 
 
-A new candidate can be registered using the *“Add candidate”* button (5) after having entered the *“Identifier”*, *“Real Name”* and *“Date of birth”* information in the text fields of the top row (1). 
+A new candidate can be registered using the *“Add candidate”* button (7) after having entered the *“Identifier”*, *“Real Name”* and *“Date of birth”* information in the text fields of (4). 
 
-Clicking on a subject row (6) of the table displayed at the bottom of the application will automatically populate the text fields (2) with the information of the candidate. 
+Clicking on a subject row (8) of the table displayed at the bottom of the application will automatically populate the text fields (4) with the information of the candidate. 
 
-The *“Real Name”* or *“Date of birth”* of that candidate can be edited if needed by altering the field and clicking on the *“Edit candidate”* button (7). 
+The *“Real Name”* or *“Date of birth”* of that candidate can be edited if needed by altering the field and clicking on the *“Edit candidate”* button (9). 
 
-Finally, the data table of candidate is sortable by clicking on any of the column headers (8).
+Finally, the data table of candidate is sortable by clicking on any of the column headers (10).
 
 ## Authors
 
@@ -105,3 +99,7 @@ Samir Das <samir.das@mcgill.ca>               - Concept and guidance
 Daniel Krötz <d.kroetz@fz-juelich.de>         - Documentation, testing on Windows
 
 Christine Rogers <christine.rogers@mcgill.ca> - Documentation
+
+Leigh Evans <evansleigh26@gmail.com> - Video tutorial
+
+Derek Lo <derek.lo@mcgill.ca> - Logo design
