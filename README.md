@@ -39,11 +39,9 @@ To open DICAT, simply double click on the executable.
 
 ### From the source code
 
-Make sure your systems Python, PyDICOM and TkInter are installed on your systems. Installation instructions can be found
-
 To install DICAT source code on a computer, download and save the content of the current Github repository into a workstation.
 
-Before running DICAT, make sure your systems contains a Python compiler with the TkInter library (usually, TkInter comes by default with most Python installations. The PyDICOM package is also required by DICAT. 
+Before running DICAT, make sure your systems contains a [Python](https://www.python.org) compiler with the [TkInter](https://wiki.python.org/moin/TkInter) library (usually, TkInter comes by default with most Python installations. The [PyDICOM](http://www.pydicom.org) package is also required by DICAT. 
 
 DICAT can be started by executing `DICAT_application.py` script with a Python compiler. On UNIX computers (Linux and Mac OS X), open a terminal, go to the main directory of DICAT source code (`dicat` directory) and run the following:
 
