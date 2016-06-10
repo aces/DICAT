@@ -25,25 +25,26 @@ Running DICAT will open a window with three different tabs:
 
 * A simple **"Welcome to DICAT"** tab giving a short description of the tool
 * A **"DICOM de-identifier"** tab, in which de-identification of DICOMs will take place 
-* An **"ID Key"** tab, containing the key between candidate's names and their IDs.
+* An **"ID Key"** tab, containing the key between candidate's names and their IDs
 
 ![Welcome page](DICAT/images/Welcome_DICAT.png)
 
 ***Welcome page of DICAT.***
 
-### On UNIX operating systems (Linux and OS X) 
+### Using DICAT executables/applications
 
-To install DICAT on a computer, download and save the content of the current repository into a workstation.
+Executables of DICAT have been created for most systems and can be found in the `executables` directory of the Github repository. They will be organized by versions of DICAT and operating systems. Download the executable relevant to your system and move it to any folder of your choice.
 
-DICAT can be started by executing `DICAT_application.py` script with a Python compiler. Once in the main directory of DICAT, run the following:
+To open DICAT, simply double click on the executable.
+
+### From the source code
+
+To install DICAT source code on a computer, download and save the content of the current Github repository into a workstation.
+
+DICAT can be started by executing `DICAT_application.py` script with a Python compiler. On UNIX computers (Linux and Mac OS X), open a terminal, go to the main directory of DICAT source code (`dicat` directory) and run the following:
 
 ```python DICAT_application.py```
 
-### On Windows operating system
-
-==To install DICAT, download the following zip archive `Zip_file_with_Windows_executable.zip` containing the DICAT executable and libraries. Extract the content of the archive onto a workstation.==
-
-Once the archive has been extracted, double-clicking on the ==anonymizer_gui.exe== executable will open the application.
 
 ## How to use the DICOM de-identifier of DICAT?
 
@@ -57,7 +58,7 @@ In the *"DICOM de-identifier"* tab (1), use the select button (2) to choose a di
 
 Once a directory containing DICOM files have been selected (as described in the above section), the DICOM fields can be viewed when clicking on the *“View DICOM fields”* button (3).
 
- The DICOM fields will be displayed in a table with editable fields in black (4) and non-editable fields greyed out (5). The non-editable fields will be replaced by empty strings in the DICOM files when running the de-identification, while the editable fields will be replaced by the value entered by the user. By default, editable fields are *“PatientName”*, *“PatientBirthDate”* and *“PatientSex”*. ==Mention how to configure editable fields== 
+ The DICOM fields will be displayed in a table with editable fields in black (4) and non-editable fields greyed out (5). The non-editable fields will be replaced by empty strings in the DICOM files when running the de-identification, while the editable fields will be replaced by the value entered by the user. By default, editable fields are *“PatientName”*, *“PatientBirthDate”* and *“PatientSex”*.  
  
 The *“Clear”* button (6) will erase values from all editable fields. 
 
