@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
+import Tkinter, tkFileDialog, tkMessageBox
 import os
 from Tkinter import *
 
@@ -31,8 +31,10 @@ class dicom_deidentifier_frame_gui(Frame):
         self.parent = parent
         self.dirname = ''
         self.dir_opt = {}
-        self.initialize()
         self.field_dict = {}
+        self.message = StringVar()
+        self.initialize()
+
 
     def initialize(self):
 
@@ -77,8 +79,21 @@ class dicom_deidentifier_frame_gui(Frame):
         self.buttonView.grid(row=0, column=0, padx=(0, 10), sticky=E + W)
         self.buttonView.configure(state=DISABLED)
 
+        self.messageView = Label( self.frame,
+                                  textvariable=self.message,
+                                )
+        self.messageView.grid( row=2,
+                               column=0,
+                               columnspan=2,
+                               padx=(0, 10),
+                               sticky=E + W
+                             )
+        self.messageView.grid_forget()
 
     def askdirectory(self):
+
+        # removes the message from the grid
+        self.messageView.grid_forget()
 
         """Returns a selected directory name."""
         self.dirname = tkFileDialog.askdirectory(**self.dir_opt)
@@ -90,6 +105,9 @@ class dicom_deidentifier_frame_gui(Frame):
         # Read the XML file with the identifying DICOM fields
         load_xml = PathMethods.resource_path("data/fields_to_zap.xml")
         XML_filename  = load_xml.return_path()
+
+        # Remove the message from the grid
+        self.messageView.grid_forget()
 
         if os.path.isfile(XML_filename):
             XML_file = XML_filename
@@ -229,14 +247,24 @@ class dicom_deidentifier_frame_gui(Frame):
         self.field_edit_win.destroy()
         if os.path.exists(deidentified_dcm) != [] and os.path.exists(
                 original_dcm) != []:
-            message = "Booya! It's de-identified!"
-            tkMessageBox.showinfo("Message", message)
+            self.message.set("BOOYA! It's de-identified!")
+            self.messageView.configure( fg="dark green",
+                                    font= "Helvetica 16 bold italic"
+                                  )
+            self.messageView.grid( row=2,
+                                   column=0,
+                                   columnspan=2,
+                                   padx=(0, 10),
+                                   sticky=E+W
+                                 )
         else:
-            message = "Oh no, there was an error when processing files"
-            tkMessageBox.showinfo("Message", message)
-
-
-if __name__ == "__main__":
-    root = Tk()
-    app = dicom_deidentifier(root)
-    root.mainloop()
+            self.message.set("An error occured during DICOM files de-identification")
+            self.messageView.configure( fg="dark red",
+                                        font= "Helvetica 16 italic"
+                                      )
+            self.messageView.grid( row=2,
+                                   column=0,
+                                   columnspan=2,
+                                   padx=(0, 10),
+                                   sticky=E+W
+                                 )

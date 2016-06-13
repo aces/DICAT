@@ -55,10 +55,10 @@ class DicAT_application():
 
 
     def id_key_frame(self):
-        print "ID key in function"
 
         # start the ID mapper frame gui
         IDMapper_frame_gui(self.page4)
+
 
     def welcome_page(self):
 
