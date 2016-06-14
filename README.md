@@ -5,7 +5,7 @@ It works on all major operating systems (Windows, Linux and OSX) and is very lig
 
 With the increasing use of web-based database systems, such as [LORIS](http://www.loris.ca) ([Das *et al.*, 2011](http://journal.frontiersin.org/article/10.3389/fninf.2011.00037/full), [Das *et al.*, 2016](http://www.sciencedirect.com/science/article/pii/S1053811915008009)), for large scale imaging studies, de-identification of DICOM datasets becomes a requirement before they can be uploaded in such databases.
 
-![Flow Chart](dicat/images/TypicFlowChartOfDICOMdeidentification.png)
+![Flow Chart](docs/images/TypicFlowChartOfDICOMdeidentification.png)
 
 ***Typical Flow Chart of DICOM de-identification.***
 
@@ -27,7 +27,7 @@ Running DICAT will open a window with three different tabs:
 * A **"DICOM de-identifier"** tab, in which de-identification of DICOMs will take place 
 * An **"ID Key"** tab, containing the key between candidate's names and their IDs
 
-![Welcome page](DICAT/images/Welcome_DICAT.png)
+![Welcome page](docs/images/Welcome_DICAT.png)
 
 ***Welcome page of DICAT.***
 
@@ -52,7 +52,7 @@ DICAT can be started by executing `DICAT_application.py` script with a Python co
 
 
 
-![DICOM deidentifier 1](dicat/images/DICOM_deidentification.png)
+![DICOM deidentifier 1](docs/images/DICOM_deidentification.png)
 
 ***DICOM de-identification with DICAT.*** 
 
@@ -71,7 +71,7 @@ Finally, once the user has finalized the edits, clicking on the *“De-identify�
 
 The ID Key feature of DICAT allows storage of the key between identifiable candidates's information (*Real Name* and *Date of Birth*) and its study’s identifier. This information will be stored locally on the workstation within an XML file (candidate.xml) in DICAT's directory. See the following figure for detailed information on how to use this feature.
 
-![ID Key](dicat/images/ID_Mapper.png)
+![ID Key](docs/images/ID_Mapper.png)
 
 ***ID key feature of DICAT.*** 
 
