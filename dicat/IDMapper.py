@@ -229,20 +229,24 @@ class IDMapper_frame_gui(Frame):
         This is set to False on initial load.
         """
         self.ErrorMessage.set("")
-        if candid in self.IDMap:
-            message = "ERROR: Candidate\nID already exists"
-            self.ErrorMessage.set(message)
-            return
 
+        # check that all fields are set
         if not candid or not realname or not dob:
-            message = "ERROR: All fields are required to add a candidate"
+            message = "ERROR:\nAll fields are\nrequired to add\na candidate"
             self.ErrorMessage.set(message)
             return
 
+        # check candid does not already exist
+        if candid in self.IDMap:
+            message = "ERROR:\nCandidate ID\nalready exists"
+            self.ErrorMessage.set(message)
+            return
+
+        # check dob is in format YYYY-MM-DD
         try:
             datetime.datetime.strptime(dob,"%Y-%m-%d")
         except ValueError:
-            message = "ERROR: Date of birth's format should be 'YYYY-MM-DD'"
+            message = "ERROR:\nDate of birth's\nformat should be\n'YYYY-MM-DD'"
             self.ErrorMessage.set(message)
             return
 
