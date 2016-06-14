@@ -27,7 +27,7 @@ Running DICAT will open a window with three different tabs:
 * A **"DICOM de-identifier"** tab, in which de-identification of DICOMs will take place 
 * An **"ID Key"** tab, containing the key between candidate's names and their IDs
 
-![Welcome page](docs/images/Welcome_DICAT.png)
+![Welcome page](docs/images/Welcome_DicAT.png)
 
 ***Welcome page of DICAT.***
 
