@@ -86,6 +86,8 @@ Congratulations! You just created the DICAT app for Mac OS X!!
 
 ### On Windows
 
+Note: Make sure the paths in the spec file contains \\ instead of \.
+
 ```pyinstaller --onefile --windowed --icon=images\DICAT_logo.icns DICAT_application.spec```
 
 A `DICAT_application.exe` will be located in the dist directory created by the pyinstaller command. 
