@@ -1,8 +1,9 @@
 #!/usr/bin/python
 
-import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
+import Tkinter, Tkconstants, tkFileDialog, tkMessageBox, re, datetime
 from Tkinter import *
 from xml.dom import minidom
+
 
 import ttk
 
@@ -103,7 +104,7 @@ class IDMapper_frame_gui(Frame):
 
         self.labelID   = Label(self.frame, text=u'Identifier')
         self.labelName = Label(self.frame, text=u'Real Name')
-        self.labelDoB  = Label(self.frame, text=u'Date of Birth')
+        self.labelDoB  = Label(self.frame, text=u'Date of Birth (YYYY-MM-DD)')
 
         self.buttonAdd    = Button(self.frame, width=12,
                                    text=u'Add candidate',
@@ -229,7 +230,20 @@ class IDMapper_frame_gui(Frame):
         """
         self.ErrorMessage.set("")
         if candid in self.IDMap:
-            self.ErrorMessage.set("ERROR: Candidate\nID key already exists")
+            message = "ERROR: Candidate\nID already exists"
+            self.ErrorMessage.set(message)
+            return
+
+        if not candid or not realname or not dob:
+            message = "ERROR: All fields are required to add a candidate"
+            self.ErrorMessage.set(message)
+            return
+
+        try:
+            datetime.datetime.strptime(dob,"%Y-%m-%d")
+        except ValueError:
+            message = "ERROR: Date of birth's format should be 'YYYY-MM-DD'"
+            self.ErrorMessage.set(message)
             return
 
         mapList = [candid, realname, dob]
