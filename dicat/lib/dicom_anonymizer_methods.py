@@ -29,15 +29,15 @@ except ImportError:
         use_pydicom = False  # set to false as PyDICOM was not found
 
 
-def find_anonymizer_tool():
+def find_deidentifier_tool():
     """
-    Determine which anonymizer tool will be used by the program:
+    Determine which de-identifier tool will be used by the program:
     - PyDICOM python module if found and imported
     - DICOM toolkit if found on the filesystem
 
     :param: None
 
-    :return: tool to use for DICOM anonymization
+    :return: tool to use for DICOM de-identification
      :rtype: object
 
     """
@@ -49,7 +49,7 @@ def find_anonymizer_tool():
         # DICOM toolkit will be used if dcmdump executable exists
         return 'DICOM_toolkit'
     else:
-        # Return False if no tool was found to read and anonymize DICOMs
+        # Return False if no tool was found to read and de-identify DICOMs
         return False
 
 
@@ -228,7 +228,7 @@ def dicom_zapping(dicom_folder, dicom_fields):
      :type dicom_fields: dict
 
     :returns:
-      anonymize_zip -> path to the zip file of the anonymized DICOMs
+      deidentified_zip -> path to the zip file of the de-identified DICOMs
       original_zip  -> path to the zip file of the original DICOMs
      :rtype: str
 
@@ -237,52 +237,53 @@ def dicom_zapping(dicom_folder, dicom_fields):
     # Grep all DICOMs present in directory
     (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
 
-    # Create an original_dcm and anonymized_dcm directory in the DICOM folder,
+    # Create an original_dcm and deidentified_dcm directory in the DICOM folder,
     # as well as subdirectories
-    (original_dir, anonymize_dir) = create_directories(dicom_folder,
+    (original_dir, deidentified_dir) = create_directories(dicom_folder,
                                                       dicom_fields,
                                                       subdirs_list)
 
     # Move DICOMs into the original_directory created and copy DICOMs into the
-    # anonymized_folder
+    # deidentified_folder
     for dicom in dicoms_list:
         if not len(dicom):
             continue
-        # set path to anonymize DICOM file
-        anonymize_dcm = dicom.replace(dicom_folder, anonymize_dir)
+        # set path to de-identified DICOM file
+        deidentified_dcm = dicom.replace(dicom_folder, deidentified_dir)
         # set path to original DICOM file
         original_dcm = dicom.replace(dicom_folder, original_dir)
-        # Move DICOM files from root folder to anonymize folder created
-        move(dicom, anonymize_dcm)
+        # Move DICOM files from root folder to de-identified folder created
+        move(dicom, deidentified_dcm)
         if use_pydicom:
-            # copy files from original folder to anonymize folder
-            shutil.copy(anonymize_dcm, original_dcm)
+            # copy files from original folder to de-identified folder
+            shutil.copy(deidentified_dcm, original_dcm)
             # Zap the DICOM fields from DICOM file using PyDICOM
-            pydicom_zapping(anonymize_dcm, dicom_fields)
+            pydicom_zapping(deidentified_dcm, dicom_fields)
         else:
             # Zap the DICOM fields from DICOM file using dcmodify
-            dcmodify_zapping(anonymize_dcm, dicom_fields)
+            dcmodify_zapping(deidentified_dcm, dicom_fields)
             # Grep the .bak files created by dcmdump and move it to original
             # DICOM folder
-            orig_bak_dcm = anonymize_dcm + ".bak"
+            orig_bak_dcm = deidentified_dcm + ".bak"
             if os.path.exists(orig_bak_dcm):
                 move(orig_bak_dcm, original_dcm)
 
-    # Zip the anonymize and original DICOM folders
-    (anonymize_zip, original_zip) = zip_dicom_directories(anonymize_dir,
-                                                          original_dir,
-                                                          subdirs_list,
-                                                          dicom_folder)
+    # Zip the de-identified and original DICOM folders
+    (deidentified_zip, original_zip) = zip_dicom_directories(deidentified_dir,
+                                                             original_dir,
+                                                             subdirs_list,
+                                                             dicom_folder
+                                                            )
 
     # return zip files
-    return anonymize_zip, original_zip
+    return deidentified_zip, original_zip
 
 
 def pydicom_zapping(dicom_file, dicom_fields):
     """
     Actual zapping method for PyDICOM
 
-    :param dicom_file: DICOM to anonymize
+    :param dicom_file: DICOM to de-identify
      :type dicom_file: str
     :param dicom_fields: Dictionary with DICOM fields & values to use
      :type dicom_fields: dict
@@ -324,7 +325,7 @@ def dcmodify_zapping(dicom_file, dicom_fields):
 
     :returns:
       original_zip  -> Path to the zip file containing original DICOM files
-      anonymize_zip -> Path to the zip file containing anonymized DICOM files
+      deidentified_zip -> Path to the zip file containing de-identified DICOM files
      :rtype: str
 
     """
@@ -350,12 +351,12 @@ def dcmodify_zapping(dicom_file, dicom_fields):
     subprocess.call(modify_cmd, shell=True)
 
 
-def zip_dicom_directories(anonymize_dir, original_dir, subdirs_list, root_dir):
+def zip_dicom_directories(deidentified_dir, original_dir, subdirs_list, root_dir):
     """
-    Zip the anonymize and origin DICOM directories.
+    Zip the de-identified and origin DICOM directories.
 
-    :param anonymize_dir: directory with the anonymized DICOM files
-     :type anonymize_dir: str
+    :param deidentified_dir: directory with the de-identified DICOM files
+     :type deidentified_dir: str
     :param original_dir: directory with the original DICOM files
      :type original_dir: str
     :param subdirs_list: list of subdirectories within the DICOM directories
@@ -364,37 +365,37 @@ def zip_dicom_directories(anonymize_dir, original_dir, subdirs_list, root_dir):
      :type root_dir: str
 
     :returns:
-      anonymize_zip -> path to the zip file of the anonymized DICOM files
+      deidentified_zip -> path to the zip file of the de-identified DICOM files
       original_zip  -> path to the zip file of the original DICOM files
      :rtype: str
 
     """
 
 
-    # If anonymize and original folders exist, zip them
-    if os.path.exists(anonymize_dir) and os.path.exists(original_dir):
+    # If de-identified and original folders exist, zip them
+    if os.path.exists(deidentified_dir) and os.path.exists(original_dir):
         original_zip = zip_dicom(original_dir)
-        anonymize_zip = zip_dicom(anonymize_dir)
+        deidentified_zip = zip_dicom(deidentified_dir)
     else:
-        sys.exit('Failed to find original and anonymize data folders')
+        sys.exit('Failed to find original and de-identify data folders')
 
-    # If archive anonymized and original DICOMs found, remove subdirectories in
+    # If archive de-identified and original DICOMs found, remove subdirectories in
     # root directory
-    if os.path.exists(anonymize_zip) and os.path.exists(original_zip):
+    if os.path.exists(deidentified_zip) and os.path.exists(original_zip):
         for subdir in subdirs_list:
             shutil.rmtree(root_dir + os.path.sep + subdir)
     else:
-        sys.exit('Failed: could not zip anonymize and original data folders')
+        sys.exit('Failed: could not zip de-identified and original data folders')
 
     # Return zip files
-    return anonymize_zip, original_zip
+    return deidentified_zip, original_zip
 
 
 def create_directories(dicom_folder, dicom_fields, subdirs_list):
     """
     Create two directories in the main DICOM folder:
         - one to copy over the original DICOM sub-folders and files
-        - one for the anonymized DICOM dataset
+        - one for the de-identified DICOM dataset
 
     :param dicom_folder: path to the folder containing the DICOM dataset
      :type dicom_folder: str
@@ -405,26 +406,26 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
 
     :returns:
       original_dir  -> directory containing original DICOM dataset
-      anonymize_dir -> directory containing anonymized DICOM dataset
+      deidentified_dir -> directory containing de-identified DICOM dataset
      :rtype: str
 
     """
 
-    # Create an original_dcm and anonymized_dcm directory in the DICOM folder,
+    # Create an original_dcm and deidentified_dcm directory in the DICOM folder,
     # as well as subdirectories
     original_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
         'Value']
-    anonymize_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
-        'Value'] + "_anonymized"
+    deidentified_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
+        'Value'] + "_deidentified"
     os.mkdir(original_dir, 0755)
-    os.mkdir(anonymize_dir, 0755)
-    # Create subdirectories in original and anonymize directory, as found in
+    os.mkdir(deidentified_dir, 0755)
+    # Create subdirectories in original and de-identified directory, as found in
     # DICOM folder
     for subdir in subdirs_list:
         os.mkdir(original_dir + os.path.sep + subdir, 0755)
-        os.mkdir(anonymize_dir + os.path.sep + subdir, 0755)
+        os.mkdir(deidentified_dir + os.path.sep + subdir, 0755)
 
-    return original_dir, anonymize_dir
+    return original_dir, deidentified_dir
 
 
 def zip_dicom(directory):

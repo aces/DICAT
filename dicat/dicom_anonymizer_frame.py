@@ -1,54 +1,68 @@
 #!/usr/bin/python
 
-import Tkinter, Tkconstants, tkFileDialog, tkMessageBox
-import anonymizer_methods as methods
+import Tkinter, tkFileDialog, tkMessageBox
 import os
 from Tkinter import *
 
+# Internal classes import
+import lib.dicom_anonymizer_methods as methods
 '''
-Determine which anonymizer tool to use (PyDICOM or DICOM toolkit) before
+lib.resource_path_methods has been created for Pyinstaller.
+Need to load images or external files using these methods, otherwise the
+created application would not find them.
+'''
+import lib.resource_path_methods as PathMethods
+
+
+'''
+Determine which de-identifier tool to use (PyDICOM or DICOM toolkit) before
 starting the program.
 Will exit with an error message if neither PyDICOM or DICOM toolkit were found.
 '''
-anonymizer_tool = methods.find_anonymizer_tool()
-if not anonymizer_tool:
-    message = "Error: no tool was found to read or anonymizer DICOM files."
+deidentifier_tool = methods.find_deidentifier_tool()
+if not deidentifier_tool:
+    message = "Error: no tool was found to read or de-identify DICOM files."
     tkMessageBox.showinfo("Message", message)
     exit()
 
 
-class dicom_anonymizer(Frame):
+class dicom_deidentifier_frame_gui(Frame):
     def __init__(self, parent):
-        Frame.__init__(self, parent)
         self.parent = parent
         self.dirname = ''
         self.dir_opt = {}
-        self.initialize()
         self.field_dict = {}
+        self.message = StringVar()
+        self.initialize()
+
 
     def initialize(self):
-        self.parent.title("DicAT")
-        self.parent.columnconfigure(0, weight=1)
-        self.parent.rowconfigure(0, weight=1)
 
+        # initialize main Frame
         self.frame = Frame(self.parent)
-        self.frame.grid(column=0, row=0, padx=10, pady=5, sticky=N + S + E + W)
+        self.frame.pack(expand=1, fill='both')
 
         self.frame.columnconfigure(0, weight=6)
         self.frame.columnconfigure(1, weight=1)
 
+        # Initialize default text that will be in self.entry
         self.entryVariable = Tkinter.StringVar()
         self.entryVariable.set("Select a DICOM directory")
 
+        # Create an entry with a default text that will be replaced by the path
+        # to the directory once directory selected
         self.entry = Entry(self.frame,
                            width=40,
-                           textvariable=self.entryVariable)
+                           textvariable=self.entryVariable
+                          )
         self.entry.focus_set()
         self.entry.selection_range(0, Tkinter.END)
 
+        # Create a select button to use to select a DICOM directory
         self.buttonSelect = Button(self.frame,
                                    text=u"Select",
-                                   command=self.askdirectory)
+                                   command=self.askdirectory
+                                  )
         self.buttonsPanel = Frame(self.frame)
 
         self.entry.grid(row=0, column=0, padx=15, pady=10, sticky=E + W)
@@ -61,21 +75,25 @@ class dicom_anonymizer(Frame):
 
         self.buttonView = Button(self.buttonsPanel,
                                  text=u"View DICOM fields",
-                                 command=self.anonymize)
+                                 command=self.deidentify)
         self.buttonView.grid(row=0, column=0, padx=(0, 10), sticky=E + W)
         self.buttonView.configure(state=DISABLED)
 
-        self.center(self.parent)
-
-    def center(self, win):
-        win.update_idletasks()
-        width = win.winfo_width()
-        height = win.winfo_height()
-        x = (win.winfo_screenwidth() // 2) - (width // 2)
-        y = (win.winfo_screenheight() // 2) - (height // 2)
-        win.geometry('%dx%d+%d+%d' % (width, height, x, y))
+        self.messageView = Label( self.frame,
+                                  textvariable=self.message,
+                                )
+        self.messageView.grid( row=2,
+                               column=0,
+                               columnspan=2,
+                               padx=(0, 10),
+                               sticky=E + W
+                             )
+        self.messageView.grid_forget()
 
     def askdirectory(self):
+
+        # removes the message from the grid
+        self.messageView.grid_forget()
 
         """Returns a selected directory name."""
         self.dirname = tkFileDialog.askdirectory(**self.dir_opt)
@@ -83,9 +101,14 @@ class dicom_anonymizer(Frame):
         self.buttonView.configure(state=NORMAL)
         return self.dirname
 
-    def anonymize(self):
+    def deidentify(self):
         # Read the XML file with the identifying DICOM fields
-        XML_filename = "fields_to_zap.xml"
+        load_xml = PathMethods.resource_path("data/fields_to_zap.xml")
+        XML_filename  = load_xml.return_path()
+
+        # Remove the message from the grid
+        self.messageView.grid_forget()
+
         if os.path.isfile(XML_filename):
             XML_file = XML_filename
         else:
@@ -100,9 +123,8 @@ class dicom_anonymizer(Frame):
         keys_length = len(fields_keys) + 1
         self.edited_entries = [Tkinter.StringVar() for i in range(keys_length)]
         if len(field_dict) != 0:
-            self.field_edit_win = Tkinter.Toplevel()
-            self.field_edit_win.title('Fields to Edit')
-            self.field_edit_win.grid()
+            self.field_edit_win = Frame(self.parent)
+            self.field_edit_win.pack(expand=1, fill='both')
             self.field_edit_win.columnconfigure(0, weight=1)
             self.field_edit_win.columnconfigure(1, weight=1)
             self.field_edit_win.rowconfigure(0, weight=1)
@@ -180,7 +202,7 @@ class dicom_anonymizer(Frame):
 
             self.field_edit_win.button_done = Tkinter.Button(
                 self.bottomPanel,
-                text=u"Anonymize",
+                text=u"De-identify",
                 command=self.collect_edited_data)
             self.field_edit_win.button_done.grid(column=0, row=0, padx=20)
 
@@ -189,7 +211,6 @@ class dicom_anonymizer(Frame):
                                                              command=self.clear,
                                                              width=8)
             self.field_edit_win.buttonClear.grid(column=1, row=0, padx=20)
-        self.center(self.field_edit_win)
 
     def clear(self):
         for items in self.edited_entries:
@@ -218,22 +239,32 @@ class dicom_anonymizer(Frame):
                 self.field_dict[key]['Update'] = False
             key_nb += 1
 
-        # Edit DICOM field values to anonymize the dataset
-        # (anonymize_dcm, original_dcm) = ''
-        (anonymize_dcm, original_dcm) = methods.dicom_zapping(
+        # Edit DICOM field values to de-identify the dataset
+        # (deidentified_dcm, original_dcm) = ''
+        (deidentified_dcm, original_dcm) = methods.dicom_zapping(
             self.dirname, self.field_dict)
 
         self.field_edit_win.destroy()
-        if os.path.exists(anonymize_dcm) != [] and os.path.exists(
+        if os.path.exists(deidentified_dcm) != [] and os.path.exists(
                 original_dcm) != []:
-            message = "Booya! It's anonymized!"
-            tkMessageBox.showinfo("Message", message)
+            self.message.set("BOOYA! It's de-identified!")
+            self.messageView.configure( fg="dark green",
+                                    font= "Helvetica 16 bold italic"
+                                  )
+            self.messageView.grid( row=2,
+                                   column=0,
+                                   columnspan=2,
+                                   padx=(0, 10),
+                                   sticky=E+W
+                                 )
         else:
-            message = "Oh no, there was an error when processing files"
-            tkMessageBox.showinfo("Message", message)
-
-
-if __name__ == "__main__":
-    root = Tk()
-    app = dicom_anonymizer(root)
-    root.mainloop()
+            self.message.set("An error occured during DICOM files de-identification")
+            self.messageView.configure( fg="dark red",
+                                        font= "Helvetica 16 italic"
+                                      )
+            self.messageView.grid( row=2,
+                                   column=0,
+                                   columnspan=2,
+                                   padx=(0, 10),
+                                   sticky=E+W
+                                 )
