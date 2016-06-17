@@ -7,6 +7,7 @@ from dicom_anonymizer_frame import dicom_deidentifier_frame_gui
 from IDMapper import IDMapper_frame_gui
 from scheduler_application import UserInterface
 from welcome_frame import welcome_frame_gui
+import ui.menubar as MenuBar
 
 class DicAT_application():
 
@@ -36,7 +37,7 @@ class DicAT_application():
         self.page4 = ttk.Frame(self.nb)
 
         # Add the pages to the notebook
-        self.nb.add(self.page1, text='Welcome to DicAT!')
+        self.nb.add(self.page1, text='Welcome to DICAT!')
         self.nb.add(self.page2, text='DICOM de-identifier')
         self.nb.add(self.page3, text='Scheduler') # hide scheduler for now
         self.nb.add(self.page4, text='ID key')
@@ -48,7 +49,7 @@ class DicAT_application():
         self.dicom_deidentifier_tab()
         self.id_key_frame()
         self.welcome_page()
-        self.scheduler_page()
+        self.scheduler_page(master)
 
 
     def dicom_deidentifier_tab(self):
@@ -68,9 +69,11 @@ class DicAT_application():
         # start the Welcome page
         welcome_frame_gui(self.page1)
 
-    def scheduler_page(self):
+    def scheduler_page(self, master):
 
-        # start the scheduler frame
+        # initialize the menu bar and start the scheduler frame
+        menu = MenuBar.MenuBar(master)
+        master.config(menu=menu)
         UserInterface(self.page3)
 
 if __name__ == "__main__":
