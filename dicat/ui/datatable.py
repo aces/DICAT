@@ -97,28 +97,38 @@ class ParticipantsList(DataTable):
     That list is comprised of all participants (even those that have not been called once.
     """
 
-    def __init__(self, parent, colheaders):  # expected is dataset
+    def __init__(self, parent, colheaders, xmlfile):  # expected is dataset
         DataTable.__init__(self, parent, colheaders)
         self.colheaders = colheaders
-        self.load_data()
+        self.load_data(xmlfile)
         # TODO add these color settings in a 'settings and preferences section of the app'
         self.datatable.tag_configure('active', background='#F1F8FF')  # TODO replace active tag by status variable value
 
-    def load_data(self):
-        data = dict(DataManagement.read_candidate_data())
+    def load_data(self, xmlfile):
+        data = DataManagement.read_candidate_data(xmlfile)
+
         try:
             for key in data:
-                if data[key].status is None:
-                    status = ''
+
+                if "CandidateStatus" not in data[key].keys():
+                    status = ""
                 else:
-                    status = data[key].status
+                    status = data[key]["CandidateStatus"]
+
+                if "PhoneNumber" not in data[key].keys():
+                    phone = ""
+                else:
+                    phone = data[key]["PhoneNumber"]
                 self.datatable.insert( '', 'end',
-                                       values=[data[key].firstname,
-                                               data[key].lastname, data[key].phone,
-                                               status
+                                       values=[ data[key]["Identifier"],
+                                                data[key]["FirstName"],
+                                                data[key]["LastName"],
+                                                data[key]["Gender"],
+                                                phone,
+                                                status
                                               ],
-                                       tags=(status, data[key].uid)
-                                     )
+                                       tags=(status, data[key]["Identifier"])
+                                    )
         except Exception as e:
             print "datatable.ParticipantsList.load_data ", str(e)  # TODO proper exception handling
             pass
@@ -130,16 +140,16 @@ class VisitList(DataTable):
     even those that have not been confirmed yet.
     """
 
-    def __init__(self, parent, colheaders):
+    def __init__(self, parent, colheaders, xmlfile):
         DataTable.__init__(self, parent, colheaders)
         self.colheaders = colheaders
-        self.load_data()
+        self.load_data(xmlfile)
         # TODO add these color settings in a 'settings and preferences section of the app'
         self.datatable.tag_configure('active', background='#F1F8FF')  # TODO change for non-language parameter
         self.datatable.tag_configure('tentative', background='#F0F0F0')  # TODO change for non-language parameter
 
-    def load_data(self):
-        data = dict(DataManagement.read_candidate_data())
+    def load_data(self, xmlfile):
+        data = dict(DataManagement.read_candidate_data(xmlfile))
         for key, value in data.iteritems():
             if data[key].visitset is not None:  # skip the search if visitset = None
                 current_visitset = data[key].visitset  # set this candidate.visitset for the next step

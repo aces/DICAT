@@ -21,16 +21,28 @@ def read_xmlfile(xmlfile):
         print message #TODO: create a log class to display the messages
 
 
-def read_candidate_data():
+def read_candidate_data(xmlfile):
     """Read and return the content of a file called candidatedata. Returns nothing if file doesn't exist"""
 
+    data = {}
     #check to see if file exists before loading it
-    if os.path.isfile("candidatedata"):
-        #load file
-        db = pickle.load(open("candidatedata", "rb"))
+    if os.path.isfile(xmlfile):
+        # read the xml file
+        xmldoc      = read_xmlfile(xmlfile)
+        xmldata     = xmldoc.getElementsByTagName('data')[0]
+        xmlcandlist = xmldata.getElementsByTagName('Candidate')
+        for cand in xmlcandlist:
+            data[cand] = {}
+            for elem in cand.childNodes:
+                tag = elem.localName
+                if not tag or tag == "Visit":
+                    continue
+                val = cand.getElementsByTagName(elem.localName)[0].firstChild.nodeValue
+                data[cand][tag] = val
     else:
-        db = ""
-    return db
+        data = ""
+
+    return data
 
 
 def save_candidate_data(data):
@@ -60,5 +72,5 @@ def save_study_data(data):
 #self-test "module"  TODO remove
 if __name__ == '__main__':
     print 'testing module:  datamanagement.py'
-    data=dict(read_candidate_data());
+    data=dict(read_candidate_data("../new_data_test.xml"));
     print data;
