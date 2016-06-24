@@ -4,7 +4,7 @@ import Tkinter
 import lib.multilanguage as MultiLanguage
 import ui.datawindow as DataWindow
 
-class MenuBar(Tkinter.Menu):
+class SchedulerMenuBar(Tkinter.Menu):
     def __init__(self, parent):
         Tkinter.Menu.__init__(self, parent)
         # create an APPLICATION pulldown menu

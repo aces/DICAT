@@ -4,7 +4,6 @@
 from Tkinter import *
 from ttk import *
 #import internal packages
-import ui.menubar as MenuBar
 import ui.datatable as DataTable
 import lib.multilanguage as MultiLanguage
 
@@ -23,26 +22,49 @@ class UserInterface(Frame):
         self.frame = Frame(self.parent)
         self.frame.pack(side=TOP, expand=YES, fill=BOTH, padx=10, pady=10)
 
-        # TODO create class for project info pane
-        # This area (datapane) is composed of one Panedwindow containing two Labelframe
-        self.data_pane = Panedwindow(self.frame, width=1000, height=500, orient=HORIZONTAL)  # TODO add dynamic resize
+        xmlfile = "new_data_test.xml"
+
+        # This area (datapane) is one Panedwindow containing 3 Labelframes
+        self.data_pane = Panedwindow( self.frame, width=1000,
+                                      height=500, orient=HORIZONTAL
+                                    )  # TODO add dynamic resize
         self.data_pane.pack(side=RIGHT, expand=YES, fill=BOTH)
-        self.project_infopane = Labelframe(self.data_pane, text=MultiLanguage.project_info_pane, width=250, height=350,
-                                          borderwidth=10)  # TODO add dynamic resize
-        self.candidate_pane = Labelframe(self.data_pane, text=MultiLanguage.candidate_pane, width=100, height=450,
-                                        borderwidth=10)  # TODO add dynamic resize
-        self.visit_pane = Labelframe(self.data_pane, text=MultiLanguage.calendar_pane, width=100, height=350,
-                                    borderwidth=10)  # TODO add dynamic resize
+        # TODO create class for project info pane
+        self.project_infopane = Labelframe(self.data_pane,
+                                           text=MultiLanguage.project_info_pane,
+                                           width=250,
+                                           height=350,
+                                           borderwidth=10
+                                          )  # TODO add dynamic resize
+        self.candidate_pane = Labelframe( self.data_pane,
+                                          text=MultiLanguage.candidate_pane,
+                                          width=100,
+                                          height=450,
+                                          borderwidth=10
+                                        )  # TODO add dynamic resize
+        self.visit_pane = Labelframe( self.data_pane,
+                                      text=MultiLanguage.calendar_pane,
+                                      width=100,
+                                      height=350,
+                                      borderwidth=10
+                                    )  # TODO add dynamic resize
         self.data_pane.add(self.project_infopane)
         self.data_pane.add(self.candidate_pane)
         self.data_pane.add(self.visit_pane)
 
         # create data tables (treeview)
-        visit_column_headers = ('candidate', 'visitlabel', 'when', 'where', 'status')
-        self.visit_table = DataTable.VisitList(self.visit_pane, visit_column_headers)
+        visit_column_headers = ( 'candidate', 'visitlabel',
+                                 'when',      'where',
+                                 'status'
+                               )
+        self.visit_table = DataTable.VisitList( self.visit_pane,
+                                                visit_column_headers
+                                              )
         self.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
-        column_header = ('firstname', 'lastname', 'phone', 'status')
-        self.data_table = DataTable.ParticipantsList(self.candidate_pane, column_header)
+        candidate_column_headers = ('firstname', 'lastname', 'phone', 'status')
+        self.data_table = DataTable.ParticipantsList( self.candidate_pane,
+                                                      candidate_column_headers
+                                                    )
         self.data_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
 
         """

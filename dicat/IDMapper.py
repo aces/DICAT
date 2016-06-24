@@ -2,7 +2,6 @@
 
 import Tkinter, Tkconstants, tkFileDialog, tkMessageBox, re, datetime
 from Tkinter import *
-from xml.dom import minidom
 
 import lib.datamanagement as DataManagement
 
@@ -186,7 +185,8 @@ class IDMapper_frame_gui(Frame):
         """Parses the XML file and loads the data into the current window"""
         try:
             xmldoc   = DataManagement.read_xmlfile(file)
-            xmlitemlist = xmldoc.getElementsByTagName('Candidate')
+            xmldata  = xmldoc.getElementsByTagName('data')
+            xmlitemlist = xmldata.getElementsByTagName('Candidate')
             for s in xmlitemlist:
                 identifier = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
                 realname = s.getElementsByTagName("RealName")[0].firstChild.nodeValue

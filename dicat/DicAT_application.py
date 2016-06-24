@@ -72,7 +72,7 @@ class DicAT_application():
     def scheduler_page(self, master):
 
         # initialize the menu bar and start the scheduler frame
-        menu = MenuBar.MenuBar(master)
+        menu = MenuBar.SchedulerMenuBar(master)
         master.config(menu=menu)
         UserInterface(self.page3)
 
