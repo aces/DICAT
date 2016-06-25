@@ -15,27 +15,51 @@ class DataTable(Frame):
     def __init__(self, parent, colheaders):
         Frame.__init__(self)
         self.parent = parent
-        colheaders = colheaders
-        datatable = self.init_datatable(parent, colheaders)
+        self.init_datatable(parent, colheaders)
 
+    """
+    Initialize the datatable (which is a tk.treeview & add scroll bars)
+    """
     def init_datatable(self, parent, colheaders):
-        """Initialize the datatable (which is a tk.treeview and add scroll bars)"""
-        self.datatable = Treeview(parent, selectmode='browse', columns=colheaders, show="headings")
+
+        # initialize the treeview datatable
+        self.datatable = Treeview( parent,             selectmode='browse',
+                                   columns=colheaders, show="headings"
+                                 )
+
+        # add the column headers to the datatable
         for col in colheaders:
-            self.datatable.heading(col, text=col.title(),
-                                   command=lambda c=col: self.treeview_sortby(self.datatable, c, 0))
-            self.datatable.column(col, width=100, stretch="Yes", anchor="center")
+            self.datatable.heading(
+                col,
+                text=col.title(),
+                command=lambda c=col: self.treeview_sortby(self.datatable, c, 0)
+                                  )
+            self.datatable.column( col,           width=100,
+                                   stretch="Yes", anchor="center"
+                                 )
+
         # add vertical and horizontal scroll
-        self.verticalscroll = Scrollbar(parent, orient="vertical", command=self.datatable.yview)
-        self.horizontalscroll = Scrollbar(parent, orient="horizontal", command=self.datatable.xview)
-        self.datatable.configure(yscrollcommand=self.verticalscroll.set, xscroll=self.horizontalscroll.set)
+        self.verticalscroll = Scrollbar( parent, orient="vertical",
+                                         command=self.datatable.yview
+                                       )
+        self.horizontalscroll = Scrollbar( parent, orient="horizontal",
+                                           command=self.datatable.xview
+                                         )
+        self.datatable.configure( yscrollcommand=self.verticalscroll.set,
+                                  xscroll=self.horizontalscroll.set
+                                )
         self.verticalscroll.pack(side=RIGHT, expand=NO, fill=BOTH)
         self.horizontalscroll.pack(side=BOTTOM, expand=NO, fill=BOTH)
+
+        # draw the datatable
         self.datatable.pack(side=LEFT, expand=YES, fill=BOTH)
-        # Binding with events
-        self.datatable.bind('<Double-1>', self.ondoubleclick)
-        self.datatable.bind("<<TreeviewSelect>>", self.onrowclick)
-        self.datatable.bind('<Button-3>', self.onrightclik)
+
+        # bind with events
+        #self.datatable.bind('<Double-1>', lambda event: self.ondoubleclick(event))
+
+        self.datatable.bind('<Double-1>',         self.ondoubleclick)
+        self.datatable.bind("<<TreeviewSelect>>", self.onrowclick   )
+        self.datatable.bind('<Button-3>',         self.onrightclik  )
 
     def load_data(self):
         """Should be overriden in child class"""
@@ -73,8 +97,8 @@ class DataTable(Frame):
             itemID = self.datatable.selection()[0]
             item = self.datatable.item(itemID)['tags']
             parent = self.parent
-            candidate_uuid = item[1]
-            DataWindow.DataWindow(parent, candidate_uuid)
+            candidate_id = item[1]
+            DataWindow.DataWindow(parent, candidate_id)
             self.update_data()
         except Exception as e:
             print "Datatable ondoubleclick ", str(e)  # TODO deal with exception or not!?!
@@ -97,15 +121,15 @@ class ParticipantsList(DataTable):
     That list is comprised of all participants (even those that have not been called once.
     """
 
-    def __init__(self, parent, colheaders, xmlfile):  # expected is dataset
+    def __init__(self, parent, colheaders):  # expected is dataset
         DataTable.__init__(self, parent, colheaders)
         self.colheaders = colheaders
-        self.load_data(xmlfile)
+        self.load_data()
         # TODO add these color settings in a 'settings and preferences section of the app'
         self.datatable.tag_configure('active', background='#F1F8FF')  # TODO replace active tag by status variable value
 
-    def load_data(self, xmlfile):
-        data = DataManagement.read_candidate_data(xmlfile)
+    def load_data(self):
+        data = DataManagement.read_candidate_data()
 
         try:
             for key in data:
@@ -140,16 +164,16 @@ class VisitList(DataTable):
     even those that have not been confirmed yet.
     """
 
-    def __init__(self, parent, colheaders, xmlfile):
+    def __init__(self, parent, colheaders):
         DataTable.__init__(self, parent, colheaders)
         self.colheaders = colheaders
-        self.load_data(xmlfile)
+        self.load_data()
         # TODO add these color settings in a 'settings and preferences section of the app'
         self.datatable.tag_configure('active', background='#F1F8FF')  # TODO change for non-language parameter
         self.datatable.tag_configure('tentative', background='#F0F0F0')  # TODO change for non-language parameter
 
-    def load_data(self, xmlfile):
-        data = dict(DataManagement.read_visitset_data(xmlfile))
+    def load_data(self):
+        data = DataManagement.read_visitset_data()
         for cand_key, value in data.iteritems():
             if "VisitSet" in data[cand_key].keys():  # skip the search if visitset = None
                 current_visitset = data[cand_key]["VisitSet"]  # set this candidate.visitset for the next step
@@ -165,7 +189,6 @@ class VisitList(DataTable):
                     if "VisitStatus" in current_visitset[visit_key].keys():
                         status = current_visitset[visit_key]["VisitStatus"]
                         visit_label = current_visitset[visit_key]["VisitLabel"]
-                        print current_visitset[ visit_key].keys()
                         if "VisitStartWhen" not in current_visitset[visit_key].keys():
                             when = ''  #TODO check what would be the next visit and set status to "to_schedule"
                             #when = current_visitset[visit_key].whenearliest

@@ -2,6 +2,7 @@
 import os.path
 import pickle
 from xml.dom import minidom
+import config as Config
 """
 The data_management.py file contains functions related to data management only.
 Generic functions: savedata(data, datafilename) and readdata(datafile).  Currently, these are not being used.
@@ -9,26 +10,26 @@ Generic functions: savedata(data, datafilename) and readdata(datafile).  Current
 Specific functions read_candidate_data(), save_candidate_data(), read_studydata() and save_study_data() are used to get/save candidate data and study setup data respectively.
 """
 
-def read_xmlfile(xmlfile):
+def read_xmlfile():
 
     """Parses the XML file and loads the data into the current window"""
     try:
-        xmldoc = minidom.parse(xmlfile)
+        xmldoc = minidom.parse(Config.xmlfile)
         return xmldoc
 
     except:
-        message = "ERROR: could not read file " + xmlfile
+        message = "ERROR: could not read file " + Config.xmlfile
         print message #TODO: create a log class to display the messages
 
 
-def read_candidate_data(xmlfile):
+def read_candidate_data():
     """Read and return the content of a file called candidatedata. Returns nothing if file doesn't exist"""
 
     data = {}
     #check to see if file exists before loading it
-    if os.path.isfile(xmlfile):
+    if os.path.isfile(Config.xmlfile):
         # read the xml file
-        xmldoc      = read_xmlfile(xmlfile)
+        xmldoc      = read_xmlfile()
         xmldata     = xmldoc.getElementsByTagName('data')[0]
         xmlcandlist = xmldata.getElementsByTagName('Candidate')
         for cand in xmlcandlist:
@@ -44,14 +45,14 @@ def read_candidate_data(xmlfile):
 
     return data
 
-def read_visitset_data(xmlfile):
+def read_visitset_data():
     """Read and return the content of a file called candidatedata. Returns nothing if file doesn't exist"""
 
     data = {}
     #check to see if file exists before loading it
-    if os.path.isfile(xmlfile):
+    if os.path.isfile(Config.xmlfile):
         # read the xml file
-        xmldoc      = read_xmlfile(xmlfile)
+        xmldoc      = read_xmlfile()
         xmldata     = xmldoc.getElementsByTagName('data')[0]
         xmlcandlist = xmldata.getElementsByTagName('Candidate')
         for cand in xmlcandlist:
