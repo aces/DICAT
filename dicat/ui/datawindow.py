@@ -16,14 +16,14 @@ import lib.datamanagement as DataManagement
 
 class DataWindow(Toplevel):
 
-    def __init__(self, parent, xmlfile, candidate_uuid='new'):
+    def __init__(self, parent, candidate_uuid='new'):
         Toplevel.__init__(self, parent)
         # create a transient window on top of parent window
         self.transient(parent) 
         self.parent = parent
         self.title(MultiLanguage.data_window_title)  #TODO find a better title for the thing
         body = Frame(self)
-        self.initial_focus = self.body(body, candidate_uuid, xmlfile)
+        self.initial_focus = self.body(body, candidate_uuid)
         body.pack(padx=5, pady=5)
 
         self.button_box()
@@ -38,11 +38,11 @@ class DataWindow(Toplevel):
         self.wait_window(self)
 
 
-    def body(self, master, candidate, xmlfile):
+    def body(self, master, candidate):
         """Creates the body of 'datawindow'.  param candidate is the candidate.uuid"""
         try:
-            cand_data  = DataManagement.read_candidate_data(xmlfile)  # TODO better way to do this
-            visit_data = DataManagement.read_visitset_data(xmlfile)
+            cand_data  = DataManagement.read_candidate_data()  # TODO better way to do this
+            visit_data = DataManagement.read_visitset_data()
             visitset = {}
             cand_info = {}
             for cand_key in cand_data:
@@ -245,7 +245,6 @@ class DataWindow(Toplevel):
                     #TODO: implement automatic range for next visit
                     visit_when = ""
                 else:
-                    print "iNINI"
                     visit_when = visit_list[x]["VisitStartWhen"]
                 label_visit_when = Label(self.schedule_pane, text=visit_when)
                 label_visit_when.grid( column=2, row=x+1,

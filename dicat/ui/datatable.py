@@ -12,15 +12,15 @@ class DataTable(Frame):
     Child clases are ParticipantsList(DataTable) and VisitList(DataTable)
     """
 
-    def __init__(self, parent, colheaders, xmlfile):
+    def __init__(self, parent, colheaders):
         Frame.__init__(self)
         self.parent = parent
-        self.init_datatable(parent, colheaders, xmlfile)
+        self.init_datatable(parent, colheaders)
 
     """
     Initialize the datatable (which is a tk.treeview & add scroll bars)
     """
-    def init_datatable(self, parent, colheaders, xmlfile):
+    def init_datatable(self, parent, colheaders):
 
         # initialize the treeview datatable
         self.datatable = Treeview( parent,             selectmode='browse',
@@ -55,9 +55,9 @@ class DataTable(Frame):
         self.datatable.pack(side=LEFT, expand=YES, fill=BOTH)
 
         # bind with events
-        self.datatable.bind('<Double-1>', lambda event: self.ondoubleclick(xmlfile, event))
+        #self.datatable.bind('<Double-1>', lambda event: self.ondoubleclick(event))
 
-        #self.datatable.bind('<Double-1>',         self.ondoubleclick(xmlfile))
+        self.datatable.bind('<Double-1>',         self.ondoubleclick)
         self.datatable.bind("<<TreeviewSelect>>", self.onrowclick   )
         self.datatable.bind('<Button-3>',         self.onrightclik  )
 
@@ -85,7 +85,7 @@ class DataTable(Frame):
             # switch the heading so that it will sort in the opposite direction
             tree.heading(column, command=lambda column=column: self.treeview_sortby(tree, column, int(not descending)))
 
-    def ondoubleclick(self, xmlfile, event):
+    def ondoubleclick(self, event):
         """
         Double clicking on a treeview line opens a 'data window'
         and refresh the treeview data when the 'data window' is closed
@@ -98,7 +98,7 @@ class DataTable(Frame):
             item = self.datatable.item(itemID)['tags']
             parent = self.parent
             candidate_id = item[1]
-            DataWindow.DataWindow(parent, xmlfile, candidate_id)
+            DataWindow.DataWindow(parent, candidate_id)
             self.update_data()
         except Exception as e:
             print "Datatable ondoubleclick ", str(e)  # TODO deal with exception or not!?!
@@ -121,15 +121,15 @@ class ParticipantsList(DataTable):
     That list is comprised of all participants (even those that have not been called once.
     """
 
-    def __init__(self, parent, colheaders, xmlfile):  # expected is dataset
-        DataTable.__init__(self, parent, colheaders, xmlfile)
+    def __init__(self, parent, colheaders):  # expected is dataset
+        DataTable.__init__(self, parent, colheaders)
         self.colheaders = colheaders
-        self.load_data(xmlfile)
+        self.load_data()
         # TODO add these color settings in a 'settings and preferences section of the app'
         self.datatable.tag_configure('active', background='#F1F8FF')  # TODO replace active tag by status variable value
 
-    def load_data(self, xmlfile):
-        data = DataManagement.read_candidate_data(xmlfile)
+    def load_data(self):
+        data = DataManagement.read_candidate_data()
 
         try:
             for key in data:
@@ -164,16 +164,16 @@ class VisitList(DataTable):
     even those that have not been confirmed yet.
     """
 
-    def __init__(self, parent, colheaders, xmlfile):
-        DataTable.__init__(self, parent, colheaders, xmlfile)
+    def __init__(self, parent, colheaders):
+        DataTable.__init__(self, parent, colheaders)
         self.colheaders = colheaders
-        self.load_data(xmlfile)
+        self.load_data()
         # TODO add these color settings in a 'settings and preferences section of the app'
         self.datatable.tag_configure('active', background='#F1F8FF')  # TODO change for non-language parameter
         self.datatable.tag_configure('tentative', background='#F0F0F0')  # TODO change for non-language parameter
 
-    def load_data(self, xmlfile):
-        data = dict(DataManagement.read_visitset_data(xmlfile))
+    def load_data(self):
+        data = DataManagement.read_visitset_data()
         for cand_key, value in data.iteritems():
             if "VisitSet" in data[cand_key].keys():  # skip the search if visitset = None
                 current_visitset = data[cand_key]["VisitSet"]  # set this candidate.visitset for the next step
