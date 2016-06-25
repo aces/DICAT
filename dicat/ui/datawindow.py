@@ -139,7 +139,7 @@ class DataWindow(Toplevel):
                 # when
                 if visit_list[x].when == None:
                     visit = visit_list[x]
-                    date_range = Visit.visit_date_range(visit)
+                    date_range = visit.visit_date_range()
                     label_visit_when = Label(self.schedule_pane, text=date_range)
                     label_visit_when.grid(column=2, row=x+1, padx=5, pady=5, sticky=N+S+E+W)
                 else:
