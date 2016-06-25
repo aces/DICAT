@@ -12,30 +12,54 @@ class DataTable(Frame):
     Child clases are ParticipantsList(DataTable) and VisitList(DataTable)
     """
 
-    def __init__(self, parent, colheaders):
+    def __init__(self, parent, colheaders, xmlfile):
         Frame.__init__(self)
         self.parent = parent
-        colheaders = colheaders
-        datatable = self.init_datatable(parent, colheaders)
+        self.init_datatable(parent, colheaders, xmlfile)
 
-    def init_datatable(self, parent, colheaders):
-        """Initialize the datatable (which is a tk.treeview and add scroll bars)"""
-        self.datatable = Treeview(parent, selectmode='browse', columns=colheaders, show="headings")
+    """
+    Initialize the datatable (which is a tk.treeview & add scroll bars)
+    """
+    def init_datatable(self, parent, colheaders, xmlfile):
+
+        # initialize the treeview datatable
+        self.datatable = Treeview( parent,             selectmode='browse',
+                                   columns=colheaders, show="headings"
+                                 )
+
+        # add the column headers to the datatable
         for col in colheaders:
-            self.datatable.heading(col, text=col.title(),
-                                   command=lambda c=col: self.treeview_sortby(self.datatable, c, 0))
-            self.datatable.column(col, width=100, stretch="Yes", anchor="center")
+            self.datatable.heading(
+                col,
+                text=col.title(),
+                command=lambda c=col: self.treeview_sortby(self.datatable, c, 0)
+                                  )
+            self.datatable.column( col,           width=100,
+                                   stretch="Yes", anchor="center"
+                                 )
+
         # add vertical and horizontal scroll
-        self.verticalscroll = Scrollbar(parent, orient="vertical", command=self.datatable.yview)
-        self.horizontalscroll = Scrollbar(parent, orient="horizontal", command=self.datatable.xview)
-        self.datatable.configure(yscrollcommand=self.verticalscroll.set, xscroll=self.horizontalscroll.set)
+        self.verticalscroll = Scrollbar( parent, orient="vertical",
+                                         command=self.datatable.yview
+                                       )
+        self.horizontalscroll = Scrollbar( parent, orient="horizontal",
+                                           command=self.datatable.xview
+                                         )
+        self.datatable.configure( yscrollcommand=self.verticalscroll.set,
+                                  xscroll=self.horizontalscroll.set
+                                )
         self.verticalscroll.pack(side=RIGHT, expand=NO, fill=BOTH)
         self.horizontalscroll.pack(side=BOTTOM, expand=NO, fill=BOTH)
+
+        # draw the datatable
         self.datatable.pack(side=LEFT, expand=YES, fill=BOTH)
-        # Binding with events
-        self.datatable.bind('<Double-1>', self.ondoubleclick)
-        self.datatable.bind("<<TreeviewSelect>>", self.onrowclick)
-        self.datatable.bind('<Button-3>', self.onrightclik)
+
+        # bind with events
+        self.datatable.bind('<Double-1>', lambda event: self.ondoubleclick(xmlfile, event))
+
+        #self.datatable.bind('<Double-1>',         self.ondoubleclick(xmlfile))
+        self.datatable.bind("<<TreeviewSelect>>", self.onrowclick   )
+        self.datatable.bind('<Button-3>',         self.onrightclik  )
 
     def load_data(self):
         """Should be overriden in child class"""
@@ -61,7 +85,7 @@ class DataTable(Frame):
             # switch the heading so that it will sort in the opposite direction
             tree.heading(column, command=lambda column=column: self.treeview_sortby(tree, column, int(not descending)))
 
-    def ondoubleclick(self, event):
+    def ondoubleclick(self, xmlfile, event):
         """
         Double clicking on a treeview line opens a 'data window'
         and refresh the treeview data when the 'data window' is closed
@@ -73,8 +97,8 @@ class DataTable(Frame):
             itemID = self.datatable.selection()[0]
             item = self.datatable.item(itemID)['tags']
             parent = self.parent
-            candidate_uuid = item[1]
-            DataWindow.DataWindow(parent, candidate_uuid)
+            candidate_id = item[1]
+            DataWindow.DataWindow(parent, xmlfile, candidate_id)
             self.update_data()
         except Exception as e:
             print "Datatable ondoubleclick ", str(e)  # TODO deal with exception or not!?!
@@ -98,7 +122,7 @@ class ParticipantsList(DataTable):
     """
 
     def __init__(self, parent, colheaders, xmlfile):  # expected is dataset
-        DataTable.__init__(self, parent, colheaders)
+        DataTable.__init__(self, parent, colheaders, xmlfile)
         self.colheaders = colheaders
         self.load_data(xmlfile)
         # TODO add these color settings in a 'settings and preferences section of the app'
@@ -141,7 +165,7 @@ class VisitList(DataTable):
     """
 
     def __init__(self, parent, colheaders, xmlfile):
-        DataTable.__init__(self, parent, colheaders)
+        DataTable.__init__(self, parent, colheaders, xmlfile)
         self.colheaders = colheaders
         self.load_data(xmlfile)
         # TODO add these color settings in a 'settings and preferences section of the app'
@@ -165,7 +189,6 @@ class VisitList(DataTable):
                     if "VisitStatus" in current_visitset[visit_key].keys():
                         status = current_visitset[visit_key]["VisitStatus"]
                         visit_label = current_visitset[visit_key]["VisitLabel"]
-                        print current_visitset[ visit_key].keys()
                         if "VisitStartWhen" not in current_visitset[visit_key].keys():
                             when = ''  #TODO check what would be the next visit and set status to "to_schedule"
                             #when = current_visitset[visit_key].whenearliest

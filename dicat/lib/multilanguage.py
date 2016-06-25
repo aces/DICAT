@@ -109,6 +109,8 @@ if language == "fr":
     candidate_phone = u"Téléphone"
     candidate_pscid = u"ID"
     candidate_status = u"Status"
+    candidate_gender = u"Sexe"
+
     schedule_visit_label = u"Visite"
     schedule_visit_rank = u"#"
     schedule_visit_status = u"Status"
@@ -215,6 +217,7 @@ elif language == "en":
     candidate_phone = u"Phone"
     candidate_pscid = u"ID"
     candidate_status = u"Status"
+    candidate_gender = u"Sex"
     schedule_visit_label = u"Visit"
     schedule_visit_rank = u"#"
     schedule_visit_status = u"Status"
