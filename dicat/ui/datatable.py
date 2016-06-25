@@ -154,10 +154,9 @@ class VisitList(DataTable):
             if data[key].visitset is not None:  # skip the search if visitset = None
                 current_visitset = data[key].visitset  # set this candidate.visitset for the next step
                 # gather information about the candidate
-                # this candidatekey is not printed on screen but saved with the new Scheduler object
-                candidatekey = data[key].uid
-                candidate_firstname = data[key].firstname
-                candidate_lastname = data[key].lastname
+                candidate_id = data[key]["Identifier"]
+                candidate_firstname = data[key]["FirstName"]
+                candidate_lastname = data[key]["LastName"]
                 candidate_fullname = str(candidate_firstname + ' ' + candidate_lastname)
                 for key, value in current_visitset.iteritems():
                     if current_visitset[key].status is not None:
@@ -174,7 +173,7 @@ class VisitList(DataTable):
                         try:
                             self.datatable.insert('', 'end',
                                                   values=[candidate_fullname, visit_label, when, where, status],
-                                                  tags=(status, candidatekey, visit_label))
+                                                  tags=(status, candidate_id, visit_label))
                         except Exception as e:
                             print "datatable.VisitList.load_data ", str(e)  # TODO add proper error handling
                             pass
