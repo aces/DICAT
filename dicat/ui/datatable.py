@@ -97,28 +97,38 @@ class ParticipantsList(DataTable):
     That list is comprised of all participants (even those that have not been called once.
     """
 
-    def __init__(self, parent, colheaders):  # expected is dataset
+    def __init__(self, parent, colheaders, xmlfile):  # expected is dataset
         DataTable.__init__(self, parent, colheaders)
         self.colheaders = colheaders
-        self.load_data()
+        self.load_data(xmlfile)
         # TODO add these color settings in a 'settings and preferences section of the app'
         self.datatable.tag_configure('active', background='#F1F8FF')  # TODO replace active tag by status variable value
 
-    def load_data(self):
-        data = dict(DataManagement.read_candidate_data())
+    def load_data(self, xmlfile):
+        data = DataManagement.read_candidate_data(xmlfile)
+
         try:
             for key in data:
-                if data[key].status is None:
-                    status = ''
+
+                if "CandidateStatus" not in data[key].keys():
+                    status = ""
                 else:
-                    status = data[key].status
+                    status = data[key]["CandidateStatus"]
+
+                if "PhoneNumber" not in data[key].keys():
+                    phone = ""
+                else:
+                    phone = data[key]["PhoneNumber"]
                 self.datatable.insert( '', 'end',
-                                       values=[data[key].firstname,
-                                               data[key].lastname, data[key].phone,
-                                               status
+                                       values=[ data[key]["Identifier"],
+                                                data[key]["FirstName"],
+                                                data[key]["LastName"],
+                                                data[key]["Gender"],
+                                                phone,
+                                                status
                                               ],
-                                       tags=(status, data[key].uid)
-                                     )
+                                       tags=(status, data[key]["Identifier"])
+                                    )
         except Exception as e:
             print "datatable.ParticipantsList.load_data ", str(e)  # TODO proper exception handling
             pass
@@ -130,41 +140,52 @@ class VisitList(DataTable):
     even those that have not been confirmed yet.
     """
 
-    def __init__(self, parent, colheaders):
+    def __init__(self, parent, colheaders, xmlfile):
         DataTable.__init__(self, parent, colheaders)
         self.colheaders = colheaders
-        self.load_data()
+        self.load_data(xmlfile)
         # TODO add these color settings in a 'settings and preferences section of the app'
         self.datatable.tag_configure('active', background='#F1F8FF')  # TODO change for non-language parameter
         self.datatable.tag_configure('tentative', background='#F0F0F0')  # TODO change for non-language parameter
 
-    def load_data(self):
-        data = dict(DataManagement.read_candidate_data())
-        for key, value in data.iteritems():
-            if data[key].visitset is not None:  # skip the search if visitset = None
-                current_visitset = data[key].visitset  # set this candidate.visitset for the next step
+    def load_data(self, xmlfile):
+        data = dict(DataManagement.read_visitset_data(xmlfile))
+        for cand_key, value in data.iteritems():
+            if "VisitSet" in data[cand_key].keys():  # skip the search if visitset = None
+                current_visitset = data[cand_key]["VisitSet"]  # set this candidate.visitset for the next step
                 # gather information about the candidate
-                # this candidatekey is not printed on screen but saved with the new Scheduler object
-                candidatekey = data[key].uid
-                candidate_firstname = data[key].firstname
-                candidate_lastname = data[key].lastname
-                candidate_fullname = str(candidate_firstname + ' ' + candidate_lastname)
-                for key, value in current_visitset.iteritems():
-                    if current_visitset[key].status is not None:
-                        status = current_visitset[key].status
-                        visit_label = current_visitset[key].visitlabel
-                        if current_visitset[key].when is None:
-                            when = current_visitset[key].whenearliest
+                candidate_id        = data[cand_key]["Identifier"]
+                candidate_firstname = data[cand_key]["FirstName"]
+                candidate_lastname  = data[cand_key]["LastName"]
+                candidate_fullname  = str( candidate_firstname
+                                           + ' '
+                                           + candidate_lastname
+                                         )
+                for visit_key, value in current_visitset.iteritems():
+                    if "VisitStatus" in current_visitset[visit_key].keys():
+                        status = current_visitset[visit_key]["VisitStatus"]
+                        visit_label = current_visitset[visit_key]["VisitLabel"]
+                        print current_visitset[ visit_key].keys()
+                        if "VisitStartWhen" not in current_visitset[visit_key].keys():
+                            when = ''  #TODO check what would be the next visit and set status to "to_schedule"
+                            #when = current_visitset[visit_key].whenearliest
                         else:
-                            when = current_visitset[key].when
-                        if current_visitset[key].where is None:
+                            when = current_visitset[visit_key]["VisitStartWhen"]
+                        if "VisitWhere" not in current_visitset[visit_key].keys():
                             where = ''
                         else:
-                            where = current_visitset[key].where
+                            where = current_visitset[visit_key]["VisitWhere"]
                         try:
-                            self.datatable.insert('', 'end',
-                                                  values=[candidate_fullname, visit_label, when, where, status],
-                                                  tags=(status, candidatekey, visit_label))
+                            row_values = [ candidate_id, candidate_fullname,
+                                           visit_label,  when,
+                                           where,        status
+                                         ]
+                            row_tags = (status, candidate_id, visit_label)
+                            self.datatable.insert('',
+                                                  'end',
+                                                  values = row_values,
+                                                  tags   = row_tags
+                                                 )
                         except Exception as e:
                             print "datatable.VisitList.load_data ", str(e)  # TODO add proper error handling
                             pass
