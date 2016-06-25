@@ -53,15 +53,14 @@ class UserInterface(Frame):
         self.data_pane.add(self.visit_pane)
 
         # create data tables (treeview)
-        visit_column_headers = ( 'candidate', 'visitlabel',
-                                 'when',      'where',
-                                 'status'
+        visit_column_headers = ( 'identifier', 'candidate', 'visitlabel',
+                                 'when',       'where',     'status'
                                )
-#        self.visit_table = DataTable.VisitList( self.visit_pane,
-#                                                visit_column_headers,
-#                                                xmlfile
-#                                              )
-#        self.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
+        self.visit_table = DataTable.VisitList( self.visit_pane,
+                                                visit_column_headers,
+                                                xmlfile
+                                              )
+        self.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
         candidate_column_headers = ( 'identifier', 'firstname', 'lastname',
                                      'gender',     'phone',     'status'
                                    )

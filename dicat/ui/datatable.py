@@ -149,31 +149,43 @@ class VisitList(DataTable):
         self.datatable.tag_configure('tentative', background='#F0F0F0')  # TODO change for non-language parameter
 
     def load_data(self, xmlfile):
-        data = dict(DataManagement.read_candidate_data(xmlfile))
-        for key, value in data.iteritems():
-            if data[key].visitset is not None:  # skip the search if visitset = None
-                current_visitset = data[key].visitset  # set this candidate.visitset for the next step
+        data = dict(DataManagement.read_visitset_data(xmlfile))
+        for cand_key, value in data.iteritems():
+            if "VisitSet" in data[cand_key].keys():  # skip the search if visitset = None
+                current_visitset = data[cand_key]["VisitSet"]  # set this candidate.visitset for the next step
                 # gather information about the candidate
-                candidate_id = data[key]["Identifier"]
-                candidate_firstname = data[key]["FirstName"]
-                candidate_lastname = data[key]["LastName"]
-                candidate_fullname = str(candidate_firstname + ' ' + candidate_lastname)
-                for key, value in current_visitset.iteritems():
-                    if current_visitset[key].status is not None:
-                        status = current_visitset[key].status
-                        visit_label = current_visitset[key].visitlabel
-                        if current_visitset[key].when is None:
-                            when = current_visitset[key].whenearliest
+                candidate_id        = data[cand_key]["Identifier"]
+                candidate_firstname = data[cand_key]["FirstName"]
+                candidate_lastname  = data[cand_key]["LastName"]
+                candidate_fullname  = str( candidate_firstname
+                                           + ' '
+                                           + candidate_lastname
+                                         )
+                for visit_key, value in current_visitset.iteritems():
+                    if "VisitStatus" in current_visitset[visit_key].keys():
+                        status = current_visitset[visit_key]["VisitStatus"]
+                        visit_label = current_visitset[visit_key]["VisitLabel"]
+                        print current_visitset[ visit_key].keys()
+                        if "VisitStartWhen" not in current_visitset[visit_key].keys():
+                            when = ''  #TODO check what would be the next visit and set status to "to_schedule"
+                            #when = current_visitset[visit_key].whenearliest
                         else:
-                            when = current_visitset[key].when
-                        if current_visitset[key].where is None:
+                            when = current_visitset[visit_key]["VisitStartWhen"]
+                        if "VisitWhere" not in current_visitset[visit_key].keys():
                             where = ''
                         else:
-                            where = current_visitset[key].where
+                            where = current_visitset[visit_key]["VisitWhere"]
                         try:
-                            self.datatable.insert('', 'end',
-                                                  values=[candidate_fullname, visit_label, when, where, status],
-                                                  tags=(status, candidate_id, visit_label))
+                            row_values = [ candidate_id, candidate_fullname,
+                                           visit_label,  when,
+                                           where,        status
+                                         ]
+                            row_tags = (status, candidate_id, visit_label)
+                            self.datatable.insert('',
+                                                  'end',
+                                                  values = row_values,
+                                                  tags   = row_tags
+                                                 )
                         except Exception as e:
                             print "datatable.VisitList.load_data ", str(e)  # TODO add proper error handling
                             pass
