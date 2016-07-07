@@ -10,15 +10,15 @@ Generic functions: savedata(data, datafilename) and readdata(datafile).  Current
 Specific functions read_candidate_data(), save_candidate_data(), read_studydata() and save_study_data() are used to get/save candidate data and study setup data respectively.
 """
 
-def read_xmlfile():
+def read_xmlfile(xmlfile):
 
-    """Parses the XML file and loads the data into the current window"""
+    """Parses the XML file return the data into xmldoc"""
     try:
-        xmldoc = minidom.parse(Config.xmlfile)
+        xmldoc = minidom.parse(xmlfile)
         return xmldoc
 
     except:
-        message = "ERROR: could not read file " + Config.xmlfile
+        message = "ERROR: could not read file " + xmlfile
         print message #TODO: create a log class to display the messages
 
 
@@ -29,7 +29,7 @@ def read_candidate_data():
     #check to see if file exists before loading it
     if os.path.isfile(Config.xmlfile):
         # read the xml file
-        xmldoc      = read_xmlfile()
+        xmldoc      = read_xmlfile(Config.xmlfile)
         xmldata     = xmldoc.getElementsByTagName('data')[0]
         xmlcandlist = xmldata.getElementsByTagName('Candidate')
         for cand in xmlcandlist:
@@ -52,7 +52,7 @@ def read_visitset_data():
     #check to see if file exists before loading it
     if os.path.isfile(Config.xmlfile):
         # read the xml file
-        xmldoc      = read_xmlfile()
+        xmldoc      = read_xmlfile(Config.xmlfile)
         xmldata     = xmldoc.getElementsByTagName('data')[0]
         xmlcandlist = xmldata.getElementsByTagName('Candidate')
         for cand in xmlcandlist:

@@ -185,11 +185,13 @@ class IDMapper_frame_gui(Frame):
         """Parses the XML file and loads the data into the current window"""
         try:
             xmldoc   = DataManagement.read_xmlfile(file)
-            xmldata  = xmldoc.getElementsByTagName('data')
-            xmlitemlist = xmldata.getElementsByTagName('Candidate')
+            #xmldata  = xmldoc.getElementsByTagName('data')[0]
+            xmlitemlist = xmldoc.getElementsByTagName('Candidate')
             for s in xmlitemlist:
                 identifier = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
-                realname = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
+                realname  = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
+                #lastname   = s.getElementsByTagName("LastName")[0].firstChild.nodeValue
+                #realname = firstname + " " + lastname
                 dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
                 self.AddIdentifierAction(identifier, realname, dob, False)
         except:
