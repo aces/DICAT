@@ -54,7 +54,7 @@ if language == "fr":
     label_candidate_table = u"Faites un double-clic sur l'une des lignes pour remplir les champs ci-dessus"
     datatable_id = u"ID"
     datatable_firstname = u"Prénom"
-    datatable_lastname = "Nom"
+    datatable_lastname = u"Nom de famille"
     datatable_dob = u"Date de Naissance"
     datatable_phone = u"Téléphone"
     datatable_address = u"Adresse"
@@ -101,6 +101,9 @@ if language == "fr":
     dialog_no = u"Non"
     dialog_title_confirm = u"Veuillez confirmer!"
     dialog_close = u"Vous êtes sur le point de fermer cette fenêtre sans sauvegarder!\n\nVoulez-vous continuer?"
+    dialog_title_error = u"Erreur"
+    dialog_ok = u"OK"
+    dialog_missing_candidate_info = u"Les champs 'Identifiant', 'Prénom', 'Nom de famille', 'Sexe', 'Date de naissance' sont requis!"
     ################  DATA WINDOW  ###################
     schedule_pane = u"Calendrier"
     candidate_pane = u"Candidat"
@@ -209,6 +212,9 @@ elif language == "en":
     dialog_no = u"No"
     dialog_title_confirm = u"Please confirm!"
     dialog_close = u"You are about to close this window without saving! \n\nDo you want to continue?"
+    dialog_title_error = u"Error"
+    dialog_ok = u"OK"
+    dialog_missing_candidate_info = u"'Identifier', 'Firstname', 'Lastname', 'Gender', 'Date of Birth' fields are required!"
     ################  DATA WINDOW  ###################
     schedule_pane = u"Calendar"
     candidate_pane = u"Candidate"

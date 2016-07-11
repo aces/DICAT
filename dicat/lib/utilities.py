@@ -118,5 +118,5 @@ def print_object(something):
 # self-test "module"  TODO remove before release
 if __name__ == '__main__':
     import lib.datamanagement as DataManagement
-    data=dict(DataManagement.read_studydata())
+    data=dict(DataManagement.read_study_data())
     print_object(data)

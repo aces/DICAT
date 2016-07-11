@@ -11,8 +11,16 @@ Specific functions read_candidate_data(), save_candidate_data(), read_studydata(
 """
 
 def read_xmlfile(xmlfile):
+    """
+    Parses the XML file and return the data into xmldoc.
 
-    """Parses the XML file return the data into xmldoc"""
+    :param: xmlfile
+
+    :return: xmldoc
+     :rtype: object
+
+    """
+
     try:
         xmldoc = minidom.parse(xmlfile)
         return xmldoc
@@ -21,40 +29,120 @@ def read_xmlfile(xmlfile):
         message = "ERROR: could not read file " + xmlfile
         print message #TODO: create a log class to display the messages
 
+def read_data(xmlfile):
+    """
+
+    :param xmlfile: XML file to read to grep the data
+     :type xmlfile: str
+
+    :return xmldata: everthing that is available under the data tag in the XML
+     :rtype xmldata: object
+    :return xmlcandlist: list of candidates
+     :rtype xmlcandlist: list
+
+    """
+
+    global xmldoc
+
+    xmldoc      = read_xmlfile(xmlfile)
+    xmldata     = xmldoc.getElementsByTagName('data')[0]
+    xmlcandlist = xmldata.getElementsByTagName('Candidate')
+
+    return xmldata, xmlcandlist
 
 def read_candidate_data():
-    """Read and return the content of a file called candidatedata. Returns nothing if file doesn't exist"""
+    """
+    Read and return the candidate level content of an XML file specified in the
+    global variable Config.xmlfile. Returns an empty dictionary nothing if file
+    doesn't exist.
+
+    :param: None
+
+    :return: data
+     :rtype: dict
+
+    """
 
     data = {}
-    #check to see if file exists before loading it
+    # check to see if file exists before loading it
     if os.path.isfile(Config.xmlfile):
         # read the xml file
-        xmldoc      = read_xmlfile(Config.xmlfile)
-        xmldata     = xmldoc.getElementsByTagName('data')[0]
-        xmlcandlist = xmldata.getElementsByTagName('Candidate')
+        (xmldata, xmlcandlist) = read_data(Config.xmlfile)
         for cand in xmlcandlist:
             data[cand] = {}
             for elem in cand.childNodes:
                 tag = elem.localName
                 if not tag or tag == "Visit":
                     continue
-                val = cand.getElementsByTagName(elem.localName)[0].firstChild.nodeValue
+                val = cand.getElementsByTagName(tag)[0].firstChild.nodeValue
                 data[cand][tag] = val
     else:
         data = ""
 
     return data
 
+
+def save_candidate_data(cand_data):
+    """
+    Save the updated candidate information into the xml file (defined by the
+    global variable Config.xmlfile).
+
+    :param cand_data: data dictionary with the updated information
+     :type cand_data: dict
+
+    :return: None
+
+    """
+
+    # check to see if xmldoc global variable and file exist before saving
+    if os.path.isfile(Config.xmlfile) and xmldoc:
+        # read the xml file
+        (xmldata, xmlcandlist) = read_data(Config.xmlfile)
+        for cand in xmlcandlist:
+            for elem in cand.childNodes:
+                tag = elem.localName
+                if not tag:
+                    continue
+                val = cand.getElementsByTagName(tag)[0].firstChild.nodeValue
+                if tag == "Identifier" and val == cand_data['Identifier']:
+                    xml_firstname = cand.getElementsByTagName("FirstName")[0]
+                    xml_lastname  = cand.getElementsByTagName("LastName")[0]
+                    xml_gender = cand.getElementsByTagName("Gender")[0]
+                    xml_phone  = cand.getElementsByTagName("PhoneNumber")[0]
+                    xml_status = cand.getElementsByTagName("CandidateStatus")[0]
+
+                    xml_firstname.firstChild.nodeValue = cand_data['FirstName']
+                    xml_lastname.firstChild.nodeValue  = cand_data['LastName']
+                    xml_gender.firstChild.nodeValue    = cand_data['Gender']
+                    xml_status.firstChild.nodeValue    = cand_data['CandStatus']
+                    xml_phone.firstChild.nodeValue     = cand_data['Phone']
+                    break
+
+            print cand.getElementsByTagName("FirstName")[0].firstChild.nodeValue
+
+        # update the xml file with the correct values
+        f = open(Config.xmlfile, "w")
+        xmldoc.writexml(f)
+
+
 def read_visitset_data():
-    """Read and return the content of a file called candidatedata. Returns nothing if file doesn't exist"""
+    """
+    Read and return the visit set content of an XML file specified in the
+    global variable Config.xmlfile. Returns an empty dictionary nothing if
+    file doesn't exist.
+
+    :param: None
+
+    :return: data
+     :rtype: dict
+
+    """
 
     data = {}
     #check to see if file exists before loading it
     if os.path.isfile(Config.xmlfile):
         # read the xml file
-        xmldoc      = read_xmlfile(Config.xmlfile)
-        xmldata     = xmldoc.getElementsByTagName('data')[0]
-        xmlcandlist = xmldata.getElementsByTagName('Candidate')
+        (xmldata, xmlcandlist) = read_data(Config.xmlfile)
         for cand in xmlcandlist:
             data[cand] = {}
             for cand_elem in cand.childNodes:
@@ -75,7 +163,23 @@ def read_visitset_data():
 
     return data
 
+
 def read_visit_data(xmlvisitlist, cand, data):
+    """
+    Read the visit data related to a specific candidate and update the data
+    dictionary.
+
+    :param xmlvisitlist: list of visits to loop through
+     :type xmlvisitlist: list
+    :param cand: candidate key
+     :type cand: object
+    :param data: data dictionary containing all candidate and visit's data
+     :type data: dict
+
+    :return: None
+
+    """
+
     data[cand]["VisitSet"] = {}
     for visit in xmlvisitlist:
         data[cand]["VisitSet"][visit] = {}
@@ -86,13 +190,8 @@ def read_visit_data(xmlvisitlist, cand, data):
             visit_val = visit.getElementsByTagName(visit_tag)[0].firstChild.nodeValue
             data[cand]["VisitSet"][visit][visit_tag] = visit_val
 
-def save_candidate_data(data):
-    """Save data in a pickle file named candididatedata.
-    Will overwrite any existing file.  Will create one if it doesn't exist"""
-    pickle.dump(data, open("candidatedata", "wb"))
 
-
-def read_studydata():
+def read_study_data():
     """Read and return the content of a file called studydata. Returns nothing if file doesn't exist"""
     #check to see if file exists before loading it
     if os.path.isfile("studydata"):
@@ -100,7 +199,7 @@ def read_studydata():
         db = pickle.load(open("studydata", "rb"))
     else:
         db = ""
-    return  db
+    return db
 
 
 def save_study_data(data):

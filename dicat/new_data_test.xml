@@ -1,5 +1,4 @@
-<?xml version="1.0"?>
-<Study>
+<?xml version="1.0" ?><Study>
     <projectInfo>
         <StudyName>DICAT test</StudyName>
         <StudyDescription>This is a test project.</StudyDescription>
@@ -222,6 +221,8 @@
             <LastName>Claus</LastName>
             <Gender>Male</Gender>
             <DateOfBirth>2015-12-25</DateOfBirth>
+            <PhoneNumber> </PhoneNumber>
+            <CandidateStatus> </CandidateStatus>
         </Candidate>
     </data>
 </Study>

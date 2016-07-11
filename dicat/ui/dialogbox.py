@@ -39,10 +39,11 @@ class DialogBox(Toplevel):
         box = Frame(self)
         b1 = Button(box, text=button1, width=12, command=self.button1, default=ACTIVE)
         b1.pack(side=LEFT, padx=4, pady=4)
-        b2 = Button(box, text=button2, width=12, command=self.button2, default=ACTIVE)
-        b2.pack(side=LEFT, padx=4, pady=4)
         self.bind("<Return>", self.button1)
-        self.bind("<Escape>", self.button2)
+        if button2:
+            b2 = Button(box, text=button2, width=12, command=self.button2, default=ACTIVE)
+            b2.pack(side=LEFT, padx=4, pady=4)
+            self.bind("<Escape>", self.button2)
         box.pack()
         
     def button1(self, event=None):
@@ -68,11 +69,14 @@ class DialogBox(Toplevel):
 #########################################################################################        
 class ConfirmYesNo(DialogBox):
     def __init__(self, parent, message):
-        title = MultiLanguage.dialog_title_confirm
+        title   = MultiLanguage.dialog_title_confirm
         button1 = MultiLanguage.dialog_yes
         button2 = MultiLanguage.dialog_no
         DialogBox.__init__(self, parent, title, message, button1, button2)
     
     
-
-        
+class ErrorMessage(DialogBox):
+    def __init__(self, parent, message):
+        title  = MultiLanguage.dialog_title_error
+        button = MultiLanguage.dialog_ok
+        DialogBox.__init__(self, parent, title, message, button, None)

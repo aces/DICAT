@@ -4,6 +4,7 @@ import Tkinter, Tkconstants, tkFileDialog, tkMessageBox, re, datetime
 from Tkinter import *
 
 import lib.datamanagement as DataManagement
+import lib.config as Config
 
 
 import ttk
@@ -174,7 +175,7 @@ class IDMapper_frame_gui(Frame):
         self.error.grid(row=3, column=3)
 
 
-    def LoadXML(self, file):
+    def LoadXML(self):
         global xmlitemlist
         global xmldoc
 
@@ -184,7 +185,7 @@ class IDMapper_frame_gui(Frame):
 
         """Parses the XML file and loads the data into the current window"""
         try:
-            xmldoc   = DataManagement.read_xmlfile(file)
+            xmldoc   = DataManagement.read_xmlfile(Config.xmlfile)
             #xmldata  = xmldoc.getElementsByTagName('data')[0]
             xmlitemlist = xmldoc.getElementsByTagName('Candidate')
             for s in xmlitemlist:
@@ -194,8 +195,8 @@ class IDMapper_frame_gui(Frame):
                 #realname = firstname + " " + lastname
                 dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
                 self.AddIdentifierAction(identifier, realname, dob, False)
-        except:
-            pass
+        except Exception as e:
+            print str(e)  #TODO add error login (in case a candidate data file does not exist)
 
 
     def SaveMapAction(self):
@@ -377,7 +378,8 @@ class IDMapper_frame_gui(Frame):
 
         if self.filename:
             # Load the data
-            self.LoadXML(self.filename)
+            Config.xmlfile = self.filename
+            self.LoadXML()
 
         return self.filename
 
@@ -393,7 +395,8 @@ class IDMapper_frame_gui(Frame):
             open(self.filename, 'w')
 
             # Load the data
-            self.LoadXML(self.filename)
+            Config.xmlfile = self.filename
+            self.LoadXML()
 
         return self.filename
 

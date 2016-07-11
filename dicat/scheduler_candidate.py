@@ -60,7 +60,7 @@ class Candidate:
         study_setup = dict()
         try:
             #1-open studydata
-            study_setup = dict(DataManagement.read_studydata())
+            study_setup = dict(DataManagement.read_study_data())
         except Exception as e:
             print str(e)  #TODO add error login (in case a study data file does not exist)
         for key, value in study_setup.iteritems():

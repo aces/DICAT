@@ -78,7 +78,8 @@ class DataWindow(Toplevel):
         self.text_pscid_var = StringVar()
         self.text_pscid_var.set(cand_info["Identifier"])
         self.text_pscid = Entry( self.candidate_pane,
-                                 textvariable=self.text_pscid_var
+                                 textvariable=self.text_pscid_var,
+                                 state='disable'
                                )
         self.text_pscid.grid(column=0, row=1, padx=10, pady=5, sticky=N+S+E+W)
 
@@ -304,7 +305,12 @@ class DataWindow(Toplevel):
 
     def ok_button(self, event=None):
         print "saving data and closing"  # TODO remove when done
-        self.capture_data()
+        message = self.capture_data()
+        if not message:
+            parent = Frame(self)
+            newwin = DialogBox.ErrorMessage(parent, MultiLanguage.dialog_missing_candidate_info)
+            if newwin.buttonvalue == 1:
+                return # to stay on the candidate pop up page after clicking OK
         if not self.validate():
             self.initial_focus.focus_set() # put focus back
             return
@@ -334,18 +340,35 @@ class DataWindow(Toplevel):
 
     def capture_data(self):
         """
-        Grap the information from the window's text field and save the candidate information based on candidate_uid.
+        Grep the information from the pop up window's text fields and save the
+        candidate information based on the pscid.
+
+        :param: None
+
+        :return: None
+
         """
-        # open the 'database'
-        db = dict(DataManagement.read_candidate_data())
-        # and find candidate based on uid
-        uid = self.candidate_uid
-        candidate = db[uid]
+
+        # initialize the candidate dictionary with new values
+        cand_data = {}
+
         # capture data from fields
-        candidate.pscid = self.text_pscid.get()
-        candidate.status = self.text_status.get()
-        candidate.firstname =  self.text_firstname.get()
-        candidate.lastname = self.text_lastname.get()
-        candidate.phone = self.text_phone.get()
+        cand_data['Identifier'] = self.text_pscid.get()
+        cand_data['FirstName']  = self.text_firstname.get()
+        cand_data['LastName']   = self.text_lastname.get()
+        cand_data['Gender']     = self.text_gender.get()
+        cand_data['CandStatus'] = self.text_status.get()
+        cand_data['Phone']      = self.text_phone.get()
+
+        if not cand_data['Identifier'] or not cand_data['FirstName'] \
+                or not cand_data['LastName'] or not cand_data['Gender']:
+            return False
+
+        if not cand_data['CandStatus'] or not cand_data['Phone']:
+            cand_data['CandStatus'] = " "
+            cand_data['Phone']      = " "
+
         # save data
-        DataManagement.save_candidate_data(db)
+        DataManagement.save_candidate_data(cand_data)
+
+        return True
