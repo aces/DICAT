@@ -40,9 +40,9 @@ To open DICAT, simply double click on the executable.
 
 To install DICAT source code on a computer, download and save the content of the current Github repository into a workstation.
 
-Before running DICAT, make sure your systems contains a [Python](https://www.python.org) compiler with the [TkInter](https://wiki.python.org/moin/TkInter) library (usually, TkInter comes by default with most Python installations.
+Before running DICAT, make sure your systems contains a [Python](https://www.python.org) compiler with the [TkInter](https://wiki.python.org/moin/TkInter) library (usually, TkInter comes by default with most Python installations.)
 
-For Ubuntu:
+For Ubuntu distributions, TkInter can be installed via apt-get:
 ```sudo apt-get install python-tk```
 
 The [PyDICOM](http://www.pydicom.org) package is also required by DICAT. 
