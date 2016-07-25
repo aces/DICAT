@@ -18,11 +18,6 @@ class SchedulerMenuBar(Tkinter.Menu):
         self.add_cascade(label=MultiLanguage.candidate_menu, underline=0, menu=candidate_menu)
         candidate_menu.add_command(label=MultiLanguage.candidate_add, command=self.add_candidate)
         candidate_menu.add_command(label=MultiLanguage.candidate_find, command=self.find_candidate)
-        candidate_menu.add_command(label=MultiLanguage.candidate_update, command=self.update_candidate)
-        candidate_menu.add_separator()
-        candidate_menu.add_command(label=MultiLanguage.candidate_get_id, command=self.get_candidate_id)
-        candidate_menu.add_separator()
-        candidate_menu.add_command(label=MultiLanguage.candidate_exclude_include_toggle, command=self.exclude_candidate)
         # create a CALENDAR pulldown menu
         calendar_menu = Tkinter.Menu(self, tearoff=False)
         self.add_cascade(label=MultiLanguage.calendar_menu, underline=0, menu=calendar_menu)
@@ -63,21 +58,6 @@ class SchedulerMenuBar(Tkinter.Menu):
     def find_candidate(self):
         #TODO implement find_candidate()
         print 'running find_candidate'
-        pass
-
-    def update_candidate(self):
-        #TODO implement update_candidate()
-        print 'running update_candidate'
-        pass
-
-    def get_candidate_id(self):
-        #TODO get_candidate_id()
-        print 'running get_candidate_id'
-        pass
-
-    def exclude_candidate(self):  #need renaming
-        #TODO exclude_candidate()
-        print 'running incativate_candidate'
         pass
 
     def open_help(self):

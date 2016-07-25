@@ -98,6 +98,7 @@ def save_candidate_data(cand_data):
     if os.path.isfile(Config.xmlfile) and xmldoc:
         # read the xml file
         (xmldata, xmlcandlist) = read_data(Config.xmlfile)
+        updated = False
         for cand in xmlcandlist:
             for elem in cand.childNodes:
                 tag = elem.localName
@@ -108,22 +109,38 @@ def save_candidate_data(cand_data):
                     xml_firstname = cand.getElementsByTagName("FirstName")[0]
                     xml_lastname  = cand.getElementsByTagName("LastName")[0]
                     xml_gender = cand.getElementsByTagName("Gender")[0]
+                    xml_dob    = cand.getElementsByTagName("DateOfBirth")[0]
                     xml_phone  = cand.getElementsByTagName("PhoneNumber")[0]
                     xml_status = cand.getElementsByTagName("CandidateStatus")[0]
 
                     xml_firstname.firstChild.nodeValue = cand_data['FirstName']
                     xml_lastname.firstChild.nodeValue  = cand_data['LastName']
-                    xml_gender.firstChild.nodeValue    = cand_data['Gender']
-                    xml_status.firstChild.nodeValue    = cand_data['CandStatus']
-                    xml_phone.firstChild.nodeValue     = cand_data['Phone']
+                    xml_gender.firstChild.nodeValue = cand_data['Gender']
+                    xml_dob.firstChild.nodeValue    = cand_data['DateOfBirth']
+                    xml_status.firstChild.nodeValue = cand_data['CandidateStatus']
+                    xml_phone.firstChild.nodeValue  = cand_data['PhoneNumber']
+
+                    updated = True
                     break
 
-            print cand.getElementsByTagName("FirstName")[0].firstChild.nodeValue
+        # if no candidate was updated, insert a new candidate
+        if not updated:
+            # Create a new Candidate element
+            cand = xmldoc.createElement("Candidate")
+            xmldata.appendChild(cand)
+
+            for key in cand_data:
+                xml_elem = xmldoc.createElement(key)
+                cand.appendChild(xml_elem)
+                txt = xmldoc.createTextNode( cand_data[key] )
+                xml_elem.appendChild(txt)
 
         # update the xml file with the correct values
         f = open(Config.xmlfile, "w")
-        xmldoc.writexml(f)
-
+        xmldoc.writexml(f, addindent="  ", newl="\n")
+        f.close()
+        # remove the empty lines inserted by writexml
+        remove_empty_lines_from_file(Config.xmlfile)
 
 def read_visitset_data():
     """
@@ -208,6 +225,21 @@ def save_study_data(data):
     pickle.dump(data, open("studydata", "wb"))
 
 
+def remove_empty_lines_from_file(file):
+    """
+    This function allows to remove empty lines that are inserted by writexml
+    function from minidom.
+
+    :param file: file that need empty lines to be removed
+     :type file: str
+    """
+
+    # grep all lines that are not empty into lines
+    with open(file) as f:
+        lines = [line for line in f if line.strip() is not ""]
+    # write lines into the file
+    with open(file, "w") as f:
+        f.writelines(lines)
 
 #self-test "module"  TODO remove
 if __name__ == '__main__':

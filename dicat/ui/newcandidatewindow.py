@@ -66,8 +66,8 @@ class NewCandidateWindow(TopLevel):
         self.label_phone.grid(column=2, row=2, padx=10, pady=5, sticky=N+S+E+W)
         self.text_phone_var = StringVar()
         self.text_phone_var.set(candidate.phone)
-        self.text_pone = Entry(self.candidate_pane, textvariable=self.text_phone_var)
-        self.text_pone.grid(column=2, row=3, padx=10, pady=5, sticky=N+S+E+W)
+        self.text_phone = Entry(self.candidate_pane, textvariable=self.text_phone_var)
+        self.text_phone.grid(column=2, row=3, padx=10, pady=5, sticky=N+S+E+W)
         #pscid
         #self.label_pscid = Label(self.candidate_pane, textvariable=self.pscid_var)
 

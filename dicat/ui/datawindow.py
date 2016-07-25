@@ -16,14 +16,14 @@ import lib.datamanagement as DataManagement
 
 class DataWindow(Toplevel):
 
-    def __init__(self, parent, candidate_uuid='new'):
+    def __init__(self, parent, candidate='new'):
         Toplevel.__init__(self, parent)
         # create a transient window on top of parent window
-        self.transient(parent) 
+        self.transient(parent)
         self.parent = parent
         self.title(MultiLanguage.data_window_title)  #TODO find a better title for the thing
         body = Frame(self)
-        self.initial_focus = self.body(body, candidate_uuid)
+        self.initial_focus = self.body(body, candidate)
         body.pack(padx=5, pady=5)
 
         self.button_box()
@@ -43,8 +43,8 @@ class DataWindow(Toplevel):
         try:
             cand_data  = DataManagement.read_candidate_data()  # TODO better way to do this
             visit_data = DataManagement.read_visitset_data()
-            visitset = {}
-            cand_info = {}
+            visitset   = {}
+            cand_info  = {}
             for cand_key in cand_data:
                 if cand_data[cand_key]["Identifier"] == candidate:
                     cand_info = cand_data[cand_key]
@@ -56,7 +56,7 @@ class DataWindow(Toplevel):
         except Exception as e:
             print "datawindow.body ", str(e)  # TODO manage exceptions
 
-        # Candidate section
+        ## Candidate section
         self.candidate_pane = Labelframe( self,
                                           text=MultiLanguage.candidate_pane,
                                           width=250,
@@ -67,136 +67,168 @@ class DataWindow(Toplevel):
                                   padx=5,   pady=5
                                 )
 
-        # object unique id - does not appear on gui but needed to keep track of this candidate
-        #self.candidate_uid = candidate["Identifier"]
-
-        # PSCID
-        self.label_pscid = Label( self.candidate_pane,
-                                  text=MultiLanguage.candidate_pscid
-                                )
-        self.label_pscid.grid(column=0, row=0, padx=10, pady=5, sticky=N+S+E+W)
-        self.text_pscid_var = StringVar()
-        self.text_pscid_var.set(cand_info["Identifier"])
-        self.text_pscid = Entry( self.candidate_pane,
-                                 textvariable=self.text_pscid_var,
-                                 state='disable'
-                               )
-        self.text_pscid.grid(column=0, row=1, padx=10, pady=5, sticky=N+S+E+W)
-
-        # firstname
-        self.label_firstname = Label( self.candidate_pane,
-                                      text=MultiLanguage.candidate_firstname
-                                    )
-        self.label_firstname.grid( column=1, row=0,
-                                   padx=10,  pady=5,
-                                   sticky=N+S+E+W
-                                 )
+        # initialize text variables that will contain the field values
+        self.text_pscid_var     = StringVar()
         self.text_firstname_var = StringVar()
-        self.text_firstname_var.set(cand_info["FirstName"])
-        self.text_firstname = Entry( self.candidate_pane,
-                                     textvariable=self.text_firstname_var
-                                   )
-        self.text_firstname.grid( column=1, row=1,
-                                  padx=10,  pady=5,
-                                  sticky=N+S+E+W
-                                )
+        self.text_lastname_var  = StringVar()
+        self.text_dob_var       = StringVar()
+        self.text_gender_var    = StringVar()
+        self.text_status_var    = StringVar()
+        self.text_phone_var     = StringVar()
 
-        # lastname
-        self.label_lastname = Label( self.candidate_pane,
-                                     text=MultiLanguage.candidate_lastname
-                                   )
-        self.label_lastname.grid(column=2, row=0, padx=10, pady=5, sticky=N+S+E+W)
-        self.text_lastname_var = StringVar()
-        self.text_lastname_var.set(cand_info["LastName"])
-        self.text_lastname = Entry( self.candidate_pane,
-                                    textvariable=self.text_lastname_var
-                                  )
-        self.text_lastname.grid(column=2, row=1, padx=10, pady=5, sticky=N+S+E+W)
+        # if candidate="new" populate the field with an empty string
+        # otherwise populate with the values available in cand_info dictionary
+        if candidate == "new":
+            self.text_pscid_var     = ""
+            self.text_firstname_var = ""
+            self.text_lastname_var  = ""
+            self.text_dob_var       = ""
+            self.text_gender_var    = "NA"
+            self.text_status_var    = ""
+            self.text_phone_var     = ""
+        else:
+            self.text_pscid_var.set(cand_info["Identifier"])
+            self.text_firstname_var.set(cand_info["FirstName"])
+            self.text_lastname_var.set(cand_info["LastName"])
+            self.text_dob_var.set(cand_info["DateOfBirth"])
+            self.text_gender_var.set(cand_info["Gender"])
+            self.text_status_var.set(cand_info["CandidateStatus"])
+            self.text_phone_var.set(cand_info["PhoneNumber"])
 
-        # gender
-        self.label_gender = Label( self.candidate_pane,
-                                   text=MultiLanguage.candidate_gender
-                                 )
-        self.label_gender.grid(column=0, row=2, padx=10, pady=5, sticky=N+S+E+W)
-        self.text_gender_var = StringVar()
-        self.text_gender_var.set(cand_info["Gender"])
-        self.text_gender = Entry( self.candidate_pane,
-                                  textvariable=self.text_gender_var
-                                )
-        self.text_gender.grid(column=0, row=3, padx=10, pady=5, sticky=N+S+E+W)
+        print cand_info["Gender"]
+        print self.text_gender_var.get()
+        # Create widgets to be displayed
+        # (typically a label with a text box underneath per variable to display)
+        self.label_pscid = Label(     # identifier label
+            self.candidate_pane, text=MultiLanguage.candidate_pscid
+        )
+        self.text_pscid  = Entry(     # identifier text box
+            self.candidate_pane, textvariable=self.text_pscid_var
+        )
+        self.label_firstname = Label( # firstname label
+            self.candidate_pane, text=MultiLanguage.candidate_firstname
+        )
+        self.text_firstname  = Entry( # firstname text box
+            self.candidate_pane, textvariable=self.text_firstname_var
+        )
+        self.label_lastname = Label(  # lastname label
+            self.candidate_pane, text=MultiLanguage.candidate_lastname
+        )
+        self.text_lastname  = Entry(  # lastname text box
+            self.candidate_pane, textvariable=self.text_lastname_var
+        )
+        self.label_dob = Label(       # date of birth label
+            self.candidate_pane, text=MultiLanguage.candidate_dob
+        )
+        self.text_dob  = Entry(       # date of birth text box
+            self.candidate_pane, textvariable=self.text_dob_var
+        )
+        self.label_gender = Label(    # gender label
+            self.candidate_pane, text=MultiLanguage.candidate_gender
+        )
+        self.text_gender  = OptionMenu( # gender selected from a drop down menu
+            self.candidate_pane,
+            self.text_gender_var,  # variable in which to store the selection
+            self.text_gender_var.get(), # default value to be used at display
+            *("NA", "Male", "Female")   # list of drop down options
+        )
+        self.label_status = Label(    # candidate status label
+            self.candidate_pane, text=MultiLanguage.candidate_status
+        )
+        self.text_status  = Entry(    # candidate status text box
+            self.candidate_pane, textvariable=self.text_status_var
+        )
+        self.label_phone = Label(     # phone number label
+            self.candidate_pane, text=MultiLanguage.candidate_phone
+        )
+        self.text_phone  = Entry(     # phone number text box
+            self.candidate_pane, textvariable=self.text_phone_var
+        )
 
-        # status
-        self.label_status = Label( self.candidate_pane,
-                                   text=MultiLanguage.candidate_status
-                                 )
-        self.label_status.grid( column=1, row=2,
-                                padx=10,  pady=5,
-                                sticky=N+S+E+W
-                              )
-        self.text_status_var = StringVar()
-        self.text_status_var.set(cand_info["CandidateStatus"])
-        self.text_status = Entry( self.candidate_pane,
-                                  textvariable=self.text_status_var
-                                )
-        self.text_status.grid(column=1, row=3, padx=10, pady=5, sticky=N+S+E+W)
+        # Draw widgets in the candidate pane section
+        self.label_pscid.grid(     # draw identifier label
+            column=0, row=0, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.text_pscid.grid(      # draw identifier text box
+            column=0, row=1, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.label_firstname.grid( # draw firstname label
+            column=1, row=0, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.text_firstname.grid( # draw firstname text box
+            column=1, row=1, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.label_lastname.grid( # draw lastname label
+            column=2, row=0, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.text_lastname.grid(  # draw lastname text box
+            column=2, row=1, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.label_dob.grid(      # draw date of birth label
+            column=3, row=0, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.text_dob.grid(       # draw date of birth text box
+            column=3, row=1, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.label_gender.grid(   # draw gender label
+            column=0, row=2, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.text_gender.grid(    # draw gender text box
+            column=0, row=3, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.label_status.grid(   # draw candidate status label
+            column=1, row=2, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.text_status.grid(    # draw candidate status text box
+            column=1, row=3, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.label_phone.grid(    # draw phone number label
+            column=2, row=2, padx=10, pady=5, sticky=N+S+E+W
+        )
+        self.text_phone.grid(     # draw phone number text box
+            column=2, row=3, padx=10, pady=5, sticky=N+S+E+W
+        )
 
-        # phone number
-        self.label_phone = Label( self.candidate_pane,
-                                  text=MultiLanguage.candidate_phone
-                                )
-        self.label_phone.grid(column=2, row=2, padx=10, pady=5, sticky=N+S+E+W)
-        self.text_phone_var = StringVar()
-        self.text_phone_var.set(cand_info["PhoneNumber"])
-        self.text_phone = Entry( self.candidate_pane,
-                                 textvariable=self.text_phone_var
-                               )
-        self.text_phone.grid(column=2, row=3, padx=10, pady=5, sticky=N+S+E+W)
 
-        # Schedule Section - displayed as a table
-        self.schedule_pane = Labelframe( self,
-                                         text=MultiLanguage.schedule_pane,
-                                         width=250,
-                                         height=350,
-                                         borderwidth=10
-                                       )
+        ## Calendar Section - displayed as a table
+        self.schedule_pane = Labelframe(
+            self,          text=MultiLanguage.schedule_pane,
+            width=250,     height=350,
+            borderwidth=10
+        )
         self.schedule_pane.pack(side=TOP, expand=YES, fill=BOTH, padx=5, pady=5)
 
         # top row (header)
-        self.label_visit_label = Label( self.schedule_pane,
-                                        text=MultiLanguage.col_visitlabel
-                                      )
-        self.label_visit_label.grid( column=1, row=0,
-                                     padx=5,   pady=5,
-                                     sticky=N+S+E+W
-                                   )
-        self.label_visit_when = Label( self.schedule_pane,
-                                       text=MultiLanguage.col_when
-                                     )
-        self.label_visit_when.grid( column=2, row=0,
-                                    padx=5,   pady=5,
-                                    sticky=NSEW
-                                  )
-        self.label_visit_status = Label( self.schedule_pane,
-                                         text=MultiLanguage.col_where
-                                       )
-        self.label_visit_status.grid( column=3, row=0,
-                                      padx=5,   pady=5,
-                                      sticky=N+S+E+W
-                                    )
-        self.label_visit_status = Label( self.schedule_pane,
-                                         text=MultiLanguage.col_withwhom
-                                       )
-        self.label_visit_status.grid( column=4, row=0,
-                                      padx=5,   pady=5,
-                                      sticky=N+S+E+W
-                                    )
-        self.label_visit_status = Label( self.schedule_pane,
-                                         text=MultiLanguage.col_status
-                                       )
-        self.label_visit_status.grid( column=5, row=0,
-                                      padx=5,   pady=5,
-                                      sticky=N+S+E+W
-                                    )
+        self.label_visit_label = Label(
+            self.schedule_pane, text=MultiLanguage.col_visitlabel
+        )
+        self.label_visit_when = Label(
+            self.schedule_pane, text=MultiLanguage.col_when
+        )
+        self.label_visit_label.grid(
+            column=1, row=0, padx=5, pady=5, sticky=N+S+E+W
+        )
+        self.label_visit_when.grid(
+            column=2, row=0, padx=5, pady=5, sticky=N+S+E+W
+        )
+        self.label_visit_status = Label(
+            self.schedule_pane, text=MultiLanguage.col_where
+        )
+        self.label_visit_status.grid(
+            column=3, row=0, padx=5, pady=5, sticky=N+S+E+W
+        )
+        self.label_visit_status = Label(
+            self.schedule_pane, text=MultiLanguage.col_withwhom
+        )
+        self.label_visit_status.grid(
+            column=4, row=0, padx=5, pady=5, sticky=N+S+E+W
+        )
+        self.label_visit_status = Label(
+            self.schedule_pane, text=MultiLanguage.col_status
+        )
+        self.label_visit_status.grid(
+            column=5, row=0, padx=5, pady=5, sticky=N+S+E+W
+        )
 
         """
         PSEUDOCODE
@@ -289,31 +321,50 @@ class DataWindow(Toplevel):
 
 
     def button_box(self):
+
         # add standard button box
         box = Frame(self)
-        w = Button( box,      text="OK",
-                    width=10, command=self.ok_button,
-                    default=ACTIVE
-                  )
-        w.pack(side=LEFT, padx=5, pady=5)
-        w = Button(box, text="Cancel", width=10, command=self.cancel_button)
-        w.pack(side=LEFT, padx=5, pady=5)
+
+        # initialize buttons
+        ok = Button( box,      text="OK",
+                     width=10, command=self.ok_button,
+                     default=ACTIVE
+                   )
+        cancel = Button( box,      text="Cancel",
+                         width=10, command=self.cancel_button
+                       )
+
+        # draw the buttons
+        ok.pack(side=LEFT, padx=5, pady=5)
+        cancel.pack(side=LEFT, padx=5, pady=5)
+
+        # bind key handlers to button functions
         self.bind("<Return>", self.ok_button)
         self.bind("<Escape>", self.closedialog)
+
+        # draw the button box
         box.pack()
 
 
     def ok_button(self, event=None):
+
         print "saving data and closing"  # TODO remove when done
+
         message = self.capture_data()
+
         if not message:
             parent = Frame(self)
-            newwin = DialogBox.ErrorMessage(parent, MultiLanguage.dialog_missing_candidate_info)
+            newwin = DialogBox.ErrorMessage(
+                        parent,
+                        MultiLanguage.dialog_missing_candidate_info
+            )
             if newwin.buttonvalue == 1:
                 return # to stay on the candidate pop up page after clicking OK
+
         if not self.validate():
             self.initial_focus.focus_set() # put focus back
             return
+
         #need to call treeview update here
         self.withdraw()
         self.closedialog()
@@ -330,7 +381,8 @@ class DataWindow(Toplevel):
 
 
     def closedialog(self, event=None):
-        self.parent.focus_set() # put focus back to parent window before destroying the window
+        # put focus back to parent window before destroying the window
+        self.parent.focus_set()
         self.destroy()
 
 
@@ -353,20 +405,22 @@ class DataWindow(Toplevel):
         cand_data = {}
 
         # capture data from fields
-        cand_data['Identifier'] = self.text_pscid.get()
-        cand_data['FirstName']  = self.text_firstname.get()
-        cand_data['LastName']   = self.text_lastname.get()
-        cand_data['Gender']     = self.text_gender.get()
-        cand_data['CandStatus'] = self.text_status.get()
-        cand_data['Phone']      = self.text_phone.get()
+        cand_data['Identifier']  = self.text_pscid.get()
+        cand_data['FirstName']   = self.text_firstname.get()
+        cand_data['LastName']    = self.text_lastname.get()
+        cand_data['DateOfBirth'] = self.text_dob.get()
+        cand_data['Gender']      = self.text_gender.get()
+        cand_data['PhoneNumber'] = self.text_phone.get()
+        cand_data['CandidateStatus'] = self.text_status.get()
 
         if not cand_data['Identifier'] or not cand_data['FirstName'] \
-                or not cand_data['LastName'] or not cand_data['Gender']:
+                or not cand_data['LastName'] or not cand_data['Gender'] \
+                or not cand_data['DateOfBirth']:
             return False
 
-        if not cand_data['CandStatus'] or not cand_data['Phone']:
-            cand_data['CandStatus'] = " "
-            cand_data['Phone']      = " "
+        if not cand_data['CandidateStatus'] or not cand_data['PhoneNumber']:
+            cand_data['CandidateStatus'] = " "
+            cand_data['PhoneNumber']     = " "
 
         # save data
         DataManagement.save_candidate_data(cand_data)

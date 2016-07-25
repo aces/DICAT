@@ -147,6 +147,7 @@ class ParticipantsList(DataTable):
                                        values=[ data[key]["Identifier"],
                                                 data[key]["FirstName"],
                                                 data[key]["LastName"],
+                                                data[key]["DateOfBirth"],
                                                 data[key]["Gender"],
                                                 phone,
                                                 status

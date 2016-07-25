@@ -5,6 +5,7 @@ from Tkinter import *
 from ttk import *
 #import internal packages
 import ui.datatable as DataTable
+import ui.datawindow as DataWindow
 import lib.multilanguage as MultiLanguage
 import lib.config as Config
 
@@ -53,7 +54,26 @@ class UserInterface(Frame):
         self.data_pane.add(self.candidate_pane)
         self.data_pane.add(self.visit_pane)
 
+        # plot the button action in the pane frame
+        # candidate pane frame buttons
+        self.buttonNewCandidate = Button( self.candidate_pane,
+                                          width=12,
+                                          text=MultiLanguage.candidate_add,
+                                          command=self.add_candidate
+                                        )
+        self.buttonNewCandidate.pack(side=TOP, anchor=W)
+
         # create data tables (treeview)
+        # candidate table
+        candidate_column_headers = ( 'identifier',    'firstname', 'lastname',
+                                     'date of birth', 'gender',    'phone',
+                                     'status'
+                                   )
+        self.cand_table = DataTable.ParticipantsList( self.candidate_pane,
+                                                      candidate_column_headers
+                                                    )
+        self.cand_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
+        # calendar table
         visit_column_headers = ( 'identifier', 'candidate', 'visitlabel',
                                  'when',       'where',     'status'
                                )
@@ -61,13 +81,6 @@ class UserInterface(Frame):
                                                 visit_column_headers
                                               )
         self.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
-        candidate_column_headers = ( 'identifier', 'firstname', 'lastname',
-                                     'gender',     'phone',     'status'
-                                   )
-        self.data_table = DataTable.ParticipantsList( self.candidate_pane,
-                                                      candidate_column_headers
-                                                    )
-        self.data_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
 
         """
         #create a filter section in each data_pane(not implemented yet)
@@ -81,3 +94,9 @@ class UserInterface(Frame):
         self.filter_candidate_label = Label(self.filter_visit, text='Filters for Active / Tentative / Closed ...')
         self.filter_candidate_label.pack(side=TOP, expand=NO, fill=BOTH)
         """
+
+    def add_candidate(self):
+        #TODO implement add_candidate()
+        DataWindow.DataWindow(self, "new")
+        print 'running add_candidate'
+        pass
