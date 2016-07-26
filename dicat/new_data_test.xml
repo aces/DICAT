@@ -234,7 +234,7 @@
       <Identifier>MTL0007</Identifier>
     </Candidate>
     <Candidate>
-      <CandidateStatus> </CandidateStatus>
+      <CandidateStatus>ineligible</CandidateStatus>
       <FirstName>Bugs</FirstName>
       <LastName>Bunny</LastName>
       <DateOfBirth>1938-04-30</DateOfBirth>

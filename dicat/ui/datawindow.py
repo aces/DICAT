@@ -83,8 +83,8 @@ class DataWindow(Toplevel):
             self.text_firstname_var.set("")
             self.text_lastname_var.set("")
             self.text_dob_var.set("")
-            self.text_gender_var.set("NA")
-            self.text_status_var.set("")
+            self.text_gender_var.set(" ")
+            self.text_status_var.set(" ")
             self.text_phone_var.set("")
         else:
             self.text_pscid_var.set(cand_info["Identifier"])
@@ -124,17 +124,26 @@ class DataWindow(Toplevel):
         self.label_gender = Label(    # gender label
             self.candidate_pane, text=MultiLanguage.candidate_gender
         )
+        gender_options = [' ', 'Male', 'Female']
         self.text_gender  = OptionMenu( # gender selected from a drop down menu
             self.candidate_pane,
             self.text_gender_var,  # variable in which to store the selection
             self.text_gender_var.get(), # default value to be used at display
-            *("NA", "Male", "Female")   # list of drop down options
+            *gender_options             # list of drop down options
         )
         self.label_status = Label(    # candidate status label
             self.candidate_pane, text=MultiLanguage.candidate_status
         )
-        self.text_status  = Entry(    # candidate status text box
-            self.candidate_pane, textvariable=self.text_status_var
+        #TODO: grep the status_options list from the project information
+        status_options = [
+            ' ',     'active',     'withdrawn', 'excluded',
+            'death', 'ineligible', 'completed'
+        ]
+        self.text_status  = OptionMenu( # cand. status selected from drop down
+            self.candidate_pane,
+            self.text_status_var,  # variable in which to store the selection
+            self.text_status_var.get(), # default value to be used at display
+            *status_options             # list of drop down options
         )
         self.label_phone = Label(     # phone number label
             self.candidate_pane, text=MultiLanguage.candidate_phone
@@ -407,7 +416,7 @@ class DataWindow(Toplevel):
         cand_data['DateOfBirth'] = self.text_dob.get()
         cand_data['Gender']      = self.text_gender_var.get()
         cand_data['PhoneNumber'] = self.text_phone.get()
-        cand_data['CandidateStatus'] = self.text_status.get()
+        cand_data['CandidateStatus'] = self.text_status_var.get()
 
         if not cand_data['Identifier'] or not cand_data['FirstName'] \
                 or not cand_data['LastName'] or not cand_data['Gender'] \

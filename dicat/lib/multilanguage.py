@@ -230,4 +230,4 @@ elif language == "en":
     schedule_visit_rank = u"#"
     schedule_visit_status = u"Status"
     schedule_visit_when = u"Date"
-    schedule_optional =u"Optional"
+    schedule_optional = u"Optional"
