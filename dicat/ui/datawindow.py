@@ -79,13 +79,13 @@ class DataWindow(Toplevel):
         # if candidate="new" populate the field with an empty string
         # otherwise populate with the values available in cand_info dictionary
         if candidate == "new":
-            self.text_pscid_var     = ""
-            self.text_firstname_var = ""
-            self.text_lastname_var  = ""
-            self.text_dob_var       = ""
-            self.text_gender_var    = "NA"
-            self.text_status_var    = ""
-            self.text_phone_var     = ""
+            self.text_pscid_var.set("")
+            self.text_firstname_var.set("")
+            self.text_lastname_var.set("")
+            self.text_dob_var.set("")
+            self.text_gender_var.set("NA")
+            self.text_status_var.set("")
+            self.text_phone_var.set("")
         else:
             self.text_pscid_var.set(cand_info["Identifier"])
             self.text_firstname_var.set(cand_info["FirstName"])
@@ -95,8 +95,6 @@ class DataWindow(Toplevel):
             self.text_status_var.set(cand_info["CandidateStatus"])
             self.text_phone_var.set(cand_info["PhoneNumber"])
 
-        print cand_info["Gender"]
-        print self.text_gender_var.get()
         # Create widgets to be displayed
         # (typically a label with a text box underneath per variable to display)
         self.label_pscid = Label(     # identifier label
