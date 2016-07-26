@@ -24,6 +24,7 @@ class UserInterface(Frame):
         self.frame = Frame(self.parent)
         self.frame.pack(side=TOP, expand=YES, fill=BOTH, padx=10, pady=10)
 
+        #TODO implement button to be able to choose the XML file
         Config.xmlfile = "new_data_test.xml"
 
         # This area (datapane) is one Panedwindow containing 3 Labelframes
@@ -65,18 +66,18 @@ class UserInterface(Frame):
 
         # create data tables (treeview)
         # candidate table
-        candidate_column_headers = ( 'identifier',    'firstname', 'lastname',
-                                     'date of birth', 'gender',    'phone',
-                                     'status'
-                                   )
+        candidate_column_headers = (
+            'identifier', 'firstname', 'lastname', 'date of birth',
+            'gender',     'phone',     'status'
+        )
         self.cand_table = DataTable.ParticipantsList( self.candidate_pane,
                                                       candidate_column_headers
                                                     )
         self.cand_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
         # calendar table
-        visit_column_headers = ( 'identifier', 'candidate', 'visitlabel',
-                                 'when',       'where',     'status'
-                               )
+        visit_column_headers = (
+            'identifier', 'candidate', 'visitlabel', 'when', 'where', 'status'
+        )
         self.visit_table = DataTable.VisitList( self.visit_pane,
                                                 visit_column_headers
                                               )
@@ -97,6 +98,10 @@ class UserInterface(Frame):
 
     def add_candidate(self):
         DataWindow.DataWindow(self, "new")
-        # TODO: might need to refresh data table to include new candidate?
-        print 'running add_candidate'
+        self.update_data(self.cand_table)
 
+
+    def update_data(self, table):
+        for i in table.datatable.get_children():
+            table.datatable.delete(i)
+        DataTable.ParticipantsList.load_data(table)

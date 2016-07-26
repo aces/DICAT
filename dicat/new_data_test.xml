@@ -251,5 +251,14 @@
       <CandidateStatus> </CandidateStatus>
       <PhoneNumber> </PhoneNumber>
     </Candidate>
+    <Candidate>
+      <CandidateStatus> </CandidateStatus>
+      <FirstName>Lucky</FirstName>
+      <LastName>Luke</LastName>
+      <DateOfBirth>1946-12-07</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <Gender>Male</Gender>
+      <Identifier>MTL0010</Identifier>
+    </Candidate>
   </data>
 </Study>

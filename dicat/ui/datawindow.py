@@ -405,7 +405,7 @@ class DataWindow(Toplevel):
         cand_data['FirstName']   = self.text_firstname.get()
         cand_data['LastName']    = self.text_lastname.get()
         cand_data['DateOfBirth'] = self.text_dob.get()
-        cand_data['Gender']      = self.text_gender.get()
+        cand_data['Gender']      = self.text_gender_var.get()
         cand_data['PhoneNumber'] = self.text_phone.get()
         cand_data['CandidateStatus'] = self.text_status.get()
 
