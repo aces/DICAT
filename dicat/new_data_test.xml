@@ -242,5 +242,14 @@
       <Gender>Male</Gender>
       <Identifier>MTL0008</Identifier>
     </Candidate>
+    <Candidate>
+      <LastName>Gonzales</LastName>
+      <Identifier>MTL0009</Identifier>
+      <FirstName>Speedy</FirstName>
+      <DateOfBirth>1953-08-29</DateOfBirth>
+      <Gender> </Gender>
+      <CandidateStatus> </CandidateStatus>
+      <PhoneNumber> </PhoneNumber>
+    </Candidate>
   </data>
 </Study>

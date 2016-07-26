@@ -115,10 +115,14 @@ def save_candidate_data(cand_data):
 
                     xml_firstname.firstChild.nodeValue = cand_data['FirstName']
                     xml_lastname.firstChild.nodeValue  = cand_data['LastName']
-                    xml_gender.firstChild.nodeValue = cand_data['Gender']
-                    xml_dob.firstChild.nodeValue    = cand_data['DateOfBirth']
-                    xml_status.firstChild.nodeValue = cand_data['CandidateStatus']
-                    xml_phone.firstChild.nodeValue  = cand_data['PhoneNumber']
+                    xml_dob.firstChild.nodeValue = cand_data['DateOfBirth']
+                    if 'Gender' in cand_data:
+                        print "in cand_data gender"
+                        xml_gender.firstChild.nodeValue = cand_data['Gender']
+                    if 'CandidateStatus' in cand_data:
+                        xml_status.firstChild.nodeValue = cand_data['CandidateStatus']
+                    if 'PhoneNumber' in cand_data:
+                        xml_phone.firstChild.nodeValue = cand_data['PhoneNumber']
 
                     updated = True
                     break
@@ -132,8 +136,16 @@ def save_candidate_data(cand_data):
             for key in cand_data:
                 xml_elem = xmldoc.createElement(key)
                 cand.appendChild(xml_elem)
-                txt = xmldoc.createTextNode( cand_data[key] )
+                txt = xmldoc.createTextNode(cand_data[key])
                 xml_elem.appendChild(txt)
+
+            optional_fields = ['Gender', 'CandidateStatus', 'PhoneNumber']
+            for key in optional_fields:
+                if key not in cand_data:
+                    xml_elem = xmldoc.createElement(key)
+                    cand.appendChild(xml_elem)
+                    txt = xmldoc.createTextNode(" ")
+                    xml_elem.appendChild(txt)
 
         # update the xml file with the correct values
         f = open(Config.xmlfile, "w")

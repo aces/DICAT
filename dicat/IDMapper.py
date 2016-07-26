@@ -224,25 +224,6 @@ class IDMapper_frame_gui(Frame):
             print str(e)  #TODO add error login (in case a candidate data file does not exist)
 
 
-    def SaveMapAction(self):
-        
-        """Function which performs the action of writing the XML file"""
-        f = open(self.filename, "w")
-        f.write("<?xml version=\"1.0\"?>\n<data>\n")
-        for key in self.IDMap:
-            f.write("\t<Candidate>\n")
-            f.write("\t\t<Identifier>%s</Identifier>\n" % key)
-            f.write("\t\t<RealName>%s</RealName>\n" % self.IDMap[key][1])
-            f.write("\t\t<DateOfBirth>%s</DateOfBirth>\n" % self.IDMap[key][2])
-            f.write("\t</Candidate>\n")
-        f.write("</data>")
-
-
-    def SaveMapEvent(self, event):
-        """Handles any wxPython event which should trigger a save action"""
-        self.SaveMapAction()
-
-
     def AddIdentifierEvent(self):
         
         firstname = self.candidateFirstName.get()
@@ -294,9 +275,6 @@ class IDMapper_frame_gui(Frame):
             cand_data["FirstName"]   = firstname
             cand_data["LastName"]    = lastname
             cand_data["DateOfBirth"] = dob
-            cand_data["Gender"]      = " "
-            cand_data["PhoneNumber"] = " "
-            cand_data["CandidateStatus"] = " "
             #self.SaveMapAction()
             DataManagement.save_candidate_data(cand_data)
 
@@ -388,9 +366,6 @@ class IDMapper_frame_gui(Frame):
         cand_data["FirstName"]   = firstname
         cand_data["LastName"]    = lastname
         cand_data["DateOfBirth"] = dob
-        cand_data["Gender"]      = " "
-        cand_data["PhoneNumber"] = " "
-        cand_data["CandidateStatus"] = " "
         DataManagement.save_candidate_data(cand_data)
 
         # update the IDMap dictionary
