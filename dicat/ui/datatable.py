@@ -112,13 +112,13 @@ class DataTable(Frame):
         """Not used yet"""
         item_id = str(self.datatable.focus())
         item = self.datatable.item(item_id)['values']
-        # print item_id, item  #TODO remove when done
 
 
 class ParticipantsList(DataTable):
     """
-    class ParticipantsList(DataTable) takes care of the data table holding the list of participants
-    That list is comprised of all participants (even those that have not been called once.
+    Class ParticipantsList(DataTable) takes care of the data table holding the
+    list of participants. That list contains all participants (even those that
+    have never been called).
     """
 
     def __init__(self, parent, colheaders):  # expected is dataset

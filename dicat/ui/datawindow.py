@@ -41,7 +41,7 @@ class DataWindow(Toplevel):
     def body(self, master, candidate):
         """Creates the body of 'datawindow'.  param candidate is the candidate.uuid"""
         try:
-            cand_data  = DataManagement.read_candidate_data()  # TODO better way to do this
+            cand_data  = DataManagement.read_candidate_data()
             visit_data = DataManagement.read_visitset_data()
             visitset   = {}
             cand_info  = {}
@@ -347,8 +347,6 @@ class DataWindow(Toplevel):
 
 
     def ok_button(self, event=None):
-
-        print "saving data and closing"  # TODO remove when done
 
         message = self.capture_data()
 

@@ -96,7 +96,7 @@ class UserInterface(Frame):
         """
 
     def add_candidate(self):
-        #TODO implement add_candidate()
         DataWindow.DataWindow(self, "new")
+        # TODO: might need to refresh data table to include new candidate?
         print 'running add_candidate'
-        pass
+
