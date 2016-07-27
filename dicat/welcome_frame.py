@@ -182,22 +182,28 @@ class welcome_frame_gui(Frame):
 
         print Config.xmlfile
 
+
     def create_database(self):
         """
         Uses a template XML file to create a new database and saves it.
 
         """
-        #TODO: use a template XML and save it as new name
+        
         self.filename = tkFileDialog.asksaveasfilename(
             defaultextension=[("*.xml")],
             filetypes=[("XML files", "*.xml")]
         )
         self.entryVariable.set(self.filename)
 
-        if self.filename:
-            open(self.filename, 'w')
+        # Fetch the database template file
+        load_template = PathMethods.resource_path("data/database_template.xml")
+        template_file = load_template.return_path()
 
-            # Load the data
+        # If both the new file and the template file exists, copy the template
+        # lines in the new file
+        if self.filename and template_file:
+            # Set the database xmlfile in Config.xmlfile to self.filename
             Config.xmlfile = self.filename
-
-        return self.filename
+            with open(Config.xmlfile, 'a') as f1:
+                for line in open(template_file, 'r'):
+                    f1.write(line)
