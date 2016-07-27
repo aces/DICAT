@@ -64,6 +64,9 @@ class DicAT_application():
         self.welcome_page()
         self.scheduler_page(master)
 
+        # refresh tab when selecting it
+        self.page3.bind("<Visibility>", self.update_scheduler)
+        self.page4.bind("<Visibility>", self.update_IDMapper)
 
     def dicom_deidentifier_tab(self):
         """
@@ -82,7 +85,7 @@ class DicAT_application():
         """
 
         # start the ID mapper frame gui
-        IDMapper_frame_gui(self.page4)
+        self.IDMapper = IDMapper_frame_gui(self.page4)
 
 
     def welcome_page(self):
@@ -105,7 +108,31 @@ class DicAT_application():
         # initialize the menu bar and start the scheduler frame
         menu = MenuBar.SchedulerMenuBar(master)
         master.config(menu=menu)
-        UserInterface(self.page3)
+        self.scheduler = UserInterface(self.page3)
+
+    def update_scheduler(self, event):
+        """
+        Reload the scheduler tables when the tab is selected
+
+        :param event: event
+         :type event: object
+
+        """
+
+        # reload the scheduler
+        self.scheduler.LoadXML()
+
+    def update_IDMapper(self, event):
+        """
+        Reload the IDMapper table when the tab is selected
+
+        :param event: event
+         :type event: object
+
+        """
+
+        # reload the IDMapper
+        self.IDMapper.LoadXML()
 
 if __name__ == "__main__":
 

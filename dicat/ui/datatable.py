@@ -292,65 +292,63 @@ class VisitList(DataTable):
         # Read visit list and visit information into a visit_data dictionary
         visit_data = DataManagement.read_visitset_data()
 
-        # Loop through candidates
-        for cand_key, value in visit_data.iteritems():
+        try:
+            # Loop through candidates
+            for cand_key, value in visit_data.iteritems():
 
-            # Skip the search if visitset == None for that candidate
-            if "VisitSet" in visit_data[cand_key].keys():
+                # Skip the search if visitset == None for that candidate
+                if "VisitSet" in visit_data[cand_key].keys():
 
-                # set this candidate.visitset for the next step
-                current_visitset = visit_data[cand_key]["VisitSet"]
+                    # set this candidate.visitset for the next step
+                    current_visitset = visit_data[cand_key]["VisitSet"]
 
-                # gather information about the candidate
-                candidate_id        = visit_data[cand_key]["Identifier"]
-                candidate_firstname = visit_data[cand_key]["FirstName"]
-                candidate_lastname  = visit_data[cand_key]["LastName"]
-                candidate_fullname  = str(
-                    candidate_firstname + ' ' + candidate_lastname
-                )
+                    # gather information about the candidate
+                    candidate_id        = visit_data[cand_key]["Identifier"]
+                    candidate_firstname = visit_data[cand_key]["FirstName"]
+                    candidate_lastname  = visit_data[cand_key]["LastName"]
+                    candidate_fullname  = str(
+                        candidate_firstname + ' ' + candidate_lastname
+                    )
 
-                # Loop through all visits for that candidate
-                for visit_key, value in current_visitset.iteritems():
+                    # Loop through all visits for that candidate
+                    for visit_key, value in current_visitset.iteritems():
 
-                    if "VisitStatus" in current_visitset[visit_key].keys():
-                        # Set visit status and label
-                        status = current_visitset[visit_key]["VisitStatus"]
-                        visit_label = current_visitset[visit_key]["VisitLabel"]
+                        if "VisitStatus" in current_visitset[visit_key].keys():
+                            # Set visit status and label
+                            status = current_visitset[visit_key]["VisitStatus"]
+                            visit_label = current_visitset[visit_key]["VisitLabel"]
 
-                        # Check at what time the visit has been scheduled
-                        field = 'VisitStartWhen'
-                        if field not in current_visitset[visit_key].keys():
-                            when = ''
-                            #TODO check what would be next visit
-                            #TODO & set its status to "to_schedule"
-                            #when = current_visitset[visit_key].whenearliest
+                            # Check at what time the visit has been scheduled
+                            field = 'VisitStartWhen'
+                            if field not in current_visitset[visit_key].keys():
+                                when = ''
+                                #TODO check what would be next visit
+                                #TODO & set its status to "to_schedule"
+                                #when = current_visitset[visit_key].whenearliest
 
-                        else:
-                            when = current_visitset[visit_key]["VisitStartWhen"]
+                            else:
+                                when_key = 'VisitStartWhen'
+                                when = current_visitset[visit_key][when_key]
 
-                        # Check if the location of the visit has been set
-                        field = 'VisitWhere'
-                        if field not in current_visitset[visit_key].keys():
-                            where = ''
+                            # Check if the location of the visit has been set
+                            field = 'VisitWhere'
+                            if field not in current_visitset[visit_key].keys():
+                                where = ''
 
-                        else:
-                            where = current_visitset[visit_key]["VisitWhere"]
-
-                        # Check that all values could be found
-                        try:
+                            else:
+                                where = current_visitset[visit_key]["VisitWhere"]
+                            # Check that all values could be found
                             row_values = [
                                 candidate_id, candidate_fullname, visit_label,
                                 when,         where,              status
                             ]
                             row_tags = (status, candidate_id, visit_label)
-                            self.datatable.insert('',
-                                                  'end',
-                                                  values = row_values,
-                                                  tags   = row_tags
-                                                 )
+                            self.datatable.insert(
+                                '', 'end', values = row_values, tags = row_tags
+                            )
 
-                        except Exception as e:
-                            # TODO deal with exception
-                            # TODO (add proper error handling)
-                            print "datatable.VisitList.load_data ", str(e)
-                            pass
+        except Exception as err:
+            #TODO deal with exception
+            #TODO add proper error handling
+            print "Could not load visits"
+            pass

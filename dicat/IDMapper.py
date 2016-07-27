@@ -41,54 +41,7 @@ class IDMapper_frame_gui(Frame):
 
     def initialize(self):
 
-        # initialize Frame
-        self.frame = Frame(self.parent)
-        self.frame.pack(expand=1, fill='both')
-        self.frame.columnconfigure(0, weight=1)
-        self.frame.columnconfigure(1, weight=1)
-        self.frame.columnconfigure(2, weight=6)
-
-
-        # select an existing candidate.xml file
-        # Initialize default text that will be in self.entry
-        self.entryVariable = Tkinter.StringVar()
-        self.entryVariable.set("Open an XML file with candidate's key")
-
-        # Create an entry with a default text that will be replaced by the path
-        # to the XML file once directory selected
-        self.entry = Entry(self.frame,
-                           width=40,
-                           textvariable=self.entryVariable
-                          )
-        self.entry.focus_set()
-        self.entry.selection_range(0, Tkinter.END)
-
-        # Create an open button to use to select an XML file with candidate's
-        # key info
-        self.buttonOpen = Button(self.frame,
-                                 text=u"Open an existing file",
-                                 command=self.openfilename
-                                )
-
-        self.buttonCreate = Button(self.frame,
-                                   text=u"Create a new file",
-                                   command=self.createfilename
-                                  )
-
-        self.buttonCreate.grid(row=0,
-                               column=0,
-                               padx=(0, 15),
-                               pady=10,
-                               sticky=E + W
-                              )
-        self.buttonOpen.grid(row=0,
-                             column=1,
-                             padx=(0, 15),
-                             pady=10,
-                             sticky=E + W
-                            )
-        self.entry.grid(row=0, column=2, padx=15, pady=10, sticky=E + W)
-
+        # Initialize GUI
         self.InitUI()
 
 
@@ -198,8 +151,10 @@ class IDMapper_frame_gui(Frame):
         self.buttonEdit.grid(  row=2, column=2, padx=(4,0), sticky=E+W)
         self.buttonAdd.grid(   row=2, column=3, padx=(4,0), sticky=E+W)
 
-        self.datatable.grid(row=3, column=0, columnspan=4, pady=10, sticky='nsew')
-        self.error.grid(    row=4, column=0)
+        self.datatable.grid(
+            row=3, column=0, columnspan=4, pady=10, sticky='nsew'
+        )
+        self.error.grid(row=4, column=0)
 
 
     def LoadXML(self):
@@ -378,38 +333,6 @@ class IDMapper_frame_gui(Frame):
         self.datatable.item(item, values=updatedList)
 
 
-    def openfilename(self):
-
-        """Returns a selected file name."""
-        self.filename = tkFileDialog.askopenfilename(
-            filetypes=[("XML files", "*.xml")]
-        )
-        self.entryVariable.set(self.filename)
-
-        if self.filename:
-            # Load the data
-            Config.xmlfile = self.filename
-            self.LoadXML()
-
-        return self.filename
-
-
-    def createfilename(self):
-
-        self.filename = tkFileDialog.asksaveasfilename(
-            defaultextension=[("*.xml")],
-            filetypes=[("XML files", "*.xml")]
-        )
-        self.entryVariable.set(self.filename)
-
-        if self.filename:
-            open(self.filename, 'w')
-
-            # Load the data
-            Config.xmlfile = self.filename
-            self.LoadXML()
-
-        return self.filename
 
 def main():
        

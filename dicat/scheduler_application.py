@@ -39,7 +39,7 @@ class UserInterface(Frame):
         self.frame.pack(side=TOP, expand=YES, fill=BOTH, padx=10, pady=10)
 
         #TODO implement button to be able to choose the XML file
-        Config.xmlfile = "new_data_test.xml"
+        #Config.xmlfile = "new_data_test.xml"
 
         ## Create the PanedWindow
 
@@ -149,3 +149,16 @@ class UserInterface(Frame):
 
         # Update the candidate datatable when save the new candidate
         self.cand_table.update_data()
+
+    def LoadXML(self):
+        """
+        Update candidate and calendar/visit datatables with data extracted from
+        XML file stored in Config.xmlfile.
+
+        """
+
+        # Load XML data into candidate datatable
+        self.cand_table.update_data()
+
+        # Load XML data into visit datatable
+        self.visit_table.update_data()

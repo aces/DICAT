@@ -482,5 +482,3 @@ class DataWindow(Toplevel):
 
         # save data
         DataManagement.save_candidate_data(cand_data)
-
-        return True
