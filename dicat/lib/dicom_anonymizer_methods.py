@@ -1,3 +1,4 @@
+# Imports from standard packages
 import os
 import sys
 import xml.etree.ElementTree as ET
@@ -13,17 +14,16 @@ Notes:
   - newer versions of the PyDICOM module are imported using "import dicom"
   - returns true if the PyDICOM was imported, false otherwise
 """
-# Create a boolean variable that returns True if PyDICOM was imported, False
-# otherwise
+# Create a boolean variable (use_pydicom) that returns:
+#    - True if PyDICOM was succesfully imported
+#    - False otherwise
 use_pydicom = False
 try:
     import pydicom as dicom
-
     use_pydicom = True  # set to true as PyDICOM was found and imported
 except ImportError:
     try:  # try importing newer versions of PyDICOM
         import dicom
-
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
         use_pydicom = False  # set to false as PyDICOM was not found
@@ -118,6 +118,7 @@ def grep_dicom_fields(xml_file):
 
     :return: dicom_fields -> dictionary of DICOM fields
      :rtype: dict
+
     """
 
     xmldoc = ET.parse(xml_file)
@@ -147,7 +148,7 @@ def grep_dicom_values(dicom_folder, dicom_fields):
     """
 
     # Grep first DICOM of the directory
-    # TODO: Need to check if file is DICOM though, otherwise go to next one
+    # TODO: Need to check if file is DICOM though, otherwise go to next file
     (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
     dicom_file = dicoms_list[0]
 
@@ -269,7 +270,7 @@ def dicom_zapping(dicom_folder, dicom_fields):
                 move(orig_bak_dcm, original_dcm)
 
     # Zip the de-identified and original DICOM folders
-    (deidentified_zip, original_zip) = zip_dicom_directories(deidentified_dir,
+    (deidentified_zip, original_zip) = zip_dcm_directories(deidentified_dir,
                                                              original_dir,
                                                              subdirs_list,
                                                              dicom_folder
@@ -325,7 +326,7 @@ def dcmodify_zapping(dicom_file, dicom_fields):
 
     :returns:
       original_zip  -> Path to the zip file containing original DICOM files
-      deidentified_zip -> Path to the zip file containing de-identified DICOM files
+      deidentified_zip -> Path to the zip containing the de-identified DICOMs
      :rtype: str
 
     """
@@ -351,7 +352,7 @@ def dcmodify_zapping(dicom_file, dicom_fields):
     subprocess.call(modify_cmd, shell=True)
 
 
-def zip_dicom_directories(deidentified_dir, original_dir, subdirs_list, root_dir):
+def zip_dcm_directories(deidentified_dir, original_dir, subdirs_list, root_dir):
     """
     Zip the de-identified and origin DICOM directories.
 
@@ -374,18 +375,18 @@ def zip_dicom_directories(deidentified_dir, original_dir, subdirs_list, root_dir
 
     # If de-identified and original folders exist, zip them
     if os.path.exists(deidentified_dir) and os.path.exists(original_dir):
-        original_zip = zip_dicom(original_dir)
+        original_zip     = zip_dicom(original_dir)
         deidentified_zip = zip_dicom(deidentified_dir)
     else:
         sys.exit('Failed to find original and de-identify data folders')
 
-    # If archive de-identified and original DICOMs found, remove subdirectories in
-    # root directory
+    # If archive de-identified and original DICOMs found, remove subdirectories
+    # in root directory
     if os.path.exists(deidentified_zip) and os.path.exists(original_zip):
         for subdir in subdirs_list:
             shutil.rmtree(root_dir + os.path.sep + subdir)
     else:
-        sys.exit('Failed: could not zip de-identified and original data folders')
+        sys.exit('Failed: could not zip de-identified & original data folders')
 
     # Return zip files
     return deidentified_zip, original_zip
@@ -413,16 +414,15 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
 
     # Create an original_dcm and deidentified_dcm directory in the DICOM folder,
     # as well as subdirectories
-    original_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
-        'Value']
-    deidentified_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
-        'Value'] + "_deidentified"
-    os.mkdir(original_dir, 0755)
+    name = dicom_fields['0010,0010']['Value']
+    original_dir     = dicom_folder + os.path.sep + name
+    deidentified_dir = dicom_folder + os.path.sep + name + "_deidentified"
+    os.mkdir(original_dir,     0755)
     os.mkdir(deidentified_dir, 0755)
     # Create subdirectories in original and de-identified directory, as found in
     # DICOM folder
     for subdir in subdirs_list:
-        os.mkdir(original_dir + os.path.sep + subdir, 0755)
+        os.mkdir(original_dir     + os.path.sep + subdir, 0755)
         os.mkdir(deidentified_dir + os.path.sep + subdir, 0755)
 
     return original_dir, deidentified_dir
