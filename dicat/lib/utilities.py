@@ -1,6 +1,6 @@
 #imports from standard packages
 from uuid import uuid1
-import time
+import time, datetime
 
 """
 This file contains utility functions used throughout the application
@@ -112,6 +112,27 @@ def print_object(something):
         for attr, value in something.__dict__.iteritems():
             print attr, value
     print "\n\n"
+
+
+def check_date_format(date):
+    """
+    Function that checks that the date format is YYYY-MM-DD
+
+    :param date: date to check
+     :type date: str
+
+    :return: True if date is in YYYY-MM-DD format, False otherwise
+     :rtype: bool
+    """
+
+    try:
+        datetime.datetime.strptime(date,"%Y-%m-%d")
+        return True
+
+    except ValueError:
+        return False
+
+
 
 
 # self-test "module"  TODO remove before release

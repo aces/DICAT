@@ -21,7 +21,8 @@ class DataWindow(Toplevel):
         # create a transient window on top of parent window
         self.transient(parent)
         self.parent = parent
-        self.title(MultiLanguage.data_window_title)  #TODO find a better title for the thing
+        #TODO find a better title for the data window
+        self.title(MultiLanguage.data_window_title)
         body = Frame(self)
         self.initial_focus = self.body(body, candidate)
         body.pack(padx=5, pady=5)
@@ -39,7 +40,7 @@ class DataWindow(Toplevel):
 
 
     def body(self, master, candidate):
-        """Creates the body of 'datawindow'.  param candidate is the candidate.uuid"""
+        """Creates the body of 'datawindow'. """
         try:
             cand_data  = DataManagement.read_candidate_data()
             visit_data = DataManagement.read_visitset_data()
@@ -406,10 +407,10 @@ class DataWindow(Toplevel):
 
         """
 
-        # initialize the candidate dictionary with new values
+        # Initialize the candidate dictionary with new values
         cand_data = {}
 
-        # capture data from fields
+        # Capture data from fields
         cand_data['Identifier']  = self.text_pscid.get()
         cand_data['FirstName']   = self.text_firstname.get()
         cand_data['LastName']    = self.text_lastname.get()
@@ -418,13 +419,27 @@ class DataWindow(Toplevel):
         cand_data['PhoneNumber'] = self.text_phone.get()
         cand_data['CandidateStatus'] = self.text_status_var.get()
 
-        if not cand_data['Identifier'] or not cand_data['FirstName'] \
+        # Check that all required fields are set (a.k.a. 'Identifier',
+        # 'FirstName', 'LastName', 'Gender' and 'DateOfBirth'), if not, return
+        # an error. (Error message stored in
+        # MultiLanguage.dialog_missing_candidate_info variable)
+        if not cand_data['Identifier'] or not cand_data['FirstName']    \
                 or not cand_data['LastName'] or not cand_data['Gender'] \
                 or not cand_data['DateOfBirth']:
-            return False
+            return MultiLanguage.dialog_missing_candidate_info
 
-        if not cand_data['CandidateStatus'] or not cand_data['PhoneNumber']:
+        # If Date of Birth does not match YYYY-MM-DD, return an error
+        # (Error message is stored in MultiLanguage.dialog_bad_dob_format)
+        success = Utilities.check_date_format(cand_data['DateOfBirth'])
+        if not success:
+            return MultiLanguage.dialog_bad_dob_format
+
+        # Set CandidateStatus to space string if not defined in cand_data
+        if not cand_data['CandidateStatus']:
             cand_data['CandidateStatus'] = " "
+
+        # Set PhoneNumber to space string if not defined in cand_data
+        if not cand_data['PhoneNumber']:
             cand_data['PhoneNumber']     = " "
 
         # save data

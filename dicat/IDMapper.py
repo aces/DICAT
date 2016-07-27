@@ -5,6 +5,7 @@ from Tkinter import *
 
 import lib.datamanagement as DataManagement
 import lib.config as Config
+import lib.utilities as Utilities
 
 
 import ttk
@@ -255,9 +256,8 @@ class IDMapper_frame_gui(Frame):
             return
 
         # check dob is in format YYYY-MM-DD
-        try:
-            datetime.datetime.strptime(dob,"%Y-%m-%d")
-        except ValueError:
+        success = Utilities.check_date_format(dob)
+        if not success:
             message = "ERROR:\nDate of birth's\nformat should be\n'YYYY-MM-DD'"
             self.ErrorMessage.set(message)
             return

@@ -106,13 +106,15 @@ if language == "fr":
                    u"sauvegarder!\n\nVoulez-vous continuer?"
     dialog_title_confirm = u"Veuillez confirmer!"
     dialog_title_error   = u"Erreur"
+    dialog_bad_dob_format = u"La date de naissance doit être formatté en " \
+                            u"AAAA-MM-JJ!"
     dialog_missing_candidate_info = u"Les champs 'Identifiant', 'Prénom', "   \
                                     u"'Nom de famille', 'Date de naissance' " \
                                     u"et 'Sexe' sont requis!"
     ################  DATA WINDOW  ###################
     schedule_pane    = u"Calendrier"
     candidate_pane   = u"Candidat"
-    candidate_dob    = u"Date de naissance"
+    candidate_dob    = u"Date de naissance (AAAA-MM-JJ)"
     candidate_phone  = u"Téléphone"
     candidate_pscid  = u"ID"
     candidate_status = u"Status"
@@ -219,15 +221,16 @@ elif language == "en":
     dialog_ok    = u"OK"
     dialog_close = u"You are about to close this window without saving!\n\n" \
                    u"Do you want to continue?"
-    dialog_title_confirm = u"Please confirm!"
-    dialog_title_error   = u"Error"
+    dialog_title_confirm  = u"Please confirm!"
+    dialog_title_error    = u"Error"
+    dialog_bad_dob_format = u"Date of Birth should be in YYYY-MM-DD format!"
     dialog_missing_candidate_info = u"'Identifier', 'Firstname', 'Lastname', " \
                                     u"'Gender' and 'Date of Birth' fields "    \
                                     u"are required!"
     ################  DATA WINDOW  ###################
     schedule_pane    = u"Calendar"
     candidate_pane   = u"Candidate"
-    candidate_dob    = u"Date of Birth"
+    candidate_dob    = u"Date of Birth (YYYY-MM-DD)"
     candidate_phone  = u"Phone"
     candidate_pscid  = u"ID"
     candidate_status = u"Status"
