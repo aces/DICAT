@@ -1,13 +1,25 @@
-#imports from standard packages
+# Imports from standard packages
 import os.path
-import pickle
 from xml.dom import minidom
-import config as Config
-"""
-The data_management.py file contains functions related to data management only.
-Generic functions: savedata(data, datafilename) and readdata(datafile).  Currently, these are not being used.
 
-Specific functions read_candidate_data(), save_candidate_data(), read_studydata() and save_study_data() are used to get/save candidate data and study setup data respectively.
+# Imports from DICAT
+import config as Config
+
+"""
+This file contains functions related to data management only.
+
+Generic functions:
+    - read_data(xmlfile)
+    - read_xmlfile(xmlfile)
+    - remove_enpty_lines_from_file(file)
+
+Specific functions:
+    - read_candidate_data()
+    - read_visitset_data()
+    - read_visit_data(xmlvisitlist, cand, data)
+    - save_candidate_data(cand_data)
+    - read_study_data()
+    - save_study_data()
 """
 
 def read_xmlfile(xmlfile):
@@ -29,6 +41,7 @@ def read_xmlfile(xmlfile):
         message = "ERROR: could not read file " + xmlfile
         print message #TODO: create a log class to display the messages
 
+
 def read_data(xmlfile):
     """
 
@@ -49,6 +62,7 @@ def read_data(xmlfile):
     xmlcandlist = xmldata.getElementsByTagName('Candidate')
 
     return xmldata, xmlcandlist
+
 
 def read_candidate_data():
     """
@@ -94,18 +108,24 @@ def save_candidate_data(cand_data):
 
     """
 
-    # check to see if xmldoc global variable and file exist before saving
+    # Check to see if xmldoc global variable and file exist before saving
     if os.path.isfile(Config.xmlfile) and xmldoc:
-        # read the xml file
+        # Read the xml file
         (xmldata, xmlcandlist) = read_data(Config.xmlfile)
         updated = False
+
+        # Loop through all the candidates that exist in the XML file
         for cand in xmlcandlist:
             for elem in cand.childNodes:
                 tag = elem.localName
                 if not tag:
                     continue
                 val = cand.getElementsByTagName(tag)[0].firstChild.nodeValue
+
+                # If the candidate was found in the XML file, updates its info
                 if tag == "Identifier" and val == cand_data['Identifier']:
+
+                    # Grep the XML elements
                     xml_firstname = cand.getElementsByTagName("FirstName")[0]
                     xml_lastname  = cand.getElementsByTagName("LastName")[0]
                     xml_gender = cand.getElementsByTagName("Gender")[0]
@@ -113,6 +133,8 @@ def save_candidate_data(cand_data):
                     xml_phone  = cand.getElementsByTagName("PhoneNumber")[0]
                     xml_status = cand.getElementsByTagName("CandidateStatus")[0]
 
+                    # Replace elements' value with what has been captured in
+                    # the cand_data dictionary
                     xml_firstname.firstChild.nodeValue = cand_data['FirstName']
                     xml_lastname.firstChild.nodeValue  = cand_data['LastName']
                     xml_dob.firstChild.nodeValue = cand_data['DateOfBirth']
@@ -120,39 +142,50 @@ def save_candidate_data(cand_data):
                         print "in cand_data gender"
                         xml_gender.firstChild.nodeValue = cand_data['Gender']
                     if 'CandidateStatus' in cand_data:
-                        xml_status.firstChild.nodeValue = cand_data['CandidateStatus']
+                        key = 'CandidateStatus'
+                        xml_status.firstChild.nodeValue = cand_data[key]
                     if 'PhoneNumber' in cand_data:
-                        xml_phone.firstChild.nodeValue = cand_data['PhoneNumber']
+                        key = 'PhoneNumber'
+                        xml_phone.firstChild.nodeValue = cand_data[key]
 
                     updated = True
                     break
 
-        # if no candidate was updated, insert a new candidate
+        # If no candidate was updated, insert a new candidate
         if not updated:
             # Create a new Candidate element
             cand = xmldoc.createElement("Candidate")
             xmldata.appendChild(cand)
 
+            # Loop through cand_data keys ('Identifier', 'FirstName' ...)
+            # and add them to the XML handler (xmldoc)
             for key in cand_data:
+                # create the child tag ('Gender', 'DOB' etc...) and its value
                 xml_elem = xmldoc.createElement(key)
+                value    = xmldoc.createTextNode(cand_data[key])
+                # append the child tag and value to the 'Candidate' tag
                 cand.appendChild(xml_elem)
-                txt = xmldoc.createTextNode(cand_data[key])
-                xml_elem.appendChild(txt)
+                xml_elem.appendChild(value)
 
+            # Loop through optional fields and add them to the XML handler
+            # with an empty string if the field was not present in cand_data
             optional_fields = ['Gender', 'CandidateStatus', 'PhoneNumber']
             for key in optional_fields:
                 if key not in cand_data:
+                    # create the new tag and its value
                     xml_elem = xmldoc.createElement(key)
+                    value    = xmldoc.createTextNode(" ")
+                    # append the child tag and value to the 'Candidate' tag
                     cand.appendChild(xml_elem)
-                    txt = xmldoc.createTextNode(" ")
-                    xml_elem.appendChild(txt)
+                    xml_elem.appendChild(value)
 
-        # update the xml file with the correct values
+        # Update the xml file with the correct values
         f = open(Config.xmlfile, "w")
         xmldoc.writexml(f, addindent="  ", newl="\n")
         f.close()
-        # remove the empty lines inserted by writexml
+        # Remove the empty lines inserted by writexml (weird bug from writexml)
         remove_empty_lines_from_file(Config.xmlfile)
+
 
 def read_visitset_data():
     """
@@ -167,26 +200,38 @@ def read_visitset_data():
 
     """
 
-    data = {}
-    #check to see if file exists before loading it
+    data = {} # Initialize data dictionary
+
+    # Check to see if file exists before loading it
     if os.path.isfile(Config.xmlfile):
-        # read the xml file
+        # Read the xml file
         (xmldata, xmlcandlist) = read_data(Config.xmlfile)
+
+        # Loop through all candidates present in the XML file
         for cand in xmlcandlist:
             data[cand] = {}
             for cand_elem in cand.childNodes:
                 cand_tag = cand_elem.localName
-                tags_to_ignore = ( "Gender",      "DateOfBirth",
-                                   "PhoneNumber", "CandidateStatus"
-                                 )
+                tags_to_ignore = (
+                    "Gender", "DateOfBirth", "PhoneNumber", "CandidateStatus"
+                )
+
+                # Continue if met a non-wanted tag
                 if not cand_tag or cand_tag in tags_to_ignore:
                     continue
+
+                # If the tag is 'Visit', grep all visit information.
+                # This will be stored in data[cand]['VisitSet'] dictionary
                 if cand_tag == "Visit":
                     xmlvisitlist = cand.getElementsByTagName('Visit')
                     read_visit_data(xmlvisitlist, cand, data)
 
-                val = cand.getElementsByTagName(cand_tag)[0].firstChild.nodeValue
+                # This will store candidate information (such as 'Identifier',
+                # 'Gender', 'Firstname' ...) into data[cand][cand_tag].
+                elem = cand.getElementsByTagName(cand_tag)[0]
+                val  = elem.firstChild.nodeValue
                 data[cand][cand_tag] = val
+
     else:
         data = ""
 
@@ -209,32 +254,47 @@ def read_visit_data(xmlvisitlist, cand, data):
 
     """
 
-    data[cand]["VisitSet"] = {}
+    data[cand]["VisitSet"] = {} # Initialize a VisitSet dictionary
+
+    # Loop through all visits present in the XML file for a given candidate
     for visit in xmlvisitlist:
-        data[cand]["VisitSet"][visit] = {}
+        data[cand]["VisitSet"][visit] = {} # Initialize a Visit dictionary
+
+        # Loop through all visit elements present under a given Visit tag
         for visit_elem in visit.childNodes:
             visit_tag = visit_elem.localName
-            if not visit_tag:
+
+            if not visit_tag: # continue if no tag
                 continue
-            visit_val = visit.getElementsByTagName(visit_tag)[0].firstChild.nodeValue
-            data[cand]["VisitSet"][visit][visit_tag] = visit_val
+
+            # Insert the visit tag and its value into the visit dictionary
+            elem = visit.getElementsByTagName(visit_tag)[0]
+            val  = elem.firstChild.nodeValue
+            data[cand]["VisitSet"][visit][visit_tag] = val
 
 
-def read_study_data():
-    """Read and return the content of a file called studydata. Returns nothing if file doesn't exist"""
+def read_study_data(): #TODO: implement this function
+    """
+    This function reads and returns the content of the XML 'projectInfo' tag.
+    It will return nothing if it could not find the information.
+
+    :return:
+
+    """
     #check to see if file exists before loading it
-    if os.path.isfile("studydata"):
-        #load file
-        db = pickle.load(open("studydata", "rb"))
-    else:
-        db = ""
-    return db
+    pass
 
 
-def save_study_data(data):
-    """Save data in a pickle file named studydata.
-    Will overwrite any existing file.  Will create one if it doesn't exist"""
-    pickle.dump(data, open("studydata", "wb"))
+def save_study_data(study_data): #TODO: implement this function
+    """
+    Save study/project information into the XML file under the tag 'projectInfo'
+
+    :param study_data: dictionary containing all the study/project information
+     :type study_data: dict
+
+    :return:
+    """
+    pass
 
 
 def remove_empty_lines_from_file(file):
@@ -253,8 +313,4 @@ def remove_empty_lines_from_file(file):
     with open(file, "w") as f:
         f.writelines(lines)
 
-#self-test "module"  TODO remove
-if __name__ == '__main__':
-    print 'testing module:  datamanagement.py'
-    data=dict(read_visitset_data("../new_data_test.xml"));
-    print data;
+

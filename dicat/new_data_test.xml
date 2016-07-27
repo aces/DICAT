@@ -223,6 +223,8 @@
       <LastName>Claus</LastName>
       <Gender>Male</Gender>
       <DateOfBirth>2015-12-25</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <CandidateStatus>ineligible</CandidateStatus>
     </Candidate>
     <Candidate>
       <CandidateStatus> </CandidateStatus>
