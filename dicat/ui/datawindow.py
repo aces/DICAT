@@ -17,16 +17,31 @@ import lib.datamanagement as DataManagement
 class DataWindow(Toplevel):
 
     def __init__(self, parent, candidate='new'):
+        """
+        Initialize the DataWindow class.
+
+        :param parent: parent frame of the data window
+         :type parent: object
+        :param candidate: candidate ID or 'new' for a new candidate
+         :type candidate: str
+
+        """
+
         Toplevel.__init__(self, parent)
-        # create a transient window on top of parent window
+
+        # Create a transient window on top of parent window
         self.transient(parent)
-        self.parent = parent
+        self.parent    = parent
+        self.candidate = candidate
         #TODO find a better title for the data window
         self.title(MultiLanguage.data_window_title)
         body = Frame(self)
-        self.initial_focus = self.body(body, candidate)
+
+        # Draw the body of the data window
+        self.initial_focus = self.body(body)
         body.pack(padx=5, pady=5)
 
+        # Draw the button box of the data window
         self.button_box()
 
         self.grab_set()
@@ -35,25 +50,42 @@ class DataWindow(Toplevel):
         self.protocol("WM_DELETE_WINDOW", self.closedialog)
         Utilities.center_window(self)
         self.initial_focus.focus_set()
-        # self.deiconify()
         self.wait_window(self)
 
 
-    def body(self, master, candidate):
-        """Creates the body of 'datawindow'. """
+    def body(self, master):
+        """
+        Creates the body of the 'datawindow'.
+
+        :param master: frame in which to draw the body of the datawindow
+         :type master: object
+        :param candidate: candidate ID or 'new' for a new candidate
+         :type candidate: str
+
+        """
+
         try:
+            # Read candidate information
             cand_data  = DataManagement.read_candidate_data()
+            # Read visit information
             visit_data = DataManagement.read_visitset_data()
-            visitset   = {}
-            cand_info  = {}
+            visitset   = {}   # Create a visitset dictionary
+            cand_info  = {}   # Create a candidate information dictionary
+
+            # Loop through all candidates
             for cand_key in cand_data:
-                if cand_data[cand_key]["Identifier"] == candidate:
+                # Grep candidate's information from cand_data dictionary
+                if cand_data[cand_key]["Identifier"] == self.candidate:
                     cand_info = cand_data[cand_key]
                     break
+
+            # Loop through candidates' visit data
             for cand_key in visit_data:
-                if visit_data[cand_key]["Identifier"] == candidate:
+                # Grep candidate's visit set information from visit_data
+                if visit_data[cand_key]["Identifier"] == self.candidate:
                     visitset = visit_data[cand_key]["VisitSet"]
                     break
+
         except Exception as e:
             print "datawindow.body ", str(e)  # TODO manage exceptions
 
@@ -68,7 +100,7 @@ class DataWindow(Toplevel):
                                   padx=5,   pady=5
                                 )
 
-        # initialize text variables that will contain the field values
+        # Initialize text variables that will contain the field values
         self.text_pscid_var     = StringVar()
         self.text_firstname_var = StringVar()
         self.text_lastname_var  = StringVar()
@@ -77,9 +109,9 @@ class DataWindow(Toplevel):
         self.text_status_var    = StringVar()
         self.text_phone_var     = StringVar()
 
-        # if candidate="new" populate the field with an empty string
+        # If candidate="new" populate the fields with an empty string
         # otherwise populate with the values available in cand_info dictionary
-        if candidate == "new":
+        if self.candidate == "new":
             self.text_pscid_var.set("")
             self.text_firstname_var.set("")
             self.text_lastname_var.set("")
@@ -358,11 +390,11 @@ class DataWindow(Toplevel):
 
         message = self.capture_data()
 
-        if not message:
+        if message:
             parent = Frame(self)
             newwin = DialogBox.ErrorMessage(
                         parent,
-                        MultiLanguage.dialog_missing_candidate_info
+                        message
             )
             if newwin.buttonvalue == 1:
                 return # to stay on the candidate pop up page after clicking OK
@@ -427,6 +459,12 @@ class DataWindow(Toplevel):
                 or not cand_data['LastName'] or not cand_data['Gender'] \
                 or not cand_data['DateOfBirth']:
             return MultiLanguage.dialog_missing_candidate_info
+
+        # If candidate is new, check that the 'Identifier' used is unique
+        candIDs_array = DataManagement.grep_list_of_candidate_IDs()
+        if self.candidate == 'new' and cand_data['Identifier'] in candIDs_array:
+                print "Candidate Exists"
+                return MultiLanguage.dialog_candID_already_exists
 
         # If Date of Birth does not match YYYY-MM-DD, return an error
         # (Error message is stored in MultiLanguage.dialog_bad_dob_format)

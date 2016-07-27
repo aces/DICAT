@@ -96,6 +96,32 @@ def read_candidate_data():
     return data
 
 
+def grep_list_of_candidate_IDs():
+    """
+    Read the XML file and grep all candidate IDs into an array candIDs_array.
+
+    :return: candIDs_array, or False if could not find the XML file
+
+    """
+
+    candIDs_array = []
+
+    if os.path.isfile(Config.xmlfile):
+        # read the xml file
+        (xmldata, xmlcandlist) = read_data(Config.xmlfile)
+
+        for cand in xmlcandlist:
+            for elem in cand.childNodes:
+                tag = elem.localName
+                if tag == 'Identifier':
+                    cand_elem = cand.getElementsByTagName(tag)[0]
+                    candID    = cand_elem.firstChild.nodeValue
+                    candIDs_array.append(candID)
+    else:
+        return False
+
+    return candIDs_array
+
 def save_candidate_data(cand_data):
     """
     Save the updated candidate information into the xml file (defined by the

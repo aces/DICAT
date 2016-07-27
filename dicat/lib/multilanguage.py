@@ -108,6 +108,7 @@ if language == "fr":
     dialog_title_error   = u"Erreur"
     dialog_bad_dob_format = u"La date de naissance doit être formatté en " \
                             u"AAAA-MM-JJ!"
+    dialog_candID_already_exists  = u"L'identifiant existe déjà!"
     dialog_missing_candidate_info = u"Les champs 'Identifiant', 'Prénom', "   \
                                     u"'Nom de famille', 'Date de naissance' " \
                                     u"et 'Sexe' sont requis!"
@@ -224,6 +225,7 @@ elif language == "en":
     dialog_title_confirm  = u"Please confirm!"
     dialog_title_error    = u"Error"
     dialog_bad_dob_format = u"Date of Birth should be in YYYY-MM-DD format!"
+    dialog_candID_already_exists  = u"Identifier already exists!"
     dialog_missing_candidate_info = u"'Identifier', 'Firstname', 'Lastname', " \
                                     u"'Gender' and 'Date of Birth' fields "    \
                                     u"are required!"
