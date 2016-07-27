@@ -14,6 +14,7 @@ def generate_uid():
     ui = str(uuid1())
     return ui
 
+
 def is_unique(data, dataset):
     """
     will verify if 'data' passed as argument is unique in a dataset
@@ -34,11 +35,13 @@ def describe(something):
     returnvalue = objectclass, " (", objecttype, "): ", attributes
     print returnvalue
 
+
 def get_current_date():
     """
     will return today's date as a string of format yyyymmdd
     """
     return time.strftime("%Y%m%d")
+
 
 def get_current_time(option):
     """
@@ -67,7 +70,6 @@ def error_log(message):
         print message + "\n"  #TODO remove when done
 
 
-
 def center_window(win):
     win.update_idletasks()
     width = win.winfo_width()
@@ -76,9 +78,6 @@ def center_window(win):
     y = (win.winfo_screenheight() // 2) - (height // 2)-200
     win.geometry('{}x{}+{}+{}'.format(width, height, x, y))
     
-
-
-
 
 ########################################################################################
 def gather_attributes(something):
