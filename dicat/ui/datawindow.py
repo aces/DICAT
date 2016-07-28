@@ -55,41 +55,20 @@ class DataWindow(Toplevel):
 
     def body(self, master):
         """
-        Creates the body of the 'datawindow'.
+        Creates the body of the 'data window'.
 
-        :param master: frame in which to draw the body of the datawindow
+        :param master: frame in which to draw the body of the data window
          :type master: object
-        :param candidate: candidate ID or 'new' for a new candidate
-         :type candidate: str
 
         """
 
-        try:
-            # Read candidate information
-            cand_data  = DataManagement.read_candidate_data()
-            # Read visit information
-            visit_data = DataManagement.read_visitset_data()
-            visitset   = {}   # Create a visitset dictionary
-            cand_info  = {}   # Create a candidate information dictionary
+        # Load the candidate and visitset data
+        cand_info = []
+        visitset  = []
+        if not self.candidate in ['new', 'search']:
+            (cand_info, visitset) = self.load_data()
 
-            # Loop through all candidates
-            for cand_key in cand_data:
-                # Grep candidate's information from cand_data dictionary
-                if cand_data[cand_key]["Identifier"] == self.candidate:
-                    cand_info = cand_data[cand_key]
-                    break
-
-            # Loop through candidates' visit data
-            for cand_key in visit_data:
-                # Grep candidate's visit set information from visit_data
-                if visit_data[cand_key]["Identifier"] == self.candidate:
-                    visitset = visit_data[cand_key]["VisitSet"]
-                    break
-
-        except Exception as e:
-            print "datawindow.body ", str(e)  # TODO manage exceptions
-
-        ## Candidate section
+        ## Create a candidate section in the data window
         self.candidate_pane = Labelframe(
             self,
             text=MultiLanguage.candidate_pane,
@@ -101,6 +80,36 @@ class DataWindow(Toplevel):
             side=TOP, expand=YES, fill=BOTH, padx=5, pady=5
         )
 
+        # Draw in the candidate section of the data window
+        self.candidate_pane_ui(cand_info)
+
+        # Draw the visit section if self.candidate is not 'new' or 'search'
+        if not self.candidate in ['new', 'search']:
+            # Create a calendar section in the data window
+            self.schedule_pane = Labelframe(
+                self,
+                text=MultiLanguage.schedule_pane,
+                width=250,
+                height=350,
+                borderwidth=10
+            )
+            self.schedule_pane.pack(
+                side=TOP, expand=YES, fill=BOTH, padx=5, pady=5
+            )
+            # Draw in the calendar section of the data window
+            self.schedule_pane_ui(visitset)
+
+
+    def candidate_pane_ui(self, cand_info):
+        """
+        Draws the candidate section of the datawindow and populates it fields
+        based on what is store in cand_info
+
+        :param cand_info: dictionary with the candidate's information
+         :type cand_info: dict
+
+        """
+
         # Initialize text variables that will contain the field values
         self.text_pscid_var     = StringVar()
         self.text_firstname_var = StringVar()
@@ -110,8 +119,9 @@ class DataWindow(Toplevel):
         self.text_status_var    = StringVar()
         self.text_phone_var     = StringVar()
 
-        # If candidate is populated with candID populate the fields with values
-        # available in cand_info dictionary, otherwise populate with empty str
+        # If self.candidate is populated with a candID populate the fields with
+        # values available in cand_info dictionary, otherwise populate with
+        # empty str or " " in the case of drop down menus
         if self.candidate == 'new' or self.candidate == 'search':
             self.text_pscid_var.set("")
             self.text_firstname_var.set("")
@@ -231,43 +241,40 @@ class DataWindow(Toplevel):
         )
 
 
-        ## Calendar Section - displayed as a table
-        self.schedule_pane = Labelframe(
-            self,          text=MultiLanguage.schedule_pane,
-            width=250,     height=350,
-            borderwidth=10
-        )
-        self.schedule_pane.pack(side=TOP, expand=YES, fill=BOTH, padx=5, pady=5)
+    def schedule_pane_ui(self, visitset):
 
-        # top row (header)
-        self.label_visit_label = Label(
+
+        # Create top row (header) widgets
+        self.label_visit_label = Label(     # create visit label widget
             self.schedule_pane, text=MultiLanguage.col_visitlabel
         )
-        self.label_visit_when = Label(
+        self.label_visit_when = Label(      # create visit when widget
             self.schedule_pane, text=MultiLanguage.col_when
         )
-        self.label_visit_label.grid(
-            column=1, row=0, padx=5, pady=5, sticky=N+S+E+W
-        )
-        self.label_visit_when.grid(
-            column=2, row=0, padx=5, pady=5, sticky=N+S+E+W
-        )
-        self.label_visit_status = Label(
+        self.label_visit_where = Label(     # create visit where widget
             self.schedule_pane, text=MultiLanguage.col_where
         )
-        self.label_visit_status.grid(
-            column=3, row=0, padx=5, pady=5, sticky=N+S+E+W
-        )
-        self.label_visit_status = Label(
+        self.label_visit_withwhom = Label(  # create visit withwhom widget
             self.schedule_pane, text=MultiLanguage.col_withwhom
         )
-        self.label_visit_status.grid(
-            column=4, row=0, padx=5, pady=5, sticky=N+S+E+W
-        )
-        self.label_visit_status = Label(
+        self.label_visit_status = Label(    # create visit status widget
             self.schedule_pane, text=MultiLanguage.col_status
         )
-        self.label_visit_status.grid(
+
+        # Draw the top row (header) widgets
+        self.label_visit_label.grid(        # draw visit label widget
+            column=1, row=0, padx=5, pady=5, sticky=N+S+E+W
+        )
+        self.label_visit_when.grid(         # draw visit when widget
+            column=2, row=0, padx=5, pady=5, sticky=N+S+E+W
+        )
+        self.label_visit_where.grid(        # draw visit where widget
+            column=3, row=0, padx=5, pady=5, sticky=N+S+E+W
+        )
+        self.label_visit_withwhom.grid(     # draw visit withwhom widget
+            column=4, row=0, padx=5, pady=5, sticky=N+S+E+W
+        )
+        self.label_visit_status.grid(       # draw visit status widget
             column=5, row=0, padx=5, pady=5, sticky=N+S+E+W
         )
 
@@ -289,7 +296,8 @@ class DataWindow(Toplevel):
         # TODO add logic "foreach" to create a table showing each visit
         # 1- Get candidate visitset and parse into a list
         visit_list = []
-        if len(visitset.keys()) == 0:
+        #if len(visitset.keys()) == 0:
+        if not visitset:
             print 'no visit yet'
         else:
             for key, value in visitset.iteritems():
@@ -354,6 +362,48 @@ class DataWindow(Toplevel):
                 label_visit_status.grid(
                     column=5, row=x+1, padx=5, pady=5, sticky=N+S+E+W
                 )
+
+
+    def load_data(self):
+        """
+        Read the XML data and return the candidate's (self.candidate)
+        information as well as its visit information.
+
+        :return cand_data:  data dictionary with candidate information
+         :rtype cand_data:  dict
+        :return visit_data: data dictionary with visit information
+         :rtype visit_data: dict
+
+        """
+
+        try:
+            # Read candidate information
+            cand_data  = DataManagement.read_candidate_data()
+            # Read visit information
+            visit_data = DataManagement.read_visitset_data()
+            visitset   = {}   # Create a visitset dictionary
+            cand_info  = {}   # Create a candidate information dictionary
+
+            # Loop through all candidates
+            for cand_key in cand_data:
+                # Grep candidate's information from cand_data dictionary
+                if cand_data[cand_key]["Identifier"] == self.candidate:
+                    cand_info = cand_data[cand_key]
+                    break
+
+            # Loop through candidates' visit data
+            for cand_key in visit_data:
+                # Grep candidate's visit set information from visit_data
+                if visit_data[cand_key]["Identifier"] == self.candidate \
+                        and 'VisitSet' in visit_data[cand_key]:
+                    visitset = visit_data[cand_key]["VisitSet"]
+                    break
+
+        except Exception as e:
+            print "datawindow.body ", str(e)  # TODO manage exceptions
+            return
+
+        return cand_info, visitset
 
 
     def button_box(self):
