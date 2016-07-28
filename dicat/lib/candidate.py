@@ -81,7 +81,7 @@ class Candidate():
             return MultiLanguage.dialog_missing_cand_info_IDmapper
 
         # If candidate is new, check that the 'Identifier' used is unique
-        candIDs_array = DataManagement.grep_list_of_candidate_IDs()
+        candIDs_array = DataManagement.grep_list_of_candidate_ids()
         # if candidate not populated with a candID, it means we are creating a
         # new candidate so we need to check if the PSCID entered is unique.
         if not candidate and self.pscid in candIDs_array:

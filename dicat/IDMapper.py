@@ -88,10 +88,16 @@ class IDMapper_frame_gui(Frame):
             command=self.clear_event
         )
         self.buttonSearch = Button(
-            self.frame, width=12, text=u'Search candidate', command=self.search_event
+            self.frame,
+            width=12,
+            text=u'Search candidate',
+            command=self.search_event
         )
         self.buttonEdit   = Button(
-            self.frame, width=12, text=u'Edit candidate', command=self.edit_search
+            self.frame,
+            width=12,
+            text=u'Edit candidate',
+            command=self.edit_event
         )
 
         self.textCandId  = StringVar()
@@ -225,7 +231,8 @@ class IDMapper_frame_gui(Frame):
 
     def clear_event(self):
         """
-        Event handler for the clear_event button. Will clear_event all the Entry boxes.
+        Event handler for the clear_event button. Will clear_event all the
+        Entry boxes.
 
         """
 
@@ -240,9 +247,9 @@ class IDMapper_frame_gui(Frame):
 
     def search_event(self):
         """
-        Event handler for the search_event button. Will call find_candidate function
-        to find the proper candidate matching what has been filled in the Entry
-        boxes.
+        Event handler for the search_event button. Will call find_candidate
+        function to find the proper candidate matching what has been filled in
+        the Entry boxes.
 
         """
 
@@ -288,7 +295,8 @@ class IDMapper_frame_gui(Frame):
 
         # Loop through the candidate tree and return the candid, name and dob
         # that matches a given value
-        # Create a filtered_data dictionary that will store all matching candidates
+        # Create a filtered_data dictionary that will store all matching
+        # candidates
         filtered_data = {}
         # Create an 'add' boolean on whether should add a candidate to the
         # filtered list and set it to False
@@ -344,10 +352,10 @@ class IDMapper_frame_gui(Frame):
                 )
 
 
-    def edit_search(self):
+    def edit_event(self):
         """
         Edit event of the Edit button. Will call check_and_save_date with
-        data entered in the Entry boxes and action='edit_search'.
+        data entered in the Entry boxes and action='edit_event'.
 
         """
 
@@ -356,7 +364,7 @@ class IDMapper_frame_gui(Frame):
             self.textCandFirstName.get(),
             self.textCandLastName.get(),
             self.textCandDoB.get(),
-            'edit_search'
+            'edit'
         )
 
 
@@ -373,7 +381,7 @@ class IDMapper_frame_gui(Frame):
          :type lastname: str
         :param dob: date of birth of the candidate
          :type dob: str
-        :param action: whether to 'save' a new candidate or 'edit_search' a candidate
+        :param action: either 'save' new candidate or 'edit' a candidate
          :type action: bool/str
 
         :return:
@@ -393,7 +401,7 @@ class IDMapper_frame_gui(Frame):
         message = False
         if action == 'save':
             message = candidate.check_candidate_data('IDmapper', False)
-        elif action == 'edit_search':
+        elif action == 'edit':
             message = candidate.check_candidate_data('IDmapper', id)
 
         # If message contains an error message, display it and return
@@ -409,7 +417,7 @@ class IDMapper_frame_gui(Frame):
         self.IDMap[id] = mapList
 
         # Update datatable
-        if action == 'edit_search':
+        if action == 'edit':
             item = self.datatable.selection()
             updatedList = (id, firstname, lastname, dob)
             self.datatable.item(item, values=updatedList)
