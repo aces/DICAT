@@ -132,7 +132,7 @@ class DicAT_application():
         """
 
         # reload the IDMapper
-        self.IDMapper.LoadXML()
+        self.IDMapper.load_xml()
 
 if __name__ == "__main__":
 

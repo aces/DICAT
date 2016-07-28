@@ -175,7 +175,7 @@ class Candidate():
 
     """
     def set_next_visit_window(self, candidate, current_visit):
-        #get the current visit object as argument.  Will search and look for the next visit (visit where previousvisit == current_visit_label)
+        #get the current visit object as argument.  Will search_event and look for the next visit (visit where previousvisit == current_visit_label)
         next_visit_searchset = candidate.visitset
         current_visit_label = current_visit.visitlabel
         next_visit = ""
@@ -208,7 +208,7 @@ class Candidate():
         """
 
 
-        #get the current visit object as argument.  Will search and look for the next visit (visit where previousvisit == current_visitlabel)
+        #get the current visit object as argument.  Will search_event and look for the next visit (visit where previousvisit == current_visitlabel)
 
         #1- Get Candidate.visitset and current_visit /  next_visit will == Visit(VisitSetup) of the next visit (relative to current_visit)
         visit_searchset = candidate.visitset

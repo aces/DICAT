@@ -103,7 +103,7 @@ class dicom_deidentifier_frame_gui(Frame):
 
     def deidentify(self):
 
-        # clear edit table if it exists
+        # clear_event edit_search table if it exists
         if hasattr(self, 'field_edit_win'):
             self.field_edit_win.destroy()
 

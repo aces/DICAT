@@ -296,7 +296,7 @@ class VisitList(DataTable):
             # Loop through candidates
             for cand_key, value in visit_data.iteritems():
 
-                # Skip the search if visitset == None for that candidate
+                # Skip the search_event if visitset == None for that candidate
                 if "VisitSet" in visit_data[cand_key].keys():
 
                     # set this candidate.visitset for the next step

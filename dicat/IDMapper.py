@@ -2,9 +2,11 @@
 
 from Tkinter import *
 import ttk
+import re
 
 import lib.datamanagement as DataManagement
 from lib.candidate import Candidate
+import lib.multilanguage as MultiLanguage
 
 
 def sortby(tree, col, descending):
@@ -42,15 +44,15 @@ class IDMapper_frame_gui(Frame):
 
     def initialize(self):
         """
-        Initialize the ID Mapper GUI by calling self.InitUI().
+        Initialize the ID Mapper GUI by calling self.init_ui().
 
         """
 
         # Initialize GUI
-        self.InitUI()
+        self.init_ui()
 
 
-    def InitUI(self):
+    def init_ui(self):
         """
         Draws the ID Mapper GUI.
 
@@ -77,16 +79,19 @@ class IDMapper_frame_gui(Frame):
             self.frame,
             width=12,
             text=u'Add candidate',
-            command=self.AddIdentifierEvent
+            command=self.add_identifier_event
         )
         self.buttonClear  = Button(
-            self.frame, width=12, text=u'Clear fields', command=self.clear
+            self.frame,
+            width=12,
+            text=u'Clear fields and filters',
+            command=self.clear_event
         )
         self.buttonSearch = Button(
-            self.frame, width=12, text=u'Search candidate', command=self.search
+            self.frame, width=12, text=u'Search candidate', command=self.search_event
         )
         self.buttonEdit   = Button(
-            self.frame, width=12, text=u'Edit candidate', command=self.edit
+            self.frame, width=12, text=u'Edit candidate', command=self.edit_search
         )
 
         self.textCandId  = StringVar()
@@ -126,7 +131,7 @@ class IDMapper_frame_gui(Frame):
                 command=lambda c=col: sortby(self.datatable, c, 0)
             )
 
-        self.datatable.bind("<<TreeviewSelect>>", self.OnRowClick)
+        self.datatable.bind("<<TreeviewSelect>>", self.on_row_click_event)
       
         self.ErrorMessage = StringVar()
         self.error = Label(self.frame, textvariable=self.ErrorMessage, fg='red')
@@ -160,7 +165,7 @@ class IDMapper_frame_gui(Frame):
         self.error.grid(row=4, column=0, columnspan=4)
 
 
-    def LoadXML(self):
+    def load_xml(self):
         """
         Parses the XML file and loads the data into the IDMapper.
         Calls check_and_save_data with option action=False as we don't want to
@@ -189,7 +194,7 @@ class IDMapper_frame_gui(Frame):
             print str(e)
 
 
-    def AddIdentifierEvent(self):
+    def add_identifier_event(self):
         """
         Event handler for the 'Add new candidate' button. Will call
         check_and_save_data on what has been entered in the Entry boxes.
@@ -203,7 +208,7 @@ class IDMapper_frame_gui(Frame):
         self.check_and_save_data(candid, firstname, lastname, dob, 'save')
 
 
-    def OnRowClick(self, event):
+    def on_row_click_event(self, event):
         """
         Update the text boxes' data on row click.
 
@@ -218,9 +223,9 @@ class IDMapper_frame_gui(Frame):
         self.textCandDoB.set(item[3])
 
 
-    def clear(self):
+    def clear_event(self):
         """
-        Event handler for the clear button. Will clear all the Entry boxes.
+        Event handler for the clear_event button. Will clear_event all the Entry boxes.
 
         """
 
@@ -230,48 +235,52 @@ class IDMapper_frame_gui(Frame):
         self.textCandDoB.set("")
         self.candidateid.focus_set()
 
+        self.load_xml() # Reload the entire dataset.
 
-    def search(self):
+
+    def search_event(self):
         """
-        Event handler for the search button. Will call FindCandidate function
+        Event handler for the search_event button. Will call find_candidate function
         to find the proper candidate matching what has been filled in the Entry
         boxes.
 
         """
 
-        #  Find a candidate based on its ID if it is set in text box
+        # Grep the data from the Entry fields
+        data_captured = {}
         if self.textCandId.get():
-            (candid, firstname, lastname, dob) = self.FindCandidate(
-                "candid", self.textCandId.get()
-            )
-        # or based on its name if it is set in text box
-        elif self.textCandFirstName.get():
-            (candid, firstname, lastname, dob) = self.FindCandidate(
-                "firstname", self.textCandFirstName.get()
-            )
-        elif self.textCandLastName.get():
-            (candid, firstname, lastname, dob) = self.FindCandidate(
-                "lastname", self.textCandLastName.get()
-            )
+            data_captured['Identifier']  = self.textCandId.get()
+        if self.textCandFirstName.get():
+            data_captured['FirstName']   = self.textCandFirstName.get()
+        if self.textCandLastName.get():
+            data_captured['LastName']    = self.textCandLastName.get()
+        if self.textCandDoB.get():
+            data_captured['DateOfBirth'] = self.textCandDoB.get()
 
-        # print the values in the text box
-        self.textCandId.set(candid)
-        self.textCandFirstName.set(firstname)
-        self.textCandLastName.set(lastname)
-        self.textCandDoB.set(dob)
+        # If no data entered, write a message saying at least one field should
+        # be entered and return
+        if not data_captured:
+            message = MultiLanguage.dialog_no_data_entered
+            self.ErrorMessage.set(message)
+            return
+
+        # Use the function find_candidate to find all matching candidates and
+        # return them in the filtered data dictionary
+        filtered_data = self.find_candidate(data_captured)
+
+        # Display only the filtered data using DisplayCandidates(filtered_data)
+        self.display_filtered_data(filtered_data)
 
 
-    def FindCandidate(self, key, value):
+    def find_candidate(self, data_captured):
         """
         Find a candidate based on one of the fields entered in the Entry boxes.
 
-        :param key: the name of the Entry type (a.k.a. 'candid', 'firstname'...)
-         :type key: str
-        :param value: the value stored in the Entry box (a.k.a. 'MTL0001' ... )
-         :type value: str
+        :param data_captured: dictionary of the data captured in the Entry boxes
+         :type data_captured: dict
 
-        :return candid, firstname, lastname, dob: found candidate
-         :rtype candid, firstname, lastname, dob: str
+        :return filtered_data: dictionary of the matching candidates
+         :rtype filtered_data: dict
 
         """
 
@@ -279,29 +288,66 @@ class IDMapper_frame_gui(Frame):
 
         # Loop through the candidate tree and return the candid, name and dob
         # that matches a given value
+        # Create a filtered_data dictionary that will store all matching candidates
+        filtered_data = {}
+        # Create an 'add' boolean on whether should add a candidate to the
+        # filtered list and set it to False
+        add = False
         for cand_key in data:
+            # Grep the candidate information from data
             candid    = data[cand_key]["Identifier"]
             firstname = data[cand_key]["FirstName"]
             lastname  = data[cand_key]["LastName"]
             dob       = data[cand_key]["DateOfBirth"]
-            if (key == "candid" and value == candid):
-                return (candid, firstname, lastname, dob)
-            elif (key == "firstname" and value == firstname):
-                return (candid, firstname, lastname, dob)
-            elif (key == "lastname" and value == lastname):
-                return (candid, firstname, lastname, dob)
-            elif (key == "dob" and value == dob):
-                return (candid, firstname, lastname, dob)
-            else:
-                continue
-        # if candidate was not found, return empty strings
-        return ("", "", "")
+            if 'DateOfBirth' in data_captured \
+                    and re.match(data_captured['DateOfBirth'], dob):
+                add = True # set the 'add' boolean to true to add candidate
+            if 'FirstName' in data_captured \
+                    and re.match(data_captured['FirstName'], firstname):
+                add = True # set the 'add' boolean to true to add candidate
+            if 'LastName' in data_captured \
+                    and re.match(data_captured['LastName'], lastname):
+                add = True # set the 'add' boolean to true to add candidate
+            if 'Identifier' in data_captured \
+                    and re.match(data_captured['Identifier'], candid):
+                add = True # set the 'add' boolean to true to add candidate
+
+            # If add is set to True, add the candidate to the filtered list.
+            if add:
+                filtered_data[cand_key] = data[cand_key]
+                add = False # reset the 'add' boolean to false for next cand_key
+
+        return filtered_data
 
 
-    def edit(self):
+    def display_filtered_data(self, filtered_data):
+        """
+        Displays only the filtered data matching the search_event.
+
+        :param filtered_data: dictionary of the matching candidates
+         :type filtered_data: dict
+
+        """
+
+        # Empty the datatable and data dictionary before loading filtered data
+        self.datatable.delete(*self.datatable.get_children())
+        self.IDMap = {}
+
+        # Loop through the data and display them in the datatable
+        for key in filtered_data:
+                identifier = filtered_data[key]["Identifier"]
+                firstname  = filtered_data[key]["FirstName"]
+                lastname   = filtered_data[key]["LastName"]
+                dob = filtered_data[key]["DateOfBirth"]
+                self.check_and_save_data(
+                    identifier, firstname, lastname, dob, False
+                )
+
+
+    def edit_search(self):
         """
         Edit event of the Edit button. Will call check_and_save_date with
-        data entered in the Entry boxes and action='edit'.
+        data entered in the Entry boxes and action='edit_search'.
 
         """
 
@@ -310,24 +356,24 @@ class IDMapper_frame_gui(Frame):
             self.textCandFirstName.get(),
             self.textCandLastName.get(),
             self.textCandDoB.get(),
-            'edit'
+            'edit_search'
         )
 
 
-    def check_and_save_data(self, candid, firstname, lastname, dob, action=False):
+    def check_and_save_data(self, id, firstname, lastname, dob, action=False):
         """
         Grep the candidate data and check them before saving and updating the
         XML file and the datatale.
 
-        :param candid: identifier of the candidate
-         :type candid: str
+        :param id: identifier of the candidate
+         :type id: str
         :param firstname: firstname of the candidate
          :type firstname: str
         :param lastname: lastname of the candidate
          :type lastname: str
         :param dob: date of birth of the candidate
          :type dob: str
-        :param action: whether to 'save' a new candidate or 'edit' a candidate
+        :param action: whether to 'save' a new candidate or 'edit_search' a candidate
          :type action: bool/str
 
         :return:
@@ -336,7 +382,7 @@ class IDMapper_frame_gui(Frame):
 
         # Check all required data are available
         cand_data = {}
-        cand_data["Identifier"]  = candid
+        cand_data["Identifier"]  = id
         cand_data["FirstName"]   = firstname
         cand_data["LastName"]    = lastname
         cand_data["DateOfBirth"] = dob
@@ -347,8 +393,8 @@ class IDMapper_frame_gui(Frame):
         message = False
         if action == 'save':
             message = candidate.check_candidate_data('IDmapper', False)
-        elif action == 'edit':
-            message = candidate.check_candidate_data('IDmapper', candid)
+        elif action == 'edit_search':
+            message = candidate.check_candidate_data('IDmapper', id)
 
         # If message contains an error message, display it and return
         if message:
@@ -359,16 +405,16 @@ class IDMapper_frame_gui(Frame):
         DataManagement.save_candidate_data(cand_data)
 
         # Update the IDMap dictionary
-        mapList = [candid, firstname, lastname, dob]
-        self.IDMap[candid] = mapList
+        mapList = [id, firstname, lastname, dob]
+        self.IDMap[id] = mapList
 
         # Update datatable
-        if action == 'edit':
+        if action == 'edit_search':
             item = self.datatable.selection()
-            updatedList = (candid, firstname, lastname, dob)
+            updatedList = (id, firstname, lastname, dob)
             self.datatable.item(item, values=updatedList)
         else:
-            insertedList = [(candid, firstname, lastname, dob)]
+            insertedList = [(id, firstname, lastname, dob)]
             for item in insertedList:
                 self.datatable.insert('', 'end', values=item)
 

@@ -104,10 +104,12 @@ if language == "fr":
     dialog_ok    = u"OK"
     dialog_close = u"Vous êtes sur le point de fermer cette fenêtre sans " \
                    u"sauvegarder!\n\nVoulez-vous continuer?"
-    dialog_title_confirm = u"Veuillez confirmer!"
-    dialog_title_error   = u"Erreur"
-    dialog_bad_dob_format = u"La date de naissance doit être formatté en " \
-                            u"AAAA-MM-JJ!"
+    dialog_title_confirm   = u"Veuillez confirmer!"
+    dialog_title_error     = u"Erreur"
+    dialog_bad_dob_format  = u"La date de naissance doit être formatté en " \
+                             u"AAAA-MM-JJ!"
+    dialog_no_data_entered = u"Au moins un des champs doit être entré pour " \
+                             u"chercher un candidat."
     dialog_candID_already_exists  = u"L'identifiant existe déjà!"
     dialog_missing_cand_info_schedul = u"Les champs 'Identifiant', 'Prénom', " \
                                        u"'Nom de famille', 'Sexe' et "         \
@@ -225,9 +227,11 @@ elif language == "en":
     dialog_ok    = u"OK"
     dialog_close = u"You are about to close this window without saving!\n\n" \
                    u"Do you want to continue?"
-    dialog_title_confirm  = u"Please confirm!"
-    dialog_title_error    = u"Error"
-    dialog_bad_dob_format = u"Date of Birth should be in YYYY-MM-DD format!"
+    dialog_title_confirm   = u"Please confirm!"
+    dialog_title_error     = u"Error"
+    dialog_bad_dob_format  = u"Date of Birth should be in YYYY-MM-DD format!"
+    dialog_no_data_entered = u"At least one of the fields needs to be entered " \
+                             u"to search_event a candidate."
     dialog_candID_already_exists  = u"Identifier already exists!"
     dialog_missing_cand_info_schedul = u"'Identifier', 'Firstname', "         \
                                        u"'Lastname', 'Date of Birth' and " \

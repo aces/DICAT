@@ -111,7 +111,7 @@ class welcome_frame_gui(Frame):
         # Display the text variable
         text.pack(side='left', fill='both', expand=1)
         scroll.pack(side="right", fill='y')
-        # Disable the edit functionality of the displayed text
+        # Disable the edit_search functionality of the displayed text
         text.config(state='disabled')
 
 
