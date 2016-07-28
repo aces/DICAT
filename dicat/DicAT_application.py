@@ -66,7 +66,7 @@ class DicAT_application():
 
         # refresh tab when selecting it
         self.page3.bind("<Visibility>", self.update_scheduler)
-        self.page4.bind("<Visibility>", self.update_IDMapper)
+        self.page4.bind("<Visibility>", self.update_id_mapper)
 
     def dicom_deidentifier_tab(self):
         """
@@ -120,9 +120,9 @@ class DicAT_application():
         """
 
         # reload the scheduler
-        self.scheduler.LoadXML()
+        self.scheduler.load_xml()
 
-    def update_IDMapper(self, event):
+    def update_id_mapper(self, event):
         """
         Reload the IDMapper table when the tab is selected
 

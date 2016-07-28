@@ -47,7 +47,7 @@ class DataWindow(Toplevel):
         self.grab_set()
         if not self.initial_focus:
             self.initial_focus = self
-        self.protocol("WM_DELETE_WINDOW", self.closedialog)
+        self.protocol("WM_DELETE_WINDOW", self.close_dialog)
         Utilities.center_window(self)
         self.initial_focus.focus_set()
         self.wait_window(self)
@@ -379,7 +379,7 @@ class DataWindow(Toplevel):
 
         # bind key handlers to button functions
         self.bind("<Return>", self.ok_button)
-        self.bind("<Escape>", self.closedialog)
+        self.bind("<Escape>", self.close_dialog)
 
         # draw the button box
         box.pack()
@@ -412,7 +412,7 @@ class DataWindow(Toplevel):
 
         #need to call treeview update here
         self.withdraw()
-        self.closedialog()
+        self.close_dialog()
 
 
     def cancel_button(self, event=None):
@@ -431,12 +431,12 @@ class DataWindow(Toplevel):
         parent = Frame(self)
         newwin = DialogBox.ConfirmYesNo(parent, MultiLanguage.dialog_close)
         if newwin.buttonvalue == 1:
-            self.closedialog()
+            self.close_dialog()
         else:
             return
 
 
-    def closedialog(self, event=None):
+    def close_dialog(self, event=None):
         """
         Close dialog handler: will put focus back to the parent window.
 

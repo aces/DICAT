@@ -151,7 +151,7 @@ class UserInterface(Frame):
         # Update the candidate datatable when save the new candidate
         self.cand_table.update_data()
 
-    def LoadXML(self):
+    def load_xml(self):
         """
         Update candidate and calendar/visit datatables with data extracted from
         XML file stored in Config.xmlfile.
