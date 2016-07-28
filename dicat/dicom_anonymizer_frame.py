@@ -38,7 +38,7 @@ class dicom_deidentifier_frame_gui(Frame):
 
     def initialize(self):
 
-        # initialize main Frame
+        # description_frame_gui main Frame
         self.frame = Frame(self.parent)
         self.frame.pack(expand=1, fill='both')
 

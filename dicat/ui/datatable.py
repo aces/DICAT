@@ -198,7 +198,7 @@ class ParticipantsList(DataTable):
 
         DataTable.__init__(self, parent, colheaders)
 
-        self.colheaders = colheaders  # initialize the column headers
+        self.colheaders = colheaders  # description_frame_gui the column headers
         self.load_data()              # load the data in the datatable
 
         # TODO add color settings in a 'settings & preferences' section
@@ -274,7 +274,7 @@ class VisitList(DataTable):
 
         DataTable.__init__(self, parent, colheaders)
 
-        self.colheaders = colheaders  # initialize the column headers
+        self.colheaders = colheaders  # description_frame_gui the column headers
         self.load_data()              # load the data in the datatable
 
         # TODO add color settings in a 'settings and preferences' section

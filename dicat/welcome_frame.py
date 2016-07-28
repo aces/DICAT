@@ -6,24 +6,34 @@ import tkFileDialog
 
 # import from DICAT libraries
 import lib.config as Config
-from IDMapper import IDMapper_frame_gui
-
-
-'''
-lib.resource_path_methods has been created for Pyinstaller.
-Need to load images or external files using these methods, otherwise the
-created application would not find them.
-'''
-import lib.resource_path_methods as PathMethods
+import lib.resource_path_methods as PathMethods # needed for PyInstaller builds
 
 class welcome_frame_gui(Frame):
+    """
+    Welcome frame GUI class.
+
+    """
 
     def __init__(self, parent):
-        self.parent = parent
-        self.initialize()
-        self.openDatabase()
+        """
+        Initialization of the welcome frame gui class.
 
-    def initialize(self):
+        :param parent: parent widget in which to display the welcome frame
+         :type parent: object
+
+        """
+
+        self.parent = parent
+        self.description_frame_gui()
+        self.load_database_gui()
+
+
+    def description_frame_gui(self):
+        """
+        Draws the description frame with the LOGO image.
+
+        """
+
         frame = Frame(self.parent)
         frame.pack(expand=1, fill='both')
 
@@ -105,10 +115,13 @@ class welcome_frame_gui(Frame):
         text.config(state='disabled')
 
 
-    def openDatabase(self):
+    def load_database_gui(self):
         """
+        Load database GUI including:
+            - a button to create a new database based on a template file
+            - a button to select and open an existing database
+            - an entry where the path to the loaded database file is displayed
 
-        :return:
         """
 
         frame = Frame(self.parent, bd=5, relief='groove')
@@ -139,13 +152,13 @@ class welcome_frame_gui(Frame):
         buttonOpen = Button(
             frame,
             text=u"Open an existing database",
-            command=self.open_database
+            command=self.open_existing_database
         )
 
         buttonCreate = Button(
             frame,
             text=u"Create a new database",
-            command=self.create_database
+            command=self.create_new_database
         )
 
         label.grid(
@@ -162,7 +175,7 @@ class welcome_frame_gui(Frame):
         )
 
 
-    def open_database(self):
+    def open_existing_database(self):
         """
         Opens and loads the selected XML database in DICAT.
 
@@ -183,12 +196,12 @@ class welcome_frame_gui(Frame):
         print Config.xmlfile
 
 
-    def create_database(self):
+    def create_new_database(self):
         """
         Uses a template XML file to create a new database and saves it.
 
         """
-        
+
         self.filename = tkFileDialog.asksaveasfilename(
             defaultextension=[("*.xml")],
             filetypes=[("XML files", "*.xml")]

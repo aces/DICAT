@@ -8,10 +8,24 @@ class resource_path():
     """
     This class allows to get the absolute path to the resource scripts. It works
     for development installation as well as for PyInstaller builds (.app, .exe).
+
+    It has been created for Pyinstaller. Linked images or external files will be
+    loaded using these methods, otherwise the created application (.app, .exe)
+    would not find them.
+
     """
 
     def __init__(self, relative_path):
+        """
+        Initialize resource_path class.
+
+        :param relative_path: relative path to the file from the dicat root dir
+         :type relative_path: str
+
+        """
+
         self.relative_path = relative_path
+
 
     def return_path(self):
         """

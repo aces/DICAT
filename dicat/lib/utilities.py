@@ -6,15 +6,6 @@ import time, datetime
 This file contains utility functions used throughout the application
 """
 
-def generate_uid():
-    """
-    will generate a random UUID.
-    see python documentation https://docs.python.org/2/library/uuid.html
-    """
-    ui = str(uuid1())
-    return ui
-
-
 def is_unique(data, dataset):
     """
     will verify if 'data' passed as argument is unique in a dataset

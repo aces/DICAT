@@ -109,9 +109,12 @@ if language == "fr":
     dialog_bad_dob_format = u"La date de naissance doit être formatté en " \
                             u"AAAA-MM-JJ!"
     dialog_candID_already_exists  = u"L'identifiant existe déjà!"
-    dialog_missing_candidate_info = u"Les champs 'Identifiant', 'Prénom', "   \
-                                    u"'Nom de famille', 'Date de naissance' " \
-                                    u"et 'Sexe' sont requis!"
+    dialog_missing_cand_info_schedul = u"Les champs 'Identifiant', 'Prénom', " \
+                                       u"'Nom de famille', 'Sexe' et "         \
+                                       u"'Date de naissance' sont requis!"
+    dialog_missing_cand_info_IDmapper = u"Les champs 'Identifiant', "  \
+                                        u"'Prénom', 'Nom de famille' " \
+                                        u"et 'Date de naissance' sont requis!"
     ################  DATA WINDOW  ###################
     schedule_pane    = u"Calendrier"
     candidate_pane   = u"Candidat"
@@ -226,9 +229,13 @@ elif language == "en":
     dialog_title_error    = u"Error"
     dialog_bad_dob_format = u"Date of Birth should be in YYYY-MM-DD format!"
     dialog_candID_already_exists  = u"Identifier already exists!"
-    dialog_missing_candidate_info = u"'Identifier', 'Firstname', 'Lastname', " \
-                                    u"'Gender' and 'Date of Birth' fields "    \
-                                    u"are required!"
+    dialog_missing_cand_info_schedul = u"'Identifier', 'Firstname', "         \
+                                       u"'Lastname', 'Date of Birth' and " \
+                                       u"'Gender' fields are required!"
+    dialog_missing_cand_info_IDmapper = u"'Identifier', 'Firstname', "     \
+                                        u"'Lastname' and 'Date of Birth' " \
+                                        u"fields are required!"
+
     ################  DATA WINDOW  ###################
     schedule_pane    = u"Calendar"
     candidate_pane   = u"Candidate"

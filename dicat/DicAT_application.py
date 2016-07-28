@@ -105,7 +105,7 @@ class DicAT_application():
          :type master:
         """
 
-        # initialize the menu bar and start the scheduler frame
+        # description_frame_gui the menu bar and start the scheduler frame
         menu = MenuBar.SchedulerMenuBar(master)
         master.config(menu=menu)
         self.scheduler = UserInterface(self.page3)

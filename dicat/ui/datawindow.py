@@ -7,7 +7,7 @@ import ui.dialogbox as DialogBox
 import lib.utilities as Utilities
 import lib.multilanguage as MultiLanguage
 import lib.datamanagement as DataManagement
-
+from lib.candidate import Candidate
 
 
 # ref: http://effbot.org/tkinterbook/tkinter-newDialog-windows.htm
@@ -16,7 +16,7 @@ import lib.datamanagement as DataManagement
 
 class DataWindow(Toplevel):
 
-    def __init__(self, parent, candidate='new'):
+    def __init__(self, parent, candidate=False):
         """
         Initialize the DataWindow class.
 
@@ -109,17 +109,9 @@ class DataWindow(Toplevel):
         self.text_status_var    = StringVar()
         self.text_phone_var     = StringVar()
 
-        # If candidate="new" populate the fields with an empty string
-        # otherwise populate with the values available in cand_info dictionary
-        if self.candidate == "new":
-            self.text_pscid_var.set("")
-            self.text_firstname_var.set("")
-            self.text_lastname_var.set("")
-            self.text_dob_var.set("")
-            self.text_gender_var.set(" ")
-            self.text_status_var.set(" ")
-            self.text_phone_var.set("")
-        else:
+        # If candidate is populated with candID populate the fields with values
+        # available in cand_info dictionary, otherwise populate with empty str
+        if self.candidate:
             self.text_pscid_var.set(cand_info["Identifier"])
             self.text_firstname_var.set(cand_info["FirstName"])
             self.text_lastname_var.set(cand_info["LastName"])
@@ -127,6 +119,14 @@ class DataWindow(Toplevel):
             self.text_gender_var.set(cand_info["Gender"])
             self.text_status_var.set(cand_info["CandidateStatus"])
             self.text_phone_var.set(cand_info["PhoneNumber"])
+        else:
+            self.text_pscid_var.set("")
+            self.text_firstname_var.set("")
+            self.text_lastname_var.set("")
+            self.text_dob_var.set("")
+            self.text_gender_var.set(" ")
+            self.text_status_var.set(" ")
+            self.text_phone_var.set("")
 
         # Create widgets to be displayed
         # (typically a label with a text box underneath per variable to display)
@@ -365,7 +365,7 @@ class DataWindow(Toplevel):
         # add standard button box
         box = Frame(self)
 
-        # initialize buttons
+        # description_frame_gui buttons
         ok = Button( box,      text="OK",
                      width=10, command=self.ok_button,
                      default=ACTIVE
@@ -451,27 +451,6 @@ class DataWindow(Toplevel):
         cand_data['PhoneNumber'] = self.text_phone.get()
         cand_data['CandidateStatus'] = self.text_status_var.get()
 
-        # Check that all required fields are set (a.k.a. 'Identifier',
-        # 'FirstName', 'LastName', 'Gender' and 'DateOfBirth'), if not, return
-        # an error. (Error message stored in
-        # MultiLanguage.dialog_missing_candidate_info variable)
-        if not cand_data['Identifier'] or not cand_data['FirstName']    \
-                or not cand_data['LastName'] or not cand_data['Gender'] \
-                or not cand_data['DateOfBirth']:
-            return MultiLanguage.dialog_missing_candidate_info
-
-        # If candidate is new, check that the 'Identifier' used is unique
-        candIDs_array = DataManagement.grep_list_of_candidate_IDs()
-        if self.candidate == 'new' and cand_data['Identifier'] in candIDs_array:
-                print "Candidate Exists"
-                return MultiLanguage.dialog_candID_already_exists
-
-        # If Date of Birth does not match YYYY-MM-DD, return an error
-        # (Error message is stored in MultiLanguage.dialog_bad_dob_format)
-        success = Utilities.check_date_format(cand_data['DateOfBirth'])
-        if not success:
-            return MultiLanguage.dialog_bad_dob_format
-
         # Set CandidateStatus to space string if not defined in cand_data
         if not cand_data['CandidateStatus']:
             cand_data['CandidateStatus'] = " "
@@ -480,5 +459,11 @@ class DataWindow(Toplevel):
         if not cand_data['PhoneNumber']:
             cand_data['PhoneNumber']     = " "
 
-        # save data
+        # Check fields format and required fields
+        candidate = Candidate(cand_data)
+        message = candidate.check_candidate_data('scheduler', self.candidate)
+        if message:
+            return message
+
+        # Save candidate data
         DataManagement.save_candidate_data(cand_data)

@@ -144,8 +144,9 @@ class UserInterface(Frame):
 
         """
 
-        # Open the datawindow
-        DataWindow.DataWindow(self, "new")
+        # Open the datawindow with candidate=False as no existing ID associated
+        # yet for the new candidate
+        DataWindow.DataWindow(self, False)
 
         # Update the candidate datatable when save the new candidate
         self.cand_table.update_data()

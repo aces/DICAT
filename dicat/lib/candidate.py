@@ -1,12 +1,12 @@
 # import standard packages
 import datetime
 
-from scheduler_visit import Visit
+from dicat.scheduler_visit import Visit
 
 # import internal packages
-import lib.datamanagement as DataManagement
-import lib.multilanguage as MultiLanguage
-import lib.utilities as Utilities
+import dicat.lib.datamanagement as DataManagement
+import dicat.lib.multilanguage as MultiLanguage
+import dicat.lib.utilities as Utilities
 
 
 class Candidate:
