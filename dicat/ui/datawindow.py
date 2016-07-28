@@ -90,15 +90,16 @@ class DataWindow(Toplevel):
             print "datawindow.body ", str(e)  # TODO manage exceptions
 
         ## Candidate section
-        self.candidate_pane = Labelframe( self,
-                                          text=MultiLanguage.candidate_pane,
-                                          width=250,
-                                          height=350,
-                                          borderwidth=10
-                                        )
-        self.candidate_pane.pack( side=TOP, expand=YES, fill=BOTH,
-                                  padx=5,   pady=5
-                                )
+        self.candidate_pane = Labelframe(
+            self,
+            text=MultiLanguage.candidate_pane,
+            width=250,
+            height=350,
+            borderwidth=10
+        )
+        self.candidate_pane.pack(
+            side=TOP, expand=YES, fill=BOTH, padx=5, pady=5
+        )
 
         # Initialize text variables that will contain the field values
         self.text_pscid_var     = StringVar()
@@ -295,21 +296,20 @@ class DataWindow(Toplevel):
                 visit_list.append(visitset[key])
 
             # 2- Sort list on visit.rank
-            visit_list = sorted( visit_list,
-                                 key=lambda visit: visit["VisitStartWhen"]
-                               )
+            visit_list = sorted(
+                visit_list, key=lambda visit: visit["VisitStartWhen"]
+            )
 
             # 3- 'print' values on ui
             x = 0
             for x in range(len(visit_list)):
                 # visitlabel
-                label_visit_label = Label( self.schedule_pane,
-                                           text=visit_list[x]["VisitLabel"]
-                                         )
-                label_visit_label.grid( column=1, row=x+1,
-                                        padx=5,   pady=5,
-                                        sticky=N+S+E+W
-                                      )
+                label_visit_label = Label(
+                    self.schedule_pane, text=visit_list[x]["VisitLabel"]
+                )
+                label_visit_label.grid(
+                    column=1, row=x+1, padx=5, pady=5, sticky=N+S+E+W
+                )
                 # when
                 visit_when = ""
                 if "VisitStartWhen" not in visit_list[x].keys():
@@ -320,59 +320,58 @@ class DataWindow(Toplevel):
                 else:
                     visit_when = visit_list[x]["VisitStartWhen"]
                 label_visit_when = Label(self.schedule_pane, text=visit_when)
-                label_visit_when.grid( column=2, row=x+1,
-                                       padx=5,   pady=5,
-                                       sticky=N+S+E+W
-                                     )
+                label_visit_when.grid(
+                    column=2, row=x+1, padx=5, pady=5, sticky=N+S+E+W
+                )
 
                 # where
                 visit_where = ""
                 if "VisitWhere" in visit_list[x].keys():
                     visit_where = visit_list[x]["VisitWhere"]
                 label_visit_where = Label(self.schedule_pane, text=visit_where)
-                label_visit_where.grid( column=3, row=x+1,
-                                        padx=5,   pady=5,
-                                        sticky=N+S+E+W
-                                      )
+                label_visit_where.grid(
+                    column=3, row=x+1, padx=5, pady=5, sticky=N+S+E+W
+                )
 
                 # withwhom
                 visit_with_whom = ""
                 if "VisitWithWhom" in visit_list[x].keys():
                     visit_with_whom = visit_list[x]["VisitWithWhom"]
-                label_visit_with_whom = Label( self.schedule_pane,
-                                               text=visit_with_whom
-                                             )
-                label_visit_with_whom.grid( column=4, row=x+1,
-                                            padx=5,   pady=5,
-                                            sticky=N+S+E+W
-                                          )
+                label_visit_with_whom = Label(
+                    self.schedule_pane, text=visit_with_whom
+                )
+                label_visit_with_whom.grid(
+                    column=4, row=x+1, padx=5, pady=5, sticky=N+S+E+W
+                )
 
                 # status
                 visit_status = ''
                 if "VisitStatus" in visit_list[x].keys():
                     visit_status = visit_list[x]["VisitStatus"]
-                label_visit_status = Label( self.schedule_pane,
-                                            text=visit_status
-                                          )
-                label_visit_status.grid( column=5, row=x+1,
-                                         padx=5,   pady=5,
-                                         sticky=N+S+E+W
-                                       )
+                label_visit_status = Label(
+                    self.schedule_pane, text=visit_status
+                )
+                label_visit_status.grid(
+                    column=5, row=x+1, padx=5, pady=5, sticky=N+S+E+W
+                )
 
 
     def button_box(self):
+        """
+        Draws the button box at the bottom of the data window.
+
+        """
 
         # add standard button box
         box = Frame(self)
 
         # description_frame_gui buttons
-        ok = Button( box,      text="OK",
-                     width=10, command=self.ok_button,
-                     default=ACTIVE
-                   )
-        cancel = Button( box,      text="Cancel",
-                         width=10, command=self.cancel_button
-                       )
+        ok = Button(
+            box, text="OK", width=10, command=self.ok_button, default=ACTIVE
+        )
+        cancel = Button(
+            box, text="Cancel", width=10, command=self.cancel_button
+        )
 
         # draw the buttons
         ok.pack(side=LEFT, padx=5, pady=5)
@@ -387,15 +386,23 @@ class DataWindow(Toplevel):
 
 
     def ok_button(self, event=None):
+        """
+        Event handler for the OK button. If something was missing in the data
+        and it could not be saved, it will pop up an error message with the
+        appropriate error message.
+
+        :param event:
+         :type event:
+
+        :return:
+
+        """
 
         message = self.capture_data()
 
         if message:
             parent = Frame(self)
-            newwin = DialogBox.ErrorMessage(
-                        parent,
-                        message
-            )
+            newwin = DialogBox.ErrorMessage(parent, message)
             if newwin.buttonvalue == 1:
                 return # to stay on the candidate pop up page after clicking OK
 
@@ -409,7 +416,18 @@ class DataWindow(Toplevel):
 
 
     def cancel_button(self, event=None):
-        print "close without saving"
+        """
+        Event handler for the cancel button. Will ask confirmation if want to
+        cancel, if yes put focus back to the datatable without saving, else put
+        focus back to the data window.
+
+        :param event:
+         :type event:
+
+        :return:
+
+        """
+
         parent = Frame(self)
         newwin = DialogBox.ConfirmYesNo(parent, MultiLanguage.dialog_close)
         if newwin.buttonvalue == 1:
@@ -419,6 +437,14 @@ class DataWindow(Toplevel):
 
 
     def closedialog(self, event=None):
+        """
+        Close dialog handler: will put focus back to the parent window.
+
+        :param event:
+        :return:
+
+        """
+
         # put focus back to parent window before destroying the window
         self.parent.focus_set()
         self.destroy()
