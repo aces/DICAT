@@ -46,7 +46,7 @@ class SchedulerMenuBar(Tkinter.Menu):
             label=MultiLanguage.candidate_add, command=self.add_candidate
         )
         candidate_menu.add_command(
-            label=MultiLanguage.candidate_find, command=self.find_candidate
+            label=MultiLanguage.candidate_search, command=self.find_candidate
         )
 
         # Create a CALENDAR pulldown menu

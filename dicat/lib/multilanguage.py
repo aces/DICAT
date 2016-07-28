@@ -22,7 +22,7 @@ if language == "fr":
     #CANDIDATE menu
     candidate_menu   = u"Candidat"
     candidate_add    = u"Nouveau candidat"
-    candidate_find   = u"Trouver candidat"
+    candidate_search = u"Trouver candidat"
     candidate_update = u"Mettre à jour"
     candidate_get_id = u"Obtenir l'identifiant d'un candidat"
     candidate_exclude_include_toggle = u"Inclure/Exclure un candidat"
@@ -151,7 +151,7 @@ elif language == "en":
     #CANDIDATE menu
     candidate_menu   = u"Candidate"
     candidate_add    = u"New candidate"
-    candidate_find   = u"Find a candidate"
+    candidate_search = u"Search candidate"
     candidate_update = u"Update"
     candidate_get_id = u"Get a canditate ID"
     candidate_exclude_include_toggle = u"Include/Exclude a candidate"

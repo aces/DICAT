@@ -16,7 +16,7 @@ from lib.candidate import Candidate
 
 class DataWindow(Toplevel):
 
-    def __init__(self, parent, candidate=False):
+    def __init__(self, parent, candidate=''):
         """
         Initialize the DataWindow class.
 
@@ -112,15 +112,7 @@ class DataWindow(Toplevel):
 
         # If candidate is populated with candID populate the fields with values
         # available in cand_info dictionary, otherwise populate with empty str
-        if self.candidate:
-            self.text_pscid_var.set(cand_info["Identifier"])
-            self.text_firstname_var.set(cand_info["FirstName"])
-            self.text_lastname_var.set(cand_info["LastName"])
-            self.text_dob_var.set(cand_info["DateOfBirth"])
-            self.text_gender_var.set(cand_info["Gender"])
-            self.text_status_var.set(cand_info["CandidateStatus"])
-            self.text_phone_var.set(cand_info["PhoneNumber"])
-        else:
+        if self.candidate == 'new' or self.candidate == 'search':
             self.text_pscid_var.set("")
             self.text_firstname_var.set("")
             self.text_lastname_var.set("")
@@ -128,6 +120,14 @@ class DataWindow(Toplevel):
             self.text_gender_var.set(" ")
             self.text_status_var.set(" ")
             self.text_phone_var.set("")
+        else:
+            self.text_pscid_var.set(cand_info["Identifier"])
+            self.text_firstname_var.set(cand_info["FirstName"])
+            self.text_lastname_var.set(cand_info["LastName"])
+            self.text_dob_var.set(cand_info["DateOfBirth"])
+            self.text_gender_var.set(cand_info["Gender"])
+            self.text_status_var.set(cand_info["CandidateStatus"])
+            self.text_phone_var.set(cand_info["PhoneNumber"])
 
         # Create widgets to be displayed
         # (typically a label with a text box underneath per variable to display)

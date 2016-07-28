@@ -3,11 +3,11 @@
 #import standard packages
 from Tkinter import *
 from ttk import *
+
 #import internal packages
 import ui.datatable as DataTable
 import ui.datawindow as DataWindow
 import lib.multilanguage as MultiLanguage
-import lib.config as Config
 
 
 class UserInterface(Frame):
@@ -77,33 +77,49 @@ class UserInterface(Frame):
         self.data_pane.add(self.candidate_pane)
         self.data_pane.add(self.visit_pane)
 
-        ## Plot the button action in the pane frame
+        ## Plot the button actions in the candidate pane frame
 
-        # Candidate pane frame buttons
+        # Create a frame that will contain the buttons
+        self.buttonBox = Frame(self.candidate_pane)
+        self.buttonBox.pack(side=TOP, anchor=W)
+
+        # Create a 'new candidate' button to be added to self.buttonBox
         self.buttonNewCandidate = Button(
-            self.candidate_pane,
-            width=12,
+            self.buttonBox,
+            width=15,
             text=MultiLanguage.candidate_add,
             command=self.add_candidate
         )
-        self.buttonNewCandidate.pack(side=TOP, anchor=W)
+        self.buttonSearchCandidate = Button(
+            self.buttonBox,
+            width=15,
+            text=MultiLanguage.candidate_search,
+            command=self.search_candidate
+        )
+        # Draw the buttons
+        self.buttonNewCandidate.grid(
+            row=0, column=0, padx=(5,0), pady=(0,5), sticky=E+W
+        )
+        self.buttonSearchCandidate.grid(
+            row=0, column=1, padx=(5,0), pady=(0,5), sticky=E+W
+        )
 
         ## Create data tables (using Treeview)
 
         # Candidate datatable
-        candidate_column_headers = (
+        candidate_column_headers = [
             'identifier', 'firstname', 'lastname', 'date of birth',
             'gender',     'phone',     'status'
-        )
+        ]
         self.cand_table = DataTable.ParticipantsList(
             self.candidate_pane, candidate_column_headers
         )
         self.cand_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
 
         # Calendar datatable
-        visit_column_headers = (
+        visit_column_headers = [
             'identifier', 'candidate', 'visitlabel', 'when', 'where', 'status'
-        )
+        ]
         self.visit_table = DataTable.VisitList(
             self.visit_pane, visit_column_headers
         )
@@ -146,10 +162,23 @@ class UserInterface(Frame):
 
         # Open the datawindow with candidate=False as no existing ID associated
         # yet for the new candidate
-        DataWindow.DataWindow(self, False)
+        DataWindow.DataWindow(self, 'new')
 
         # Update the candidate datatable when save the new candidate
         self.cand_table.update_data()
+
+    def search_candidate(self):
+        """
+        This function will allow functionality to search for candidates using
+        the same data window as when editing a subject.
+
+        """
+
+        # Open the datawindow with candidate=False as want to fill in the
+        # options to search for a candidate
+        DataWindow.DataWindow(self, 'search')
+
+        #
 
     def load_xml(self):
         """

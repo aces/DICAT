@@ -56,7 +56,7 @@ class Candidate():
         #self.visitset  = cand_data['VisitSet']
 
 
-    def check_candidate_data(self, tab, candidate=False):
+    def check_candidate_data(self, tab, candidate=''):
         """
         Check that the data entered in the data window for a given candidate is
         as expected. If not, will return an error message that can be displayed.
@@ -84,7 +84,7 @@ class Candidate():
         candIDs_array = DataManagement.grep_list_of_candidate_ids()
         # if candidate not populated with a candID, it means we are creating a
         # new candidate so we need to check if the PSCID entered is unique.
-        if not candidate and self.pscid in candIDs_array:
+        if candidate == 'new' and self.pscid in candIDs_array:
                 return MultiLanguage.dialog_candID_already_exists
 
         # If Date of Birth does not match YYYY-MM-DD, return an error
