@@ -110,6 +110,9 @@ if language == "fr":
                              u"AAAA-MM-JJ!"
     dialog_no_data_entered = u"Au moins un des champs doit être entré pour " \
                              u"chercher un candidat."
+    warning_filters_set    = u"ATTENTION: des filtres sont en fonction. " \
+                             u"Seuls les candidats correspondant aux filtres " \
+                             u"sont montrés"
     dialog_candID_already_exists  = u"L'identifiant existe déjà!"
     dialog_missing_cand_info_schedul = u"Les champs 'Identifiant', 'Prénom', " \
                                        u"'Nom de famille', 'Sexe' et "         \
@@ -232,6 +235,8 @@ elif language == "en":
     dialog_bad_dob_format  = u"Date of Birth should be in YYYY-MM-DD format!"
     dialog_no_data_entered = u"At least one of the fields needs to be entered " \
                              u"to search_event a candidate."
+    warning_filters_set    = u"WARNING: filters are set. Only matching " \
+                             u"candidates are shown."
     dialog_candID_already_exists  = u"Identifier already exists!"
     dialog_missing_cand_info_schedul = u"'Identifier', 'Firstname', "         \
                                        u"'Lastname', 'Date of Birth' and " \

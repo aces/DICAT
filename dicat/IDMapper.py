@@ -278,6 +278,10 @@ class IDMapper_frame_gui(Frame):
         # Display only the filtered data using DisplayCandidates(filtered_data)
         self.display_filtered_data(filtered_data)
 
+        # Show a message warning to say that filters are set
+        message = MultiLanguage.warning_filters_set
+        self.ErrorMessage.set(message)
+
 
     def find_candidate(self, data_captured):
         """
