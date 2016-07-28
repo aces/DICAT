@@ -1,15 +1,15 @@
 # import standard packages
 import datetime
 
-from dicat.scheduler_visit import Visit
+#from dicat.scheduler_visit import Visit
 
 # import internal packages
-import dicat.lib.datamanagement as DataManagement
-import dicat.lib.multilanguage as MultiLanguage
-import dicat.lib.utilities as Utilities
+import lib.datamanagement as DataManagement
+import lib.multilanguage as MultiLanguage
+import lib.utilities as Utilities
 
 
-class Candidate:
+class Candidate():
     """
     The Candidate class defines the candidates/participants of the study
 
@@ -31,18 +31,75 @@ class Candidate:
         candidatedb[candidatedata.uid] = candidatedata  #add candidate to dict
         DataManagement.save_candidate_data(candidatedb) #save data to file
     """
-    def __init__(self, firstname, lastname, phone, uid=None, visitset = None, status = None, pscid=None, **kwargs): #TODO *kwarg
-        self.uid = Utilities.generate_uid()
-        self.firstname = firstname
-        self.lastname = lastname
-        self.visitset = visitset
-        self.phone = phone
-        self.status = status
-        self.pscid = pscid
-        #...many other attributes
-        if kwargs is not None:
-            for key, value in kwargs.iteritems():
-                setattr(self, key, value)
+    def __init__(self, cand_data):
+        # Required fields in cand_data
+        self.pscid  = cand_data['Identifier']
+        self.dob    = cand_data['DateOfBirth']
+        self.firstname   = cand_data['FirstName']
+        self.lastname    = cand_data['LastName']
+
+        # Optional fields
+        if 'Gender' in cand_data:
+            self.gender = cand_data['Gender']
+        else:
+            self.gender = " "
+        if 'PhoneNumber' in cand_data:
+            self.phone = cand_data['PhoneNumber']
+        else:
+            self.phone = ""
+        if 'CandidateStatus' in cand_data:
+            self.cand_status = cand_data['CandidateStatus']
+        else:
+            self.cand_status = " "
+
+        #TODO check if VisitSet necessary here. Commenting it for now.
+        #self.visitset  = cand_data['VisitSet']
+
+
+    def check_candidate_data(self, tab, candidate=False):
+        """
+        Check that the data entered in the data window for a given candidate is
+        as expected. If not, will return an error message that can be displayed.
+
+        :param tab: IDMapper or Scheduler tab
+         :type tab: str
+
+        :return: error message determined by the checks
+         :rtype: str
+
+        """
+
+        # Check that all required fields are set (a.k.a. 'Identifier',
+        # 'FirstName', 'LastName', 'Gender' and 'DateOfBirth'), if not, return
+        # an error. (Error message stored in
+        # MultiLanguage.dialog_missing_candidate_info variable)
+        if not self.pscid or not self.firstname or not self.lastname \
+                or not self.dob or (tab == 'scheduler' and self.gender == " "):
+            # If it is the scheduler capturing the data, gender must be set
+            if tab == 'scheduler' and self.gender == " ":
+                return MultiLanguage.dialog_missing_cand_info_schedul
+            return MultiLanguage.dialog_missing_cand_info_IDmapper
+
+        # If candidate is new, check that the 'Identifier' used is unique
+        candIDs_array = DataManagement.grep_list_of_candidate_IDs()
+        # if candidate not populated with a candID, it means we are creating a
+        # new candidate so we need to check if the PSCID entered is unique.
+        if not candidate and self.pscid in candIDs_array:
+                return MultiLanguage.dialog_candID_already_exists
+
+        # If Date of Birth does not match YYYY-MM-DD, return an error
+        # (Error message is stored in MultiLanguage.dialog_bad_dob_format)
+        date_ok = Utilities.check_date_format(self.dob)
+        if not date_ok:
+            return MultiLanguage.dialog_bad_dob_format
+
+        # If we get there, it means all the data is good so no message needs
+        # to be displayed. Return False so that no message is displayed
+        return False
+
+
+
+
 
     def setup_visitset(self):
         """
