@@ -1,7 +1,6 @@
 # DICAT (DICOM Anonymization Tool)
 
-DICAT is a simple graphical tool that facilitates DICOM (Digital Imaging and Communications in Medicine) de-identification directly on a local workstation.
-It works on all major operating systems (Windows, Linux and OSX) and is very light in terms of dependencies.
+DICAT is a simple graphical tool that facilitates DICOM (Digital Imaging and Communications in Medicine) de-identification directly on a local workstation. It was designed to work on all major operating systems (Windows, Linux and OSX) and is very light in terms of dependencies (Python). Binaries (with no dependencies) have been compiled for all operating systems.
 
 With the increasing use of web-based database systems, such as [LORIS](http://www.loris.ca) ([Das *et al.*, 2011](http://journal.frontiersin.org/article/10.3389/fninf.2011.00037/full), [Das *et al.*, 2016](http://www.sciencedirect.com/science/article/pii/S1053811915008009)), for large scale imaging studies, de-identification of DICOM datasets becomes a requirement before they can be uploaded in such databases.
 
@@ -43,13 +42,12 @@ To install DICAT source code on a computer, download and save the content of the
 
 Before running DICAT, make sure your systems contains a [Python](https://www.python.org) compiler with the [TkInter](https://wiki.python.org/moin/TkInter) library (usually, TkInter comes by default with most Python installations. The [PyDICOM](http://www.pydicom.org) package is also required by DICAT. 
 
-DICAT can be started by executing `DICAT_application.py` script with a Python compiler. On UNIX computers (Linux and Mac OS X), open a terminal, go to the main directory of DICAT source code (`dicat` directory) and run the following:
+DICAT can be started by executing `DICAT.py` script with a Python compiler. On UNIX computers (Linux and Mac OS X), open a terminal, go to the main directory of DICAT source code (`dicat` directory) and run the following:
 
-```python DICAT_application.py```
+```python DICAT.py```
 
 
 ## How to use the DICOM de-identifier of DICAT?
-
 
 
 ![DICOM deidentifier 1](docs/images/DICOM_deidentification.png)
@@ -87,7 +85,8 @@ Clicking on a subject row (8) of the table displayed at the bottom of the applic
 
 The *“Real Name”* or *“Date of birth”* of that candidate can be edited if needed by altering the field and clicking on the *“Edit candidate”* button (9). 
 
-Finally, the data table of candidate is sortable by clicking on any of the column headers (10).
+Finally, the data table of candidate is sortable by clicking on any of the column headers (10).
+
 
 ## Authors
 
