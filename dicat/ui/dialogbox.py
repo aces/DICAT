@@ -15,6 +15,22 @@ class DialogBox(Toplevel):
     """
 
     def __init__(self,parent, title, message, button1, button2):
+        """
+        Initialize the dialog box window.
+
+        :param parent:  parent window to the dialog window
+         :type parent:  object
+        :param title:   title to give to the dialog window
+         :type title:   str
+        :param message: message to be displayed in the dialog window
+         :type message: str
+        :param button1: what should be written on button 1 of the dialog window
+         :type button1: str
+        :param button2: what should be written on button 2 of the dialog window
+         :type button2: str
+
+        """
+
         Toplevel.__init__(self,parent)
         self.transient(parent)
         self.parent = parent
@@ -36,12 +52,32 @@ class DialogBox(Toplevel):
 
 
     def body(self, parent, message):
+        """
+        Draw the body of the dialog box
+
+        :param parent:  parent window of the dialog box
+         :type parent:  object
+        :param message: message to be drawn on the dialog box
+         :type message: str
+
+        """
+
+        # Draw the message in the dialog box
         label = Label(self, text=message)
         label.pack(padx=4, pady=4)
-        pass
 
 
     def buttonbox(self, button1, button2):
+        """
+        Draws the button box at the bottom of the dialog box.
+
+        :param button1: button 1 of the button box
+         :type button1: str
+        :param button2: button 2 of the button box
+         :type button2: str
+
+        """
+
         #add a standard button box
         box = Frame(self)
         b1  = Button(
@@ -60,6 +96,14 @@ class DialogBox(Toplevel):
 
 
     def button1(self, event=None):
+        """
+        Event handler for button1.
+
+        :param event:
+         :type event:
+
+        """
+
         if not self.validate():
             self.initial_focus.focus_set() #put focus on Button
             return
@@ -68,11 +112,26 @@ class DialogBox(Toplevel):
 
 
     def button2(self, event=None):
+        """
+        Event handler for button2.
+
+        :param event:
+         :type event:
+
+        """
         self.buttonvalue = 2
         self.closedialog()
         
         
     def closedialog(self, event=None):
+        """
+        Event handler to close the dialog box.
+
+        :param event:
+         :type event:
+
+        """
+
         #put focus back to parent window before destroying the window
         self.parent.focus_set()
         self.destroy()
@@ -85,7 +144,21 @@ class DialogBox(Toplevel):
 
 
 class ConfirmYesNo(DialogBox):
+    """
+    Confirmation on closing a window class -> Yes or No.
+
+    """
+
     def __init__(self, parent, message):
+        """
+        Initialization of the confirmation window class.
+
+        :param parent:  parent of the confirmation window
+         :type parent:  object
+        :param message: message to print in the confirmation window.
+         :type message: str
+
+        """
         title   = MultiLanguage.dialog_title_confirm
         button1 = MultiLanguage.dialog_yes
         button2 = MultiLanguage.dialog_no
@@ -93,9 +166,24 @@ class ConfirmYesNo(DialogBox):
 
 
 
-    
+
 class ErrorMessage(DialogBox):
+    """
+    Error Message pop up window.
+
+    """
+
     def __init__(self, parent, message):
+        """
+        Initialization of the error message window.
+
+        :param parent:  parent of the error message window to be displayed
+         :type parent:  object
+        :param message: message to be displayed on the error window.
+         :type message: str
+
+        """
+
         title  = MultiLanguage.dialog_title_error
         button = MultiLanguage.dialog_ok
         DialogBox.__init__(self, parent, title, message, button, None)
