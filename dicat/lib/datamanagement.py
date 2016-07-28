@@ -96,7 +96,7 @@ def read_candidate_data():
     return data
 
 
-def grep_list_of_candidate_IDs():
+def grep_list_of_candidate_ids():
     """
     Read the XML file and grep all candidate IDs into an array candIDs_array.
 
