@@ -1,0 +1,284 @@
+<?xml version="1.0" ?>
+<Study>
+  <projectInfo>
+    <StudyName>DICAT test</StudyName>
+    <StudyDescription>This is a test project.</StudyDescription>
+    <StudyDesign>
+      <ageMin>0</ageMin>
+      <ageMax>100</ageMax>
+      <startYear>2000</startYear>
+      <endYear>2050</endYear>
+      <Project>
+        <ProjectName>Project 1</ProjectName>
+        <Subproject>
+          <SubprojectName>Subproject 1</SubprojectName>
+          <Visit>
+            <VisitName>V0</VisitName>
+            <VisitRank>1</VisitRank>
+            <!-- find better name for the ordering of visits-->
+            <NextVisitRange>25-35</NextVisitRange>
+          </Visit>
+          <VisitName>V1</VisitName>
+          <VisitRank>2</VisitRank>
+          <NextVisitRange>55-65</NextVisitRange>
+          <Visit>
+            <VisitName>V2</VisitName>
+            <VisitRank>3</VisitRank>
+            <NextVisitRange>95-105</NextVisitRange>
+          </Visit>
+          <Visit>
+            <VisitName>V3</VisitName>
+            <VisitRank>4</VisitRank>
+          </Visit>
+        </Subproject>
+        <Subproject>
+          <SubprojectName>Subproject 2</SubprojectName>
+          <Visit>
+            <VisitName>V0</VisitName>
+            <VisitRank>1</VisitRank>
+          </Visit>
+        </Subproject>
+      </Project>
+    </StudyDesign>
+  </projectInfo>
+  <data>
+    <Candidate>
+      <Identifier>MTL0002</Identifier>
+      <!-- could allow 2 identifiers? -->
+      <FirstName>Sepia</FirstName>
+      <LastName>Calamari</LastName>
+      <Gender>Female</Gender>
+      <DateOfBirth>2015-06-14</DateOfBirth>
+      <PhoneNumber>444-555-6666</PhoneNumber>
+      <CandidateStatus>active</CandidateStatus>
+      <Visit>
+        <VisitLabel>V0</VisitLabel>
+        <VisitStatus>completed</VisitStatus>
+        <!-- possible status for visit: scheduled, completed, to re-schedule (cancelled) (to schedule when previous visit completed)-->
+        <VisitStartWhen>2016-01-06 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-01-06 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWithWhom>Annie</VisitWithWhom>
+      </Visit>
+      <Visit>
+        <VisitLabel>V1</VisitLabel>
+        <VisitStatus>completed</VisitStatus>
+        <VisitStartWhen>2016-04-05 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-04-05 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWhom>Jennifer</VisitWhom>
+      </Visit>
+      <Visit>
+        <VisitLabel>V2</VisitLabel>
+        <VisitStatus>scheduled</VisitStatus>
+        <VisitStartWhen>2016-06-05 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-06-05 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWhom>Jennifer</VisitWhom>
+      </Visit>
+    </Candidate>
+    <Candidate>
+      <Identifier>MTL0003</Identifier>
+      <FirstName>Bibi</FirstName>
+      <LastName>LaPraline</LastName>
+      <Gender>Female</Gender>
+      <DateOfBirth>2010-08-12</DateOfBirth>
+      <PhoneNumber>450-345-6789</PhoneNumber>
+      <CandidateStatus>excluded</CandidateStatus>
+      <Visit>
+        <VisitLabel>V0</VisitLabel>
+        <VisitStatus>completed</VisitStatus>
+        <!-- possible status for visit: scheduled, completed, to re-schedule (cancelled) (to schedule when previous visit completed)-->
+        <VisitStartWhen>2016-01-06 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-01-06 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWithWhom>Annie</VisitWithWhom>
+      </Visit>
+    </Candidate>
+    <Candidate>
+      <Identifier>MTL0001</Identifier>
+      <FirstName>Blues</FirstName>
+      <LastName>Singer</LastName>
+      <Gender>Male</Gender>
+      <DateOfBirth>2015-06-14</DateOfBirth>
+      <PhoneNumber>444-555-6666</PhoneNumber>
+      <CandidateStatus>active</CandidateStatus>
+      <Visit>
+        <VisitLabel>V0</VisitLabel>
+        <VisitStatus>completed</VisitStatus>
+        <!-- possible status for visit: scheduled, completed, to re-schedule (cancelled) (to schedule when previous visit completed)-->
+        <VisitStartWhen>2016-01-06 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-01-06 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWithWhom>Annie</VisitWithWhom>
+      </Visit>
+      <Visit>
+        <VisitLabel>V1</VisitLabel>
+        <VisitStatus>completed</VisitStatus>
+        <VisitStartWhen>2016-04-05 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-04-05 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWhom>Jennifer</VisitWhom>
+      </Visit>
+      <Visit>
+        <VisitLabel>V2</VisitLabel>
+        <VisitStatus>scheduled</VisitStatus>
+        <VisitStartWhen>2016-06-05 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-06-05 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWhom>Jennifer</VisitWhom>
+      </Visit>
+    </Candidate>
+    <Candidate>
+      <Identifier>MTL0006</Identifier>
+      <FirstName>Ali</FirstName>
+      <LastName>Gator</LastName>
+      <Gender>Male</Gender>
+      <DateOfBirth>2014-02-05</DateOfBirth>
+      <PhoneNumber>514-758-8903</PhoneNumber>
+      <CandidateStatus>active</CandidateStatus>
+      <Visit>
+        <VisitLabel>V0</VisitLabel>
+        <VisitStatus>completed</VisitStatus>
+        <!-- possible status for visit: scheduled, completed, to re-schedule (cancelled) (to schedule when previous visit completed)-->
+        <VisitStartWhen>2016-01-06 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-01-06 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWithWhom>Annie</VisitWithWhom>
+      </Visit>
+      <Visit>
+        <VisitLabel>V1</VisitLabel>
+        <VisitStatus>scheduled</VisitStatus>
+        <VisitStartWhen>2016-04-05 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-04-05 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWhom>Jennifer</VisitWhom>
+      </Visit>
+    </Candidate>
+    <Candidate>
+      <Identifier>MTL0004</Identifier>
+      <FirstName>Pikachu</FirstName>
+      <LastName>Pokemon</LastName>
+      <Gender>Male</Gender>
+      <DateOfBirth>1996-01-01</DateOfBirth>
+      <PhoneNumber>543-453-5432</PhoneNumber>
+      <CandidateStatus>withdrawn</CandidateStatus>
+      <Visit>
+        <VisitLabel>V0</VisitLabel>
+        <VisitStatus>completed</VisitStatus>
+        <!-- possible status for visit: scheduled, completed, to re-schedule (cancelled) (to schedule when previous visit completed)-->
+        <VisitStartWhen>2016-01-06 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-01-06 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWithWhom>Annie</VisitWithWhom>
+      </Visit>
+    </Candidate>
+    <Candidate>
+      <Identifier>MTL0005</Identifier>
+      <FirstName>Bilou</FirstName>
+      <LastName>Doudou</LastName>
+      <Gender>Female</Gender>
+      <DateOfBirth>2014-02-03</DateOfBirth>
+      <PhoneNumber>450-758-9385</PhoneNumber>
+      <CandidateStatus>withdrawn</CandidateStatus>
+      <Visit>
+        <VisitLabel>V0</VisitLabel>
+        <VisitStatus>completed</VisitStatus>
+        <!-- possible status for visit: scheduled, completed, to re-schedule (cancelled) (to schedule when previous visit completed)-->
+        <VisitStartWhen>2016-01-06 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-01-06 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWithWhom>Annie</VisitWithWhom>
+      </Visit>
+    </Candidate>
+    <Candidate>
+      <Identifier>MTL9999</Identifier>
+      <FirstName>Lego</FirstName>
+      <LastName>Phantom</LastName>
+      <Gender>Male</Gender>
+      <DateOfBirth>2012-04-29</DateOfBirth>
+      <PhoneNumber>432-654-9093</PhoneNumber>
+      <CandidateStatus>active</CandidateStatus>
+      <Visit>
+        <VisitLabel>V0</VisitLabel>
+        <VisitStatus>completed</VisitStatus>
+        <!-- possible status for visit: scheduled, completed, to re-schedule (cancelled) (to schedule when previous visit completed)-->
+        <VisitStartWhen>2016-01-06 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-01-06 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWithWhom>Annie</VisitWithWhom>
+      </Visit>
+      <Visit>
+        <VisitLabel>V1</VisitLabel>
+        <VisitStatus>scheduled</VisitStatus>
+        <VisitStartWhen>2016-04-05 13:15:00</VisitStartWhen>
+        <VisitEndWhen>2016-04-05 14:15:00</VisitEndWhen>
+        <VisitWhere>Douglas</VisitWhere>
+        <VisitWhom>Jennifer</VisitWhom>
+      </Visit>
+    </Candidate>
+    <Candidate>
+      <Identifier>MTL0025</Identifier>
+      <FirstName>Santa</FirstName>
+      <LastName>Claus</LastName>
+      <Gender>Male</Gender>
+      <DateOfBirth>2015-12-25</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <CandidateStatus>ineligible</CandidateStatus>
+    </Candidate>
+    <Candidate>
+      <CandidateStatus> </CandidateStatus>
+      <FirstName>James</FirstName>
+      <LastName>Bond</LastName>
+      <DateOfBirth>1977-07-07</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <Gender>Male</Gender>
+      <Identifier>MTL0007</Identifier>
+    </Candidate>
+    <Candidate>
+      <CandidateStatus>ineligible</CandidateStatus>
+      <FirstName>Bugs</FirstName>
+      <LastName>Bunny</LastName>
+      <DateOfBirth>1938-04-30</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <Gender>Male</Gender>
+      <Identifier>MTL0008</Identifier>
+    </Candidate>
+    <Candidate>
+      <LastName>Gonzales</LastName>
+      <Identifier>MTL0009</Identifier>
+      <FirstName>Speedy</FirstName>
+      <DateOfBirth>1953-08-29</DateOfBirth>
+      <Gender> </Gender>
+      <CandidateStatus> </CandidateStatus>
+      <PhoneNumber> </PhoneNumber>
+    </Candidate>
+    <Candidate>
+      <CandidateStatus> </CandidateStatus>
+      <FirstName>Lucky</FirstName>
+      <LastName>Luke</LastName>
+      <DateOfBirth>1946-12-07</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <Gender>Male</Gender>
+      <Identifier>MTL0010</Identifier>
+    </Candidate>
+    <Candidate>
+      <CandidateStatus> </CandidateStatus>
+      <FirstName>Hopie</FirstName>
+      <LastName>Chipmunk</LastName>
+      <DateOfBirth>2008-04-20</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <Gender>Female</Gender>
+      <Identifier>MTL0011</Identifier>
+    </Candidate>
+    <Candidate>
+      <CandidateStatus>death</CandidateStatus>
+      <FirstName>Chatran</FirstName>
+      <LastName>Cat</LastName>
+      <DateOfBirth>1992-04-05</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <Gender>Male</Gender>
+      <Identifier>MTL0012</Identifier>
+    </Candidate>
+  </data>
+</Study>
