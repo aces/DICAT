@@ -243,6 +243,16 @@ class DataWindow(Toplevel):
 
     def schedule_pane_ui(self, visitset):
 
+        # If the candidate has not visit set, display a message on the calendar
+        # section to say that no visit has been scheduled yet for that candidate
+        if not visitset:
+            self.label_no_visit = Label(
+                self.schedule_pane, text=MultiLanguage.schedule_no_visit_yet
+            )
+            self.label_no_visit.grid(
+                row=0, column=1, columnspan=4, padx=5, sticky=N+S+E+W
+            )
+            return
 
         # Create top row (header) widgets
         self.label_visit_label = Label(     # create visit label widget
@@ -263,105 +273,83 @@ class DataWindow(Toplevel):
 
         # Draw the top row (header) widgets
         self.label_visit_label.grid(        # draw visit label widget
-            column=1, row=0, padx=5, pady=5, sticky=N+S+E+W
+            row=0, column=1, padx=5, pady=5, sticky=N+S+E+W
         )
         self.label_visit_when.grid(         # draw visit when widget
-            column=2, row=0, padx=5, pady=5, sticky=N+S+E+W
+            row=0, column=2, padx=5, pady=5, sticky=N+S+E+W
         )
         self.label_visit_where.grid(        # draw visit where widget
-            column=3, row=0, padx=5, pady=5, sticky=N+S+E+W
+            row=0, column=3, padx=5, pady=5, sticky=N+S+E+W
         )
         self.label_visit_withwhom.grid(     # draw visit withwhom widget
-            column=4, row=0, padx=5, pady=5, sticky=N+S+E+W
+            row=0, column=4, padx=5, pady=5, sticky=N+S+E+W
         )
         self.label_visit_status.grid(       # draw visit status widget
-            column=5, row=0, padx=5, pady=5, sticky=N+S+E+W
+            row=0, column=5, padx=5, pady=5, sticky=N+S+E+W
         )
 
-        """
-        PSEUDOCODE
-        1. Get candidate.visitset
-        2. Parse into a sorted list (sorted on visit.rank)
-        3. Print cand_data on screen
-
-
-        visit_set = candidate.visitset
-        for key, value in study_setup.iteritems():
-            visit_list.append(study_setup[key])
-        visit_list = sorted(visit_list, key=lambda visit: visit.rank)
-
-        for key, value in visit_list.iteritems():
-
-        """
         # TODO add logic "foreach" to create a table showing each visit
-        # 1- Get candidate visitset and parse into a list
-        visit_list = []
-        #if len(visitset.keys()) == 0:
-        if not visitset:
-            print 'no visit yet'
-        else:
-            for key, value in visitset.iteritems():
-                visit_list.append(visitset[key])
 
-            # 2- Sort list on visit.rank
-            visit_list = sorted(
-                visit_list, key=lambda visit: visit["VisitStartWhen"]
+        # Sort visit list based on the VisitStartWhen field
+        visit_list = DataManagement.sort_candidate_visit_list(visitset)
+
+        # Show values on ui
+        row_number=1
+        for visit in visit_list:
+
+            # Check if values are set for VisitStartWhen, VisitWhere,
+            # VisitWindow & VisitStatus keys. If not, set it to empty string as
+            # we need a text to display in the corresponding label widgets.
+            visit_when   = ""
+            visit_where  = ""
+            visit_status = ""
+            visit_with_whom = ""
+            if "VisitStartWhen" in visit.keys():
+                #TODO: implement automatic range for next visit
+                visit_when = visit["VisitStartWhen"]
+            if "VisitWhere" in visit.keys():
+                visit_where = visit["VisitWhere"]
+            if "VisitWithWhom" in visit.keys():
+                visit_with_whom = visit["VisitWithWhom"]
+            if "VisitStatus" in visit.keys():
+                visit_status = visit["VisitStatus"]
+
+            # Create the visit row widgets
+            label_visit_label = Label(     # visit label widget
+                self.schedule_pane, text=visit["VisitLabel"]
+            )
+            label_visit_when  = Label(     # visit when widget
+                self.schedule_pane, text=visit_when
+            )
+            label_visit_where = Label(     # visit where widget
+                self.schedule_pane, text=visit_where
+            )
+            label_visit_with_whom = Label( # visit with whom widget
+                self.schedule_pane, text=visit_with_whom
+            )
+            label_visit_status = Label(    # visit status widget
+                self.schedule_pane, text=visit_status
             )
 
-            # 3- 'print' values on ui
-            x = 0
-            for x in range(len(visit_list)):
-                # visitlabel
-                label_visit_label = Label(
-                    self.schedule_pane, text=visit_list[x]["VisitLabel"]
-                )
-                label_visit_label.grid(
-                    column=1, row=x+1, padx=5, pady=5, sticky=N+S+E+W
-                )
-                # when
-                visit_when = ""
-                if "VisitStartWhen" not in visit_list[x].keys():
-                    #visit = visit_list[x]["VisitLabel"]
-                    #date_range = visit.visit_date_range()
-                    #TODO: implement automatic range for next visit
-                    visit_when = ""
-                else:
-                    visit_when = visit_list[x]["VisitStartWhen"]
-                label_visit_when = Label(self.schedule_pane, text=visit_when)
-                label_visit_when.grid(
-                    column=2, row=x+1, padx=5, pady=5, sticky=N+S+E+W
-                )
+            # Draw the visit row widget
+            label_visit_label.grid(
+                row=row_number+1, column=1, padx=5, pady=5, sticky=N+S+E+W
+            )
+            label_visit_when.grid(
+                row=row_number+1, column=2, padx=5, pady=5, sticky=N+S+E+W
+            )
+            label_visit_where.grid(
+                row=row_number+1, column=3, padx=5, pady=5, sticky=N+S+E+W
+            )
+            label_visit_with_whom.grid(
+                row=row_number+1, column=4, padx=5, pady=5, sticky=N+S+E+W
+            )
+            label_visit_status.grid(
+                row=row_number+1, column=5, padx=5, pady=5, sticky=N+S+E+W
+            )
 
-                # where
-                visit_where = ""
-                if "VisitWhere" in visit_list[x].keys():
-                    visit_where = visit_list[x]["VisitWhere"]
-                label_visit_where = Label(self.schedule_pane, text=visit_where)
-                label_visit_where.grid(
-                    column=3, row=x+1, padx=5, pady=5, sticky=N+S+E+W
-                )
-
-                # withwhom
-                visit_with_whom = ""
-                if "VisitWithWhom" in visit_list[x].keys():
-                    visit_with_whom = visit_list[x]["VisitWithWhom"]
-                label_visit_with_whom = Label(
-                    self.schedule_pane, text=visit_with_whom
-                )
-                label_visit_with_whom.grid(
-                    column=4, row=x+1, padx=5, pady=5, sticky=N+S+E+W
-                )
-
-                # status
-                visit_status = ''
-                if "VisitStatus" in visit_list[x].keys():
-                    visit_status = visit_list[x]["VisitStatus"]
-                label_visit_status = Label(
-                    self.schedule_pane, text=visit_status
-                )
-                label_visit_status.grid(
-                    column=5, row=x+1, padx=5, pady=5, sticky=N+S+E+W
-                )
+            # Increment row_number for the next visit to be displayed
+            row_number += 1
 
 
     def load_data(self):

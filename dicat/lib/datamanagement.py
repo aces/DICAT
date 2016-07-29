@@ -340,3 +340,26 @@ def remove_empty_lines_from_file(file):
         f.writelines(lines)
 
 
+def sort_candidate_visit_list(visitset):
+        """
+        Sort a candidate's visit set and return it into sorted visit_list.
+
+        :param visitset: visit set for a given candidate
+         :type visitset: dict
+
+        :return visit_list: list of sorted visits for that candidate
+         :rtype visit_list: list
+
+        """
+
+        # 1- Grep candidate's visitset and parse into a list
+        visit_list = []
+        for key, value in visitset.iteritems():
+            visit_list.append(visitset[key])
+
+        # 2- Sort list on visit.rank
+        visit_list = sorted(
+            visit_list, key=lambda visit: visit["VisitStartWhen"]
+        )
+
+        return visit_list

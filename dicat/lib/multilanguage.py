@@ -136,6 +136,7 @@ if language == "fr":
     schedule_visit_status = u"Status"
     schedule_visit_when   = u"Date"
     schedule_optional     = u"Optionnel"
+    schedule_no_visit_yet = u"Aucune visite de programmé pour ce candidat"
 
 elif language == "en":
     app_title = u"LORIS tools"
@@ -218,11 +219,14 @@ elif language == "en":
     col_when   = u"Date/Time"
     col_where  = u"Place"
     col_status = u"Status"
+
     ####################  STATUS  #####################
     status_active    = u"active"
     status_tentative = u"tentative"
+
     #################  DATA WINDOWS  ##################
     data_window_title = u"Data Window"
+
     ##################  DIALOGBOX  ####################
     # very not sure what to do about that section
     dialog_yes   = u"Yes"
@@ -260,3 +264,4 @@ elif language == "en":
     schedule_visit_status = u"Status"
     schedule_visit_when   = u"Date"
     schedule_optional     = u"Optional"
+    schedule_no_visit_yet = u"No visit scheduled for that candidate yet"
