@@ -152,7 +152,7 @@ elif language == "en":
     #CANDIDATE menu
     candidate_menu   = u"Candidate"
     candidate_add    = u"New candidate"
-    candidate_search = u"Search candidate"
+    candidate_search = u"Search:"
     candidate_update = u"Update"
     candidate_get_id = u"Get a canditate ID"
     candidate_exclude_include_toggle = u"Include/Exclude a candidate"

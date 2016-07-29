@@ -312,16 +312,16 @@ class IDMapper_frame_gui(Frame):
             lastname  = data[cand_key]["LastName"]
             dob       = data[cand_key]["DateOfBirth"]
             if 'DateOfBirth' in data_captured \
-                    and re.match(data_captured['DateOfBirth'], dob):
+                    and re.search(data_captured['DateOfBirth'], dob):
                 add = True # set the 'add' boolean to true to add candidate
             if 'FirstName' in data_captured \
-                    and re.match(data_captured['FirstName'], firstname):
+                    and re.search(data_captured['FirstName'], firstname):
                 add = True # set the 'add' boolean to true to add candidate
             if 'LastName' in data_captured \
-                    and re.match(data_captured['LastName'], lastname):
+                    and re.search(data_captured['LastName'], lastname):
                 add = True # set the 'add' boolean to true to add candidate
             if 'Identifier' in data_captured \
-                    and re.match(data_captured['Identifier'], candid):
+                    and re.search(data_captured['Identifier'], candid):
                 add = True # set the 'add' boolean to true to add candidate
 
             # If add is set to True, add the candidate to the filtered list.

@@ -73,7 +73,7 @@ class DataTable(Frame):
         self.datatable.bind('<Button-3>',         self.onrightclik  )
 
 
-    def load_data(self):
+    def load_data(self, pattern=False):
         """
         Should be overriden in child's class
 
@@ -81,7 +81,7 @@ class DataTable(Frame):
         pass
 
 
-    def update_data(self):
+    def update_data(self, pattern=False):
         """
         Delete everything in datatable and reload its content with the updated
         data coming from the XML file.
@@ -90,7 +90,7 @@ class DataTable(Frame):
 
         for i in self.datatable.get_children():
             self.datatable.delete(i) # delete all data from the datatable
-        self.load_data() # reload all data with updated values
+        self.load_data(pattern) # reload all data with updated values
 
 
     def treeview_sortby(self, tree, column, descending):
@@ -206,9 +206,13 @@ class ParticipantsList(DataTable):
         self.datatable.tag_configure('active', background='#F1F8FF')
 
 
-    def load_data(self):
+    def load_data(self, pattern=False):
         """
-        Load candidates information into the candidate datatable.
+        Load candidates information into the candidate datatable. If pattern is
+        set, will only load candidates that have info that matches the pattern.
+
+        :param pattern: pattern to use to find matching candidates
+         :type pattern: str
 
         """
         
@@ -217,11 +221,23 @@ class ParticipantsList(DataTable):
 
         try:
             # Loop through all candidates
+            matching_cand = {}
             for key in cand_data:
+
+                # If pattern, check if found its match in cand_data[key] dict
+                # DataManagement.dict_match function will return:
+                #     - True if found a match,
+                #     - False otherwise
+                if pattern and \
+                        not DataManagement.dict_match(pattern, cand_data[key]):
+                    continue   # continue to the following candidate
+
+                # Populate the matching_cand dictionary with the candidate info
+                matching_cand[key] = cand_data[key]
 
                 # Deal with occurences where CandidateStatus is not set
                 if "CandidateStatus" not in cand_data[key].keys():
-                    status = ""
+                    status = " "
                 else:
                     status = cand_data[key]["CandidateStatus"]
 
@@ -236,15 +252,15 @@ class ParticipantsList(DataTable):
                     '', 
                     'end', 
                     values=[ 
-                        cand_data[key]["Identifier"],
-                        cand_data[key]["FirstName"],
-                        cand_data[key]["LastName"],
-                        cand_data[key]["DateOfBirth"],
-                        cand_data[key]["Gender"],
+                        matching_cand[key]["Identifier"],
+                        matching_cand[key]["FirstName"],
+                        matching_cand[key]["LastName"],
+                        matching_cand[key]["DateOfBirth"],
+                        matching_cand[key]["Gender"],
                         phone,
                         status
                     ],
-                    tags=(status, cand_data[key]["Identifier"])
+                    tags=(status, matching_cand[key]["Identifier"])
                 )
 
         except Exception as e:  # TODO proper exception handling
@@ -283,7 +299,7 @@ class VisitList(DataTable):
         self.datatable.tag_configure('tentative', background='#F0F0F0')
 
 
-    def load_data(self):
+    def load_data(self, pattern=False):
         """
         Load the visit list into the datatable.
 

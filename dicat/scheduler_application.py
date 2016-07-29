@@ -84,24 +84,33 @@ class UserInterface(Frame):
         self.buttonBox.pack(side=TOP, anchor=W)
 
         # Create a 'new candidate' button to be added to self.buttonBox
-        self.buttonNewCandidate = Button(
+        self.buttonNewCandidate = Button(    # new candidate button widget
             self.buttonBox,
             width=15,
             text=MultiLanguage.candidate_add,
             command=self.add_candidate
         )
-        self.buttonSearchCandidate = Button(
+        self.labelSearchCandidate = Label(   # search candidate Label widget
             self.buttonBox,
-            width=15,
+            width=8,
             text=MultiLanguage.candidate_search,
-            command=self.search_candidate
+            justify=RIGHT,
+            anchor=E
+        )
+        self.textSearchCandValue  = StringVar()
+        self.textSearchCandValue.trace('w', self.find_matching_candidates)
+        self.entrySearchCandidate = Entry(   # search candidate entry widget
+            self.buttonBox, text=self.textSearchCandValue, width=20,
         )
         # Draw the buttons
         self.buttonNewCandidate.grid(
-            row=0, column=0, padx=(5,0), pady=(0,5), sticky=E+W
+            row=0, column=0, padx=(0,10), pady=(0,5), sticky=E+W
         )
-        self.buttonSearchCandidate.grid(
+        self.labelSearchCandidate.grid(
             row=0, column=1, padx=(5,0), pady=(0,5), sticky=E+W
+        )
+        self.entrySearchCandidate.grid(
+            row=0, column=2, padx=(0,0), pady=(0,5), sticky=E+W
         )
 
         ## Create data tables (using Treeview)
@@ -125,32 +134,17 @@ class UserInterface(Frame):
         )
         self.visit_table.pack(side=BOTTOM, expand=YES, fill=BOTH)
 
-        #TODO This section to be replaced by REAL CODE actively filtering data
-        """
-        #Create a filter section in each data_pane (not implemented yet)
 
-
-        self.filter_candidate = Labelframe(
-            self.candidate_pane, text='Filters', width=220, height=50,
-            borderwidth=10
-        )
-        self.filter_candidate.pack(side=TOP, expand=NO, fill=BOTH, pady=5)
-        self.filter_candidate_label = Label(
-            self.filter_candidate,
-            text='Filter for Non-Active / Active / Excluded / Group...'
-        )
-        self.filter_candidate_label.pack(side=TOP, expand=NO, fill=BOTH)
-        self.filter_visit = Labelframe(
-            self.visit_pane, text='Filters', width=220, height=50,
-            borderwidth=10
-        )
-        self.filter_visit.pack(side=TOP, expand=NO, fill=BOTH, pady=5)
-        self.filter_candidate_label = Label(
-            self.filter_visit,
-            text='Filters for Active / Tentative / Closed ...'
-        )
-        self.filter_candidate_label.pack(side=TOP, expand=NO, fill=BOTH)
+    def find_matching_candidates(self, *args):
         """
+        Updates data table with matching candidates.
+
+        :param args:
+         :type args: list
+
+        """
+        pattern = self.textSearchCandValue.get()
+        self.cand_table.update_data(pattern)
 
 
     def add_candidate(self):
@@ -167,18 +161,6 @@ class UserInterface(Frame):
         # Update the candidate datatable when save the new candidate
         self.cand_table.update_data()
 
-    def search_candidate(self):
-        """
-        This function will allow functionality to search for candidates using
-        the same data window as when editing a subject.
-
-        """
-
-        # Open the datawindow with candidate=False as want to fill in the
-        # options to search for a candidate
-        DataWindow.DataWindow(self, 'search')
-
-        #
 
     def load_xml(self):
         """

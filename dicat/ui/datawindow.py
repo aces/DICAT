@@ -2,7 +2,6 @@
 from Tkinter import *
 from ttk import *
 # import internal packages
-from scheduler_visit import Visit
 import ui.dialogbox as DialogBox
 import lib.utilities as Utilities
 import lib.multilanguage as MultiLanguage
@@ -65,7 +64,7 @@ class DataWindow(Toplevel):
         # Load the candidate and visitset data
         cand_info = []
         visitset  = []
-        if not self.candidate in ['new', 'search']:
+        if not self.candidate == 'new':
             (cand_info, visitset) = self.load_data()
 
         ## Create a candidate section in the data window
@@ -84,7 +83,7 @@ class DataWindow(Toplevel):
         self.candidate_pane_ui(cand_info)
 
         # Draw the visit section if self.candidate is not 'new' or 'search'
-        if not self.candidate in ['new', 'search']:
+        if not self.candidate == 'new':
             # Create a calendar section in the data window
             self.schedule_pane = Labelframe(
                 self,
@@ -122,7 +121,7 @@ class DataWindow(Toplevel):
         # If self.candidate is populated with a candID populate the fields with
         # values available in cand_info dictionary, otherwise populate with
         # empty str or " " in the case of drop down menus
-        if self.candidate == 'new' or self.candidate == 'search':
+        if self.candidate == 'new':
             self.text_pscid_var.set("")
             self.text_firstname_var.set("")
             self.text_lastname_var.set("")
@@ -287,8 +286,6 @@ class DataWindow(Toplevel):
         self.label_visit_status.grid(       # draw visit status widget
             row=0, column=5, padx=5, pady=5, sticky=N+S+E+W
         )
-
-        # TODO add logic "foreach" to create a table showing each visit
 
         # Sort visit list based on the VisitStartWhen field
         visit_list = DataManagement.sort_candidate_visit_list(visitset)

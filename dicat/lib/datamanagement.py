@@ -1,5 +1,5 @@
 # Imports from standard packages
-import os.path
+import os.path, re
 from xml.dom import minidom
 
 # Imports from DICAT
@@ -338,6 +338,7 @@ def remove_empty_lines_from_file(file):
     # write lines into the file
     with open(file, "w") as f:
         f.writelines(lines)
+        f.writelines(lines)
 
 
 def sort_candidate_visit_list(visitset):
@@ -363,3 +364,25 @@ def sort_candidate_visit_list(visitset):
         )
 
         return visit_list
+
+
+def dict_match(pattern, data_dict):
+    """
+    Function that will return True if the pattern was matching one value of the
+    data dictionary (data_dict). False otherwise.
+
+    :param pattern:   pattern to be used in the regular expression
+     :type pattern:   str
+    :param data_dict: data dictionary to look for matches
+     :type data_dict: dict
+
+    :return: True if found a match, False otherwise
+     :rtype: bool
+
+    """
+
+    for key in data_dict:
+        if re.search(pattern, data_dict[key]):
+            return True
+
+    return False
