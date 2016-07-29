@@ -37,28 +37,6 @@ class SchedulerMenuBar(Tkinter.Menu):
             command=self.quit_application
         )
 
-        # Create a CANDIDATE pulldown menu
-        candidate_menu = Tkinter.Menu(self, tearoff=False)
-        self.add_cascade(
-            label=MultiLanguage.candidate_menu, underline=0, menu=candidate_menu
-        )
-        candidate_menu.add_command(
-            label=MultiLanguage.candidate_add, command=self.add_candidate
-        )
-        candidate_menu.add_command(
-            label=MultiLanguage.candidate_search, command=self.find_candidate
-        )
-
-        # Create a CALENDAR pulldown menu
-        calendar_menu = Tkinter.Menu(self, tearoff=False)
-        self.add_cascade(
-            label=MultiLanguage.calendar_menu, underline=0, menu=calendar_menu
-        )
-        calendar_menu.add_command(
-            label=MultiLanguage.calendar_new_appointment,
-            command=self.open_calendar
-        )
-
         # Create a HELP pulldown menu
         help_menu = Tkinter.Menu(self, tearoff=0)
         self.add_cascade(
@@ -83,31 +61,6 @@ class SchedulerMenuBar(Tkinter.Menu):
         #TODO implement quit_application()
         print 'running quit_application'
         self.quit()
-        pass
-
-
-    def open_calendar(self):
-        #TODO implement open_calendar()
-        print 'running open_calendar'
-        pass
-
-
-    def dicom_anonymizer(self):
-        #TODO implement dicom_anonymizer()
-        print 'running dicom anonymizer'
-        pass
-
-
-    def add_candidate(self):
-        #TODO implement add_candidate()
-        DataWindow.DataWindow(self, "new")
-        print 'running add_candidate'
-        pass
-
-
-    def find_candidate(self):
-        #TODO implement find_candidate()
-        print 'running find_candidate'
         pass
 
 
