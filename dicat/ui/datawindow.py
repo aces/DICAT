@@ -522,7 +522,7 @@ class DataWindow(Toplevel):
 
         # Check fields format and required fields
         candidate = Candidate(cand_data)
-        message = candidate.check_candidate_data('scheduler', self.candidate)
+        message   = candidate.check_candidate_data('scheduler', self.candidate)
         if message:
             return message
 

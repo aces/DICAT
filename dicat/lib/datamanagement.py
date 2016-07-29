@@ -165,7 +165,6 @@ def save_candidate_data(cand_data):
                     xml_lastname.firstChild.nodeValue  = cand_data['LastName']
                     xml_dob.firstChild.nodeValue = cand_data['DateOfBirth']
                     if 'Gender' in cand_data:
-                        print "in cand_data gender"
                         xml_gender.firstChild.nodeValue = cand_data['Gender']
                     if 'CandidateStatus' in cand_data:
                         key = 'CandidateStatus'
@@ -337,7 +336,6 @@ def remove_empty_lines_from_file(file):
         lines = [line for line in f if line.strip() is not ""]
     # write lines into the file
     with open(file, "w") as f:
-        f.writelines(lines)
         f.writelines(lines)
 
 

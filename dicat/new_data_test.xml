@@ -262,5 +262,23 @@
       <Gender>Male</Gender>
       <Identifier>MTL0010</Identifier>
     </Candidate>
+    <Candidate>
+      <CandidateStatus> </CandidateStatus>
+      <FirstName>Hopie</FirstName>
+      <LastName>Chipmunk</LastName>
+      <DateOfBirth>2008-04-20</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <Gender>Female</Gender>
+      <Identifier>MTL0011</Identifier>
+    </Candidate>
+    <Candidate>
+      <CandidateStatus>death</CandidateStatus>
+      <FirstName>Chatran</FirstName>
+      <LastName>Cat</LastName>
+      <DateOfBirth>1992-04-05</DateOfBirth>
+      <PhoneNumber> </PhoneNumber>
+      <Gender>Male</Gender>
+      <Identifier>MTL0012</Identifier>
+    </Candidate>
   </data>
 </Study>
