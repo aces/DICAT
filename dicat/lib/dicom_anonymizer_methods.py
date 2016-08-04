@@ -5,7 +5,6 @@ import xml.etree.ElementTree as ET
 import subprocess
 import re
 import shutil
-from shutil import move
 
 """
 Test whether PyDICOM module exists and import it.
@@ -254,7 +253,7 @@ def dicom_zapping(dicom_folder, dicom_fields):
         # set path to original DICOM file
         original_dcm = dicom.replace(dicom_folder, original_dir)
         # Move DICOM files from root folder to de-identified folder created
-        move(dicom, deidentified_dcm)
+        shutil.move(dicom, deidentified_dcm)
         if use_pydicom:
             # copy files from original folder to de-identified folder
             shutil.copy(deidentified_dcm, original_dcm)
@@ -267,7 +266,7 @@ def dicom_zapping(dicom_folder, dicom_fields):
             # DICOM folder
             orig_bak_dcm = deidentified_dcm + ".bak"
             if os.path.exists(orig_bak_dcm):
-                move(orig_bak_dcm, original_dcm)
+                shutil.move(orig_bak_dcm, original_dcm)
 
     # Zip the de-identified and original DICOM folders
     (deidentified_zip, original_zip) = zip_dcm_directories(deidentified_dir,
