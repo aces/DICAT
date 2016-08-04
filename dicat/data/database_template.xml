@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<Study>
+  <projectInfo>
+    <StudyName>DICAT test</StudyName>
+    <StudyDescription>This is a test project.</StudyDescription>
+    <StudyDesign>
+      <ageMin>0</ageMin>
+      <ageMax>100</ageMax>
+      <startYear>2000</startYear>
+      <endYear>2050</endYear>
+      <Project>
+        <ProjectName>Project 1</ProjectName>
+        <Subproject>
+          <SubprojectName>Subproject 1</SubprojectName>
+          <Visit>
+            <VisitName>V0</VisitName>
+            <VisitRank>1</VisitRank>
+            <!-- find better name for the ordering of visits-->
+            <NextVisitRange>25-35</NextVisitRange>
+          </Visit>
+          <VisitName>V1</VisitName>
+          <VisitRank>2</VisitRank>
+          <NextVisitRange>55-65</NextVisitRange>
+          <Visit>
+            <VisitName>V2</VisitName>
+            <VisitRank>3</VisitRank>
+            <NextVisitRange>95-105</NextVisitRange>
+          </Visit>
+          <Visit>
+            <VisitName>V3</VisitName>
+            <VisitRank>4</VisitRank>
+          </Visit>
+        </Subproject>
+        <Subproject>
+          <SubprojectName>Subproject 2</SubprojectName>
+          <Visit>
+            <VisitName>V0</VisitName>
+            <VisitRank>1</VisitRank>
+          </Visit>
+        </Subproject>
+      </Project>
+    </StudyDesign>
+  </projectInfo>
+  <data>
+  </data>
+</Study>

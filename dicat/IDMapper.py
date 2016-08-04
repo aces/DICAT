@@ -1,11 +1,13 @@
 #!/usr/bin/python
 
-import Tkinter, Tkconstants, tkFileDialog, tkMessageBox, re, datetime
 from Tkinter import *
-from xml.dom import minidom
-
-
 import ttk
+import re
+
+import lib.datamanagement as DataManagement
+from lib.candidate import Candidate
+import lib.multilanguage as MultiLanguage
+
 
 def sortby(tree, col, descending):
     """Sort tree contents when a column is clicked on."""
@@ -26,7 +28,11 @@ def sortby(tree, col, descending):
 class IDMapper_frame_gui(Frame):
     
     def __init__(self, parent):
-        """Initialize the application"""
+        """
+        Initialize the ID Mapper frame.
+
+        """
+
         self.parent = parent
 
         # Set up the dictionary map
@@ -37,60 +43,20 @@ class IDMapper_frame_gui(Frame):
 
 
     def initialize(self):
+        """
+        Initialize the ID Mapper GUI by calling self.init_ui().
 
-        # initialize Frame
-        self.frame = Frame(self.parent)
-        self.frame.pack(expand=1, fill='both')
-        self.frame.columnconfigure(0, weight=1)
-        self.frame.columnconfigure(1, weight=1)
-        self.frame.columnconfigure(2, weight=6)
+        """
 
-
-        # select an existing candidate.xml file
-        # Initialize default text that will be in self.entry
-        self.entryVariable = Tkinter.StringVar()
-        self.entryVariable.set("Open an XML file with candidate's key")
-
-        # Create an entry with a default text that will be replaced by the path
-        # to the XML file once directory selected
-        self.entry = Entry(self.frame,
-                           width=40,
-                           textvariable=self.entryVariable
-                          )
-        self.entry.focus_set()
-        self.entry.selection_range(0, Tkinter.END)
-
-        # Create an open button to use to select an XML file with candidate's
-        # key info
-        self.buttonOpen = Button(self.frame,
-                                 text=u"Open an existing file",
-                                 command=self.openfilename
-                                )
-
-        self.buttonCreate = Button(self.frame,
-                                   text=u"Create a new file",
-                                   command=self.createfilename
-                                  )
-
-        self.buttonCreate.grid(row=0,
-                               column=0,
-                               padx=(0, 15),
-                               pady=10,
-                               sticky=E + W
-                              )
-        self.buttonOpen.grid(row=0,
-                             column=1,
-                             padx=(0, 15),
-                             pady=10,
-                             sticky=E + W
-                            )
-        self.entry.grid(row=0, column=2, padx=15, pady=10, sticky=E + W)
-
-        self.InitUI()
+        # Initialize GUI
+        self.init_ui()
 
 
+    def init_ui(self):
+        """
+        Draws the ID Mapper GUI.
 
-    def InitUI(self):
+        """
         
         self.frame = Frame(self.parent)
         self.frame.pack(expand=1, fill='both')
@@ -102,296 +68,370 @@ class IDMapper_frame_gui(Frame):
         for i in range(3, 4):
             self.frame.rowconfigure(i, weight=1)
 
-        self.labelID   = Label(self.frame, text=u'Identifier')
-        self.labelName = Label(self.frame, text=u'Real Name')
-        self.labelDoB  = Label(self.frame, text=u'Date of Birth (YYYY-MM-DD)')
+        self.labelID        = Label(self.frame, text=u'Identifier')
+        self.labelFirstName = Label(self.frame, text=u'First Name')
+        self.labelLastName  = Label(self.frame, text=u'Last Name')
+        self.labelDoB       = Label(
+            self.frame, text=u'Date of Birth (YYYY-MM-DD)'
+        )
 
-        self.buttonAdd    = Button(self.frame, width=12,
-                                   text=u'Add candidate',
-                                   command=self.AddIdentifierEvent
-                                  )
-        self.buttonClear  = Button(self.frame, width=12,
-                                   text=u'Clear fields',
-                                   command=self.clear
-                                  )
-        self.buttonSearch = Button(self.frame, width=12,
-                                   text=u'Search candidate',
-                                   command=self.search
-                                  )
-        self.buttonEdit   = Button(self.frame, width=12,
-                                   text=u'Edit candidate',
-                                   command=self.edit
-                                  )
+        self.buttonAdd    = Button(
+            self.frame,
+            width=12,
+            text=u'Add candidate',
+            command=self.add_identifier_event
+        )
+        self.buttonClear  = Button(
+            self.frame,
+            width=12,
+            text=u'Clear fields and filters',
+            command=self.clear_event
+        )
+        self.buttonSearch = Button(
+            self.frame,
+            width=12,
+            text=u'Search candidate',
+            command=self.search_event
+        )
+        self.buttonEdit   = Button(
+            self.frame,
+            width=12,
+            text=u'Edit candidate',
+            command=self.edit_event
+        )
 
         self.textCandId  = StringVar()
-        self.candidateid = Entry(self.frame,
-                                 textvariable=self.textCandId,
-                                 width=20
-                                )
+        self.candidateid = Entry(
+            self.frame, textvariable=self.textCandId, width=20
+        )
         self.candidateid.focus_set()
 
-        self.textCandName  = StringVar()
-        self.candidatename = Entry(self.frame,
-                                   textvariable=self.textCandName,
-                                   width=20
-                                  )
+        self.textCandFirstName  = StringVar()
+        self.candidateFirstName = Entry(
+            self.frame, textvariable=self.textCandFirstName, width=20
+        )
+
+        self.textCandLastName  = StringVar()
+        self.candidateLastName = Entry(
+            self.frame, textvariable=self.textCandLastName, width=20
+        )
 
         self.textCandDoB  = StringVar()
-        self.candidateDoB = Entry(self.frame,
-                                  textvariable=self.textCandDoB,
-                                  width=20
-                                 )
+        self.candidateDoB = Entry(
+            self.frame, textvariable=self.textCandDoB, width=20
+        )
 
-        self.tableColumns = ("Identifier", "Real Name", "Date of Birth")
-        self.datatable    = ttk.Treeview(self.frame,
-                                         selectmode='browse',
-                                         columns=self.tableColumns,
-                                         show="headings")
+        self.tableColumns = (
+            "Identifier", "First Name", "Last Name", "Date of Birth"
+        )
+        self.datatable    = ttk.Treeview(
+            self.frame,
+            selectmode='browse',
+            columns=self.tableColumns,
+            show="headings"
+        )
         for col in self.tableColumns:
-            self.datatable.heading(col, text=col.title(), 
-                                   command=lambda c=col: sortby(self.datatable, c, 0))
+            self.datatable.heading(
+                col,
+                text=col.title(),
+                command=lambda c=col: sortby(self.datatable, c, 0)
+            )
 
-        self.datatable.bind("<<TreeviewSelect>>", self.OnRowClick)
+        self.datatable.bind("<<TreeviewSelect>>", self.on_row_click_event)
       
         self.ErrorMessage = StringVar()
         self.error = Label(self.frame, textvariable=self.ErrorMessage, fg='red')
 
-        self.labelID.grid(row=0, column=0, padx=(0,4), sticky=E+W)
-        self.labelName.grid(row=0, column=1, padx=(4,4), sticky=E+W)
-        self.labelDoB.grid(row=0, column=2, padx=(4,4), sticky=E+W)
+        self.labelID.grid(       row=0, column=0, padx=(0,4), sticky=E+W)
+        self.labelFirstName.grid(row=0, column=1, padx=(4,4), sticky=E+W)
+        self.labelLastName.grid( row=0, column=2, padx=(4,4), sticky=E+W)
+        self.labelDoB.grid(      row=0, column=3, padx=(4,4), sticky=E+W)
 
-        self.candidateid.grid(row=1, column=0, padx=(0,4), pady=(0,10), sticky=E+W)
-        self.candidatename.grid(row=1, column=1, padx=(4,4), pady=(0,10), sticky=E+W)
-        self.candidateDoB.grid(row=1, column=2, padx=(4,4), pady=(0,10), sticky=E+W)
+        self.candidateid.grid(
+            row=1, column=0, padx=(0,4), pady=(0,10), sticky=E+W
+        )
+        self.candidateFirstName.grid(
+            row=1, column=1, padx=(4,4), pady=(0,10), sticky=E+W
+        )
+        self.candidateLastName.grid(
+            row=1, column=2, padx=(4,4), pady=(0,10), sticky=E+W
+        )
+        self.candidateDoB.grid(
+            row=1, column=3, padx=(4,4), pady=(0,10), sticky=E+W
+        )
  
-        self.buttonAdd.grid(row=2, column=1, padx=(4,0), sticky=E+W)
-        self.buttonClear.grid(row=1, column=3, padx=(4,0), sticky=E+W)
-        self.buttonSearch.grid(row=2, column=0, padx=(4,0), sticky=E+W)
-        self.buttonEdit.grid(row=2, column=2, padx=(4,0), sticky=E+W)
+        self.buttonClear.grid( row=2, column=0, padx=(4,0), sticky=E+W)
+        self.buttonSearch.grid(row=2, column=1, padx=(4,0), sticky=E+W)
+        self.buttonEdit.grid(  row=2, column=2, padx=(4,0), sticky=E+W)
+        self.buttonAdd.grid(   row=2, column=3, padx=(4,0), sticky=E+W)
 
-        self.datatable.grid(row=3, column=0, columnspan=3, pady=10, sticky='nsew')
-        self.error.grid(row=3, column=3)
+        self.datatable.grid(
+            row=3, column=0, columnspan=4, pady=10, sticky='nsew'
+        )
+        self.error.grid(row=4, column=0, columnspan=4)
 
 
-    def LoadXML(self, file):
-        global xmlitemlist
-        global xmldoc
+    def load_xml(self):
+        """
+        Parses the XML file and loads the data into the IDMapper.
+        Calls check_and_save_data with option action=False as we don't want to
+        save the candidates to be added to the datatable back in the XML.
+
+        """
+
+        global data
 
         # empty the datatable and data dictionary before loading new file
         self.datatable.delete(*self.datatable.get_children())
         self.IDMap = {}
 
-        """Parses the XML file and loads the data into the current window"""
         try:
-            xmldoc   = minidom.parse(file)
-            xmlitemlist = xmldoc.getElementsByTagName('Candidate')
-            for s in xmlitemlist:
-                identifier = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
-                realname = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
-                dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
-                self.AddIdentifierAction(identifier, realname, dob, False)
-        except:
-            pass
+            data = DataManagement.read_candidate_data()
+            for key in data:
+                identifier = data[key]["Identifier"]
+                firstname  = data[key]["FirstName"]
+                lastname   = data[key]["LastName"]
+                dob = data[key]["DateOfBirth"]
+                self.check_and_save_data(
+                    identifier, firstname, lastname, dob, False
+                )
+        except Exception as e:
+            #TODO add error login (in case a candidate data file does not exist)
+            print str(e)
 
 
-    def SaveMapAction(self):
-        
-        """Function which performs the action of writing the XML file"""
-        f = open(self.filename, "w")
-        f.write("<?xml version=\"1.0\"?>\n<data>\n")
-        for key in self.IDMap:
-            f.write("\t<Candidate>\n")
-            f.write("\t\t<Identifier>%s</Identifier>\n" % key)
-            f.write("\t\t<RealName>%s</RealName>\n" % self.IDMap[key][1])
-            f.write("\t\t<DateOfBirth>%s</DateOfBirth>\n" % self.IDMap[key][2])
-            f.write("\t</Candidate>\n")
-        f.write("</data>")
-
-
-    def SaveMapEvent(self, event):
-        """Handles any wxPython event which should trigger a save action"""
-        self.SaveMapAction()
-
-
-    def AddIdentifierEvent(self):
-        
-        name = self.candidatename.get()
-        candid = self.candidateid.get()
-        dob = self.candidateDoB.get()
-        self.AddIdentifierAction(candid, name, dob)
-
-
-    def AddIdentifierAction(self, candid, realname, dob, save=True):
+    def add_identifier_event(self):
         """
-        Adds the given identifier and real name to the mapping. If
-        the "save" parameter is true, this also triggers the saving
-        of the XML file. 
-        This is set to False on initial load.
+        Event handler for the 'Add new candidate' button. Will call
+        check_and_save_data on what has been entered in the Entry boxes.
+
         """
-        self.ErrorMessage.set("")
-
-        # check that all fields are set
-        if not candid or not realname or not dob:
-            message = "ERROR:\nAll fields are\nrequired to add\na candidate"
-            self.ErrorMessage.set(message)
-            return
-
-        # check candid does not already exist
-        if candid in self.IDMap:
-            message = "ERROR:\nCandidate ID\nalready exists"
-            self.ErrorMessage.set(message)
-            return
-
-        # check dob is in format YYYY-MM-DD
-        try:
-            datetime.datetime.strptime(dob,"%Y-%m-%d")
-        except ValueError:
-            message = "ERROR:\nDate of birth's\nformat should be\n'YYYY-MM-DD'"
-            self.ErrorMessage.set(message)
-            return
-
-        mapList = [candid, realname, dob]
-        self.IDMap[candid] = mapList
-                        
-        insertedList = [(candid, realname, dob)]
-        for item in insertedList:
-            self.datatable.insert('', 'end', values=item)
         
-        if(save):
-            self.SaveMapAction()
+        firstname = self.candidateFirstName.get()
+        lastname  = self.candidateLastName.get()
+        candid    = self.candidateid.get()
+        dob       = self.candidateDoB.get()
+        self.check_and_save_data(candid, firstname, lastname, dob, 'save')
 
 
-    def OnRowClick(self, event):
-        
-        """Update the text boxes' data on row click"""
+    def on_row_click_event(self, event):
+        """
+        Update the text boxes' data on row click.
+
+        """
+
         item_id = str(self.datatable.focus())
         item = self.datatable.item(item_id)['values']
         
         self.textCandId.set(item[0])
-        self.textCandName.set(item[1])
-        self.textCandDoB.set(item[2])
+        self.textCandFirstName.set(item[1])
+        self.textCandLastName.set(item[2])
+        self.textCandDoB.set(item[3])
 
 
-    def clear(self):
-        
+    def clear_event(self):
+        """
+        Event handler for the clear_event button. Will clear_event all the
+        Entry boxes.
+
+        """
+
         self.textCandId.set("")
-        self.textCandName.set("")
+        self.textCandFirstName.set("")
+        self.textCandLastName.set("")
         self.textCandDoB.set("")
         self.candidateid.focus_set()
 
+        self.load_xml() # Reload the entire dataset.
 
-    def search(self):
-        #  Find a candidate based on its ID if it is set in text box
+
+    def search_event(self):
+        """
+        Event handler for the search_event button. Will call find_candidate
+        function to find the proper candidate matching what has been filled in
+        the Entry boxes.
+
+        """
+
+        # Grep the data from the Entry fields
+        data_captured = {}
         if self.textCandId.get():
-            (candid, name, dob) = self.FindCandidate("candid",
-                                                     self.textCandId.get()
-                                                    )
-        # or based on its name if it is set in text box
-        elif self.textCandName.get():
-            (candid, name, dob) = self.FindCandidate("name",
-                                                     self.textCandName.get()
-                                                    )
-        # print the values in the text box
-        self.textCandId.set(candid)
-        self.textCandName.set(name)
-        self.textCandDoB.set(dob)
+            data_captured['Identifier']  = self.textCandId.get()
+        if self.textCandFirstName.get():
+            data_captured['FirstName']   = self.textCandFirstName.get()
+        if self.textCandLastName.get():
+            data_captured['LastName']    = self.textCandLastName.get()
+        if self.textCandDoB.get():
+            data_captured['DateOfBirth'] = self.textCandDoB.get()
+
+        # If no data entered, write a message saying at least one field should
+        # be entered and return
+        if not data_captured:
+            message = MultiLanguage.dialog_no_data_entered
+            self.ErrorMessage.set(message)
+            return
+
+        # Use the function find_candidate to find all matching candidates and
+        # return them in the filtered data dictionary
+        filtered_data = self.find_candidate(data_captured)
+
+        # Display only the filtered data using DisplayCandidates(filtered_data)
+        self.display_filtered_data(filtered_data)
+
+        # Show a message warning to say that filters are set
+        message = MultiLanguage.warning_filters_set
+        self.ErrorMessage.set(message)
 
 
-    def FindCandidate(self, key, value):
-        global xmlitemlist
+    def find_candidate(self, data_captured):
+        """
+        Find a candidate based on one of the fields entered in the Entry boxes.
+
+        :param data_captured: dictionary of the data captured in the Entry boxes
+         :type data_captured: dict
+
+        :return filtered_data: dictionary of the matching candidates
+         :rtype filtered_data: dict
+
+        """
+
+        global data
 
         # Loop through the candidate tree and return the candid, name and dob
         # that matches a given value
-        for s in xmlitemlist:
-            candid = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
-            name = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
-            dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
-            if (key == "candid" and value == candid):
-                return (candid, name, dob)
-            elif (key == "name" and value == name):
-                return (candid, name, dob)
-            elif (key == "dob" and value == dob):
-                return (candid, name, dob)
-            else:
-                continue
-        # if candidate was not found, return empty strings
-        return ("", "", "")
+        # Create a filtered_data dictionary that will store all matching
+        # candidates
+        filtered_data = {}
+        # Create an 'add' boolean on whether should add a candidate to the
+        # filtered list and set it to False
+        add = False
+        for cand_key in data:
+            # Grep the candidate information from data
+            candid    = data[cand_key]["Identifier"]
+            firstname = data[cand_key]["FirstName"]
+            lastname  = data[cand_key]["LastName"]
+            dob       = data[cand_key]["DateOfBirth"]
+            if 'DateOfBirth' in data_captured \
+                    and re.search(data_captured['DateOfBirth'], dob):
+                add = True # set the 'add' boolean to true to add candidate
+            if 'FirstName' in data_captured \
+                    and re.search(data_captured['FirstName'], firstname):
+                add = True # set the 'add' boolean to true to add candidate
+            if 'LastName' in data_captured \
+                    and re.search(data_captured['LastName'], lastname):
+                add = True # set the 'add' boolean to true to add candidate
+            if 'Identifier' in data_captured \
+                    and re.search(data_captured['Identifier'], candid):
+                add = True # set the 'add' boolean to true to add candidate
+
+            # If add is set to True, add the candidate to the filtered list.
+            if add:
+                filtered_data[cand_key] = data[cand_key]
+                add = False # reset the 'add' boolean to false for next cand_key
+
+        return filtered_data
 
 
-    def edit(self):
-        self.EditIdentifierAction(self.textCandId.get(),
-                                  self.textCandName.get(),
-                                  self.textCandDoB.get()
-                                 )
+    def display_filtered_data(self, filtered_data):
+        """
+        Displays only the filtered data matching the search_event.
 
-    def EditIdentifierAction(self, identifier, realname, realdob, edit=True):
-        global xmlitemlist
-        # Loop through the candidate tree, find a candidate based on its ID
-        # and check if name or DoB needs to be updated
-        for s in xmlitemlist:
-            # initialize update variable
-            update = False
+        :param filtered_data: dictionary of the matching candidates
+         :type filtered_data: dict
 
-            # get the candid, name and dob stored in the XML file
-            candid = s.getElementsByTagName("Identifier")[0].firstChild.nodeValue
-            name = s.getElementsByTagName("RealName")[0].firstChild.nodeValue
-            dob = s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue
+        """
 
-            # if name of candidate is changed
-            if (candid == identifier) and not (realname == name):
-                # update in the XML file
-                s.getElementsByTagName("RealName")[0].firstChild.nodeValue = realname
-                update = True   # set update to True
+        # Empty the datatable and data dictionary before loading filtered data
+        self.datatable.delete(*self.datatable.get_children())
+        self.IDMap = {}
 
-            # if candidate's date of birth is changed
-            if (candid == identifier) and not (realdob == dob):
-                # update in the XML file
-                s.getElementsByTagName("DateOfBirth")[0].firstChild.nodeValue = realdob
-                update = True   # set update to True
+        # Loop through the data and display them in the datatable
+        for key in filtered_data:
+                identifier = filtered_data[key]["Identifier"]
+                firstname  = filtered_data[key]["FirstName"]
+                lastname   = filtered_data[key]["LastName"]
+                dob = filtered_data[key]["DateOfBirth"]
+                self.check_and_save_data(
+                    identifier, firstname, lastname, dob, False
+                )
 
-            if (update):
-                # update the XML file
-                f = open(self.filename, "w")
-                xmldoc.writexml(f)
 
-                # update IDMap dictionary
-                mapList = [candid, realname, realdob]
-                self.IDMap[candid] = mapList
+    def edit_event(self):
+        """
+        Edit event of the Edit button. Will call check_and_save_date with
+        data entered in the Entry boxes and action='edit_event'.
 
-                # update datatable
-                item = self.datatable.selection()
-                updatedList = (candid, realname, realdob)
-                self.datatable.item(item, values=updatedList)
+        """
 
-    def openfilename(self):
-
-        """Returns a selected file name."""
-        self.filename = tkFileDialog.askopenfilename(
-            filetypes=[("XML files", "*.xml")]
+        self.check_and_save_data(
+            self.textCandId.get(),
+            self.textCandFirstName.get(),
+            self.textCandLastName.get(),
+            self.textCandDoB.get(),
+            'edit'
         )
-        self.entryVariable.set(self.filename)
 
-        if self.filename:
-            # Load the data
-            self.LoadXML(self.filename)
 
-        return self.filename
+    def check_and_save_data(self, id, firstname, lastname, dob, action=False):
+        """
+        Grep the candidate data and check them before saving and updating the
+        XML file and the datatale.
 
-    def createfilename(self):
+        :param id: identifier of the candidate
+         :type id: str
+        :param firstname: firstname of the candidate
+         :type firstname: str
+        :param lastname: lastname of the candidate
+         :type lastname: str
+        :param dob: date of birth of the candidate
+         :type dob: str
+        :param action: either 'save' new candidate or 'edit' a candidate
+         :type action: bool/str
 
-        self.filename = tkFileDialog.asksaveasfilename(
-            defaultextension=[("*.xml")],
-            filetypes=[("XML files", "*.xml")]
-        )
-        self.entryVariable.set(self.filename)
+        :return:
 
-        if self.filename:
-            open(self.filename, 'w')
+        """
 
-            # Load the data
-            self.LoadXML(self.filename)
+        # Check all required data are available
+        cand_data = {}
+        cand_data["Identifier"]  = id
+        cand_data["FirstName"]   = firstname
+        cand_data["LastName"]    = lastname
+        cand_data["DateOfBirth"] = dob
+        candidate = Candidate(cand_data)
 
-        return self.filename
+        # Initialize message to False. Will be replaced by the appropriate error
+        # message if checks failed.
+        message = False
+        if action == 'save':
+            message = candidate.check_candidate_data('IDmapper', False)
+        elif action == 'edit':
+            message = candidate.check_candidate_data('IDmapper', id)
+
+        # If message contains an error message, display it and return
+        if message:
+            self.ErrorMessage.set(message)
+            return
+
+        # Save the candidate data in the XML
+        DataManagement.save_candidate_data(cand_data)
+
+        # Update the IDMap dictionary
+        mapList = [id, firstname, lastname, dob]
+        self.IDMap[id] = mapList
+
+        # Update datatable
+        if action == 'edit':
+            item = self.datatable.selection()
+            updatedList = (id, firstname, lastname, dob)
+            self.datatable.item(item, values=updatedList)
+        else:
+            insertedList = [(id, firstname, lastname, dob)]
+            for item in insertedList:
+                self.datatable.insert('', 'end', values=item)
+
+
+
 
 def main():
        

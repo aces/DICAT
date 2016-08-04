@@ -38,7 +38,7 @@ class dicom_deidentifier_frame_gui(Frame):
 
     def initialize(self):
 
-        # initialize main Frame
+        # description_frame_gui main Frame
         self.frame = Frame(self.parent)
         self.frame.pack(expand=1, fill='both')
 
@@ -102,6 +102,11 @@ class dicom_deidentifier_frame_gui(Frame):
         return self.dirname
 
     def deidentify(self):
+
+        # clear edit table if it exists
+        if hasattr(self, 'field_edit_win'):
+            self.field_edit_win.destroy()
+
         # Read the XML file with the identifying DICOM fields
         load_xml = PathMethods.resource_path("data/fields_to_zap.xml")
         XML_filename  = load_xml.return_path()
