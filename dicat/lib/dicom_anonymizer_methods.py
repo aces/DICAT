@@ -412,10 +412,15 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
 
     # Create an original_dcm and deidentified_dcm directory in the DICOM folder,
     # as well as subdirectories
-    original_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
-        'Value']
-    deidentified_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
-        'Value'] + "_deidentified"
+    original_dir = dicom_folder + os.path.sep
+    deidentified_dir = dicom_folder + os.path.sep
+    # if PatientName is set, include PatientName in the directory name
+    if dicom_fields['0010,0010']['Value']:
+        original_dir     += dicom_fields['0010,0010']['Value'] + '_'
+        deidentified_dir += dicom_fields['0010,0010']['Value'] + '_'
+    # append _original or _deidentified str to the folder names
+    original_dir     +=  "original_DICOMs"
+    deidentified_dir +=  "deidentified_DICOMs"
     os.mkdir(original_dir, 0755)
     os.mkdir(deidentified_dir, 0755)
     # Create subdirectories in original and de-identified directory, as found in
