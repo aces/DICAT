@@ -96,6 +96,11 @@
       <editable>no</editable>
     </item>
     <item>
+      <name>0010,1001</name>
+      <description>OtherPatientNames</description>
+      <editable>no</editable>
+    </item>
+    <item>
       <name>0010,0021</name>
       <description>IssuerOfPatientID</description>
       <editable>no</editable>
