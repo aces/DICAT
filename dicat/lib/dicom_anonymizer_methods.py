@@ -94,7 +94,7 @@ def grep_dicoms_from_folder(dicom_folder):
     # Same for subdirectories
     # Regular expression to identify files that are not DICOM.
     pattern = re.compile(
-        "\.bmp$|\.png$|\.zip$|\.txt$|\.jpeg$|\.pdf$|\.DS_Store")
+        "\.bmp$|\.png$|\.zip$|\.txt$|\.jpeg$|\.pdf$|\.DS_Store|\._")
     for root, subdirs, files in os.walk(dicom_folder, topdown=True):
         if len(files) != 0 or len(subdirs) != 0:
             for dicom_file in files:
