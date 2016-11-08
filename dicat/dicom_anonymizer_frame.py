@@ -14,17 +14,6 @@ created application would not find them.
 import lib.resource_path_methods as PathMethods
 
 
-'''
-Determine which de-identifier tool to use (PyDICOM or DICOM toolkit) before
-starting the program.
-Will exit with an error message if neither PyDICOM or DICOM toolkit were found.
-'''
-deidentifier_tool = methods.find_deidentifier_tool()
-if not deidentifier_tool:
-    message = "Error: no tool was found to read or de-identify DICOM files."
-    tkMessageBox.showinfo("Message", message)
-    exit()
-
 
 class dicom_deidentifier_frame_gui(Frame):
     def __init__(self, parent):
@@ -33,6 +22,15 @@ class dicom_deidentifier_frame_gui(Frame):
         self.dir_opt = {}
         self.field_dict = {}
         self.message = StringVar()
+
+        # Determine which de-identifier tool to use (PyDICOM or DICOM toolkit) before
+        # starting the program.
+        deidentifier_tool = methods.find_deidentifier_tool()
+        if deidentifier_tool:
+            error = "ERROR: no tool was found to read or de-identify DICOM files. \n " + \
+                    "Please make sure PyDICOM has been properly installed."
+            self.message.set(error)
+
         self.initialize()
 
 
@@ -88,7 +86,13 @@ class dicom_deidentifier_frame_gui(Frame):
                                padx=(0, 10),
                                sticky=E + W
                              )
-        self.messageView.grid_forget()
+        if not self.message.get():
+            # if error message is set due to not finding the tool, show the error on the screen
+            self.messageView.configure(fg="dark red",
+                                       font="Helvetica 16 bold italic"
+                                       )
+        else:
+            self.messageView.grid_forget()
 
     def askdirectory(self):
 

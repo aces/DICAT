@@ -94,14 +94,15 @@ def grep_dicoms_from_folder(dicom_folder):
     # Same for subdirectories
     # Regular expression to identify files that are not DICOM.
     pattern = re.compile(
-        "\.bmp$|\.png$|\.zip$|\.txt$|\.jpeg$|\.pdf$|\.DS_Store")
+        "\.bmp$|\.png$|\.zip$|\.txt$|\.jpeg$|\.pdf$|\.DS_Store|\._")
     for root, subdirs, files in os.walk(dicom_folder, topdown=True):
         if len(files) != 0 or len(subdirs) != 0:
+            thisdir = re.sub(dicom_folder, '', root)
+            if thisdir != '' and thisdir not in subdirs_list:
+                subdirs_list.append(thisdir)
             for dicom_file in files:
                 if pattern.search(dicom_file) is None:
                     dicoms_list.append(os.path.join(root, dicom_file))
-            for subdir in subdirs:
-                subdirs_list.append(subdir)
         else:
             sys.exit('Could not find any files in ' + dicom_folder)
 
@@ -383,7 +384,8 @@ def zip_dcm_directories(deidentified_dir, original_dir, subdirs_list, root_dir):
     # in root directory
     if os.path.exists(deidentified_zip) and os.path.exists(original_zip):
         for subdir in subdirs_list:
-            shutil.rmtree(root_dir + os.path.sep + subdir)
+            if os.path.exists(root_dir + os.path.sep + subdir):
+                shutil.rmtree(root_dir + os.path.sep + subdir)
     else:
         sys.exit('Failed: could not zip de-identified & original data folders')
 
