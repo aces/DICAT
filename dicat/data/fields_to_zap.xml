@@ -135,4 +135,29 @@
       <description>PatientTelephoneNumbers</description>
       <editable>no</editable>
     </item>
+    <item>
+      <name>0008,1040</name>
+      <description>InstitutionalDepartmentName</description>
+      <editable>no</editable>
+    </item>
+    <item>
+      <name>0008,1050</name>
+      <description>PerformingPhysicianName</description>
+      <editable>no</editable>
+    </item>
+    <item>
+      <name>0008,1070</name>
+      <description>OperatorsName</description>
+      <editable>no</editable>
+    </item>
+    <item>
+      <name>0008,1040</name>
+      <description>InstitutionalDepartmentName</description>
+      <editable>no</editable>
+    </item>
+    <item>
+      <name>0008,1050</name>
+      <description>PerformingPhysicianName</description>
+      <editable>no</editable>
+    </item>
 </data>    
