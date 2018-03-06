@@ -8,7 +8,7 @@ In the terminal/console, go into the `dicat` directory hosting the DICAT.py scri
 
 ### On Mac OS X
 
-```pyinstaller --onefile --windowed --icon=images/DICAT_logo.icns DICAT.py```
+```pyinstaller --onefile --windowed --icon=images/DICAT_logo_icns DICAT.py```
 
 ### On Windows
 
@@ -61,14 +61,14 @@ Once the path to the images have been added, rerun the pyinstaller command on th
 
 ### On Mac OS X
 
-```pyinstaller --onefile --windowed --icon=images/DICAT_logo.icns DICAT.spec```
+```pyinstaller --onefile --windowed --icon=images/DICAT_logo_icns DICAT.spec```
 
 A `DICAT.app` will be located in the dist directory created by the pyinstaller command. 
 
 To include the DICAT logo to the app, execute the following steps:
 
 1.  Copy the icon to the clipboard
-  *  Click on the `DICAT_logo.icns` file from the Finder
+  *  Click on the `DICAT_logo_icns` file from the Finder
   *  Choose 'Get Info' from the 'File' menu.
   *  In the info window that pops up, click on the icon
   *  Choose 'Copy' from the 'Edit' menu.
@@ -88,7 +88,7 @@ Congratulations! You just created the DICAT app for Mac OS X!!
 
 Note: Make sure the paths in the spec file contains \\ instead of \.
 
-```pyinstaller --onefile --windowed --icon=images\DICAT_logo.icns DICAT.spec```
+```pyinstaller --onefile --windowed --icon=images\dicat_logo_HsB_2.ico DICAT.spec```
 
 A `DICAT.exe` will be located in the dist directory created by the pyinstaller command. 
 
