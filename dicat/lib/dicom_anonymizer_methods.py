@@ -4,6 +4,8 @@ import xml.etree.ElementTree as ET
 import subprocess
 import re
 import shutil
+import csv
+import lib.resource_path_methods as PathMethods
 
 """
 Test whether PyDICOM module exists and import it.
@@ -454,3 +456,102 @@ def zip_dicom(directory):
         return archive
     else:
         sys.exit(archive + " could not be created.")
+
+
+def read_csv(csv_file):
+    """
+
+    :param csv_file:
+    :return:
+
+    """
+
+    fieldnames = ['dcm_dir', 'pname', 'dob', 'sex']
+    csv_dict   = []
+    with open(csv_file) as file:
+        reader = csv.DictReader(file, fieldnames, restval='')
+
+        for row in reader:
+            csv_dict.append(row)
+
+    return csv_dict
+
+def mass_zapping(csv_dict):
+
+    success_arr = []
+    error_arr   = []
+    for row in csv_dict:
+        field_dict = map_DICOM_fields(row)
+        (deidentified_dcm, original_dcm) = dicom_zapping(
+            row['dcm_dir'], field_dict
+        )
+        if os.path.exists(deidentified_dcm) != [] and os.path.exists(
+                original_dcm) != []:
+            success_arr.append(row['dcm_dir'])
+        else:
+            error_arr.append(row['dcm_dir'])
+
+    return success_arr, error_arr
+
+
+def map_DICOM_fields(row):
+
+    # Read the XML file with the identifying DICOM fields
+    xml_file   = load_xml('data/fields_to_zap.xml')
+    field_dict = grep_dicom_fields(xml_file)
+
+
+    # Read DICOM header and grep identifying DICOM field values
+    #TODO: be able to read file with space in the path
+    field_dict = grep_dicom_values(row['dcm_dir'], field_dict)
+
+    for key in field_dict.keys():
+        if field_dict[key]['Editable'] == False:
+            continue
+        if field_dict[key]['Description'] == 'PatientName':
+            update_DICOM_value(field_dict, key, row['pname'])
+        elif field_dict[key]['Description'] == 'PatientBirthDate':
+            update_DICOM_value(field_dict, key, row['dob'])
+        elif field_dict[key]['Description'] == 'PatientSex':
+            update_DICOM_value(field_dict, key, row['sex'])
+
+    return field_dict
+
+
+def update_DICOM_value(field_dict, key, value):
+
+    if 'Value' in field_dict[key]:
+        if field_dict[key]['Value'] == value:
+            field_dict[key]['Update'] = False
+        else:
+            field_dict[key]['Value']  = value
+            field_dict[key]['Update'] = True
+
+
+def load_xml(xml_path):
+
+    # Read the XML file with the identifying DICOM fields
+    load_xml = PathMethods.resource_path(xml_path)
+    XML_filename = load_xml.return_path()
+
+    if os.path.isfile(XML_filename):
+        XML_file = XML_filename
+    else:
+        XML_filepath = os.path.dirname(os.path.abspath(__file__))
+        XML_file = XML_filepath + "/" + XML_filename
+
+    return XML_file
+
+
+def print_mass_summary(success_arr, error_arr):
+
+    if success_arr:
+        print "\nList of successfully deidentified datasets:"
+        print "\t" + "\n\t".join(str(success) for success in success_arr) + "\n"
+    else:
+        print "\nNo datasets were successfully deidentified.\n"
+    if error_arr:
+        print "List of datasets that were not successfully deidentified:"
+        print "\t" + "\n\t".join(str(error) for error in error_arr) + "\n"
+    else:
+        print "\nAll datasets were successfully deidentified!\n"

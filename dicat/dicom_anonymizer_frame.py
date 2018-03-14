@@ -111,18 +111,11 @@ class dicom_deidentifier_frame_gui(Frame):
         if hasattr(self, 'field_edit_win'):
             self.field_edit_win.destroy()
 
-        # Read the XML file with the identifying DICOM fields
-        load_xml = PathMethods.resource_path("data/fields_to_zap.xml")
-        XML_filename  = load_xml.return_path()
-
         # Remove the message from the grid
         self.messageView.grid_forget()
 
-        if os.path.isfile(XML_filename):
-            XML_file = XML_filename
-        else:
-            XML_filepath = os.path.dirname(os.path.abspath(__file__))
-            XML_file = XML_filepath + "/" + XML_filename
+        # load XML file and create the field dictionary
+        XML_file   = methods.load_xml("data/fields_to_zap.xml")
         field_dict = methods.grep_dicom_fields(XML_file)
 
         # Read DICOM header and grep identifying DICOM field values
