@@ -4,6 +4,8 @@ import xml.etree.ElementTree as ET
 import subprocess
 import re
 import shutil
+import csv
+import lib.resource_path_methods as PathMethods
 
 """
 Test whether PyDICOM module exists and import it.
@@ -406,7 +408,7 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
      :type subdirs_list: list
 
     :returns:
-      original_dir  -> directory containing original DICOM dataset
+      original_dir     -> directory containing original DICOM dataset
       deidentified_dir -> directory containing de-identified DICOM dataset
      :rtype: str
 
@@ -454,3 +456,180 @@ def zip_dicom(directory):
         return archive
     else:
         sys.exit(archive + " could not be created.")
+
+
+def read_csv(csv_file):
+    """
+    Function that reads a CSV file and return its content in an list of
+    dictionaries.
+        - Each row in the CSV will be one entry in the list.
+        - Each column {names : values} for a given row will be stored in a
+        dictionary within that row.
+
+    Example of a row in the returned array:
+    {'dcm_dir': '/path/to/dicom/dir', 'pname': 'sub-01', 'dob': '', 'sex': 'M'}
+
+    :param csv_file: CSV file to be read
+     :type csv_file: str
+
+    :return: dicom_dict_list -> list of dictionaries with 1 row per DICOM study
+     :rtype: list
+
+    """
+
+    fieldnames = ['dcm_dir', 'pname', 'dob', 'sex']
+    dicom_dict_list   = []
+    with open(csv_file) as file:
+        reader = csv.DictReader(file, fieldnames, restval='')
+
+        for row in reader:
+            dicom_dict_list.append(row)
+
+    return dicom_dict_list
+
+
+def mass_zapping(dicom_dict_list, verbose):
+    """
+    Function that deidentifies a given list of DICOM studies.
+
+    :param dicom_dict_list: list of dictionaries with 1 row per DICOM study.
+                            See description of read_csv() above to see
+                            dictionary's structure
+     :type dicom_dict_list: list
+         
+    :returns:
+      success_arr -> list of DICOM studies successfully deidentified
+      error_arr   -> list of DICOM studies not properly deidentified
+     :rtype: list
+
+    """
+
+    success_arr = []
+    error_arr   = []
+    for row in dicom_dict_list:
+        field_dict = map_DICOM_fields(row)
+        if verbose:
+            print 'Deidentifying DICOM study: ' + row['dcm_dir']
+
+        # get rid of '\ ' in DICOM path and map it to ' ' for the zapping method
+        dicom_dir = row['dcm_dir'].replace('\ ', ' ')
+        (deidentified_dcm, original_dcm) = dicom_zapping(
+            dicom_dir, field_dict
+        )
+
+        # check if deidentification was successful
+        if os.path.exists(deidentified_dcm) != [] and os.path.exists(
+                original_dcm) != []:
+            success_arr.append(row['dcm_dir'])
+        else:
+            error_arr.append(row['dcm_dir'])
+
+    return success_arr, error_arr
+
+
+def map_DICOM_fields(dicom_dict):
+    """
+    Function that maps DICOM values with the new values provided in dicom_dict.
+
+    :param dicom_dict: DICOM dictionary with DICOM path, new patient name, dob
+                       and sex information to modify into the DICOM files
+     :type dicom_dict: dict
+
+    :return: field_dict -> dictionary of {field: values} to be replaced in DICOM
+     :rtype: dict
+
+    """
+
+    # Read the XML file with the identifying DICOM fields
+    xml_file   = load_xml('data/fields_to_zap.xml')
+    field_dict = grep_dicom_fields(xml_file)
+
+    # Read DICOM header and grep identifying DICOM field values
+    dicom_dir  = dicom_dict['dcm_dir'].replace('\ ', ' ')  # get rid of '\ '
+    field_dict = grep_dicom_values(dicom_dir, field_dict)
+
+    for key in field_dict.keys():
+        if field_dict[key]['Editable'] == False:
+            continue
+        if field_dict[key]['Description'] == 'PatientName':
+            update_DICOM_value(field_dict, key, dicom_dict['pname'])
+        elif field_dict[key]['Description'] == 'PatientBirthDate':
+            update_DICOM_value(field_dict, key, dicom_dict['dob'])
+        elif field_dict[key]['Description'] == 'PatientSex':
+            update_DICOM_value(field_dict, key, dicom_dict['sex'])
+
+    return field_dict
+
+
+def update_DICOM_value(field_dict, key, value):
+    """
+    Function that updates a DICOM value stored in field_dict with the new value
+    provided as input. This new value will be modified later on in the DICOMs.
+
+    :param field_dict: dictionary with DICOM fields and values
+     :type field_dict: dict
+    :param key       : key of the DICOM field to update
+     :type key       : str
+    :param value     : new value to insert into the DICOM files
+     :type value     : str
+
+    """
+
+    if 'Value' in field_dict[key]:
+        if field_dict[key]['Value'] == value:
+            field_dict[key]['Update'] = False
+        else:
+            field_dict[key]['Value']  = value
+            field_dict[key]['Update'] = True
+    else:
+        field_dict[key]['Update'] = False
+
+
+def load_xml(xml_path):
+    """
+    Function that determines the full path to the XML file
+
+    :param xml_path: path to the XML file (could be a relative path)
+     :type xml_path: str
+
+    :return: XML_file -> full path to the XML file to be read if it exists  in
+             the filesystem, None otherwise
+     :rtype: str
+
+    """
+
+    # Read the XML file with the identifying DICOM fields
+    load_xml = PathMethods.resource_path(xml_path)
+    XML_filename = load_xml.return_path()
+
+    if os.path.isfile(XML_filename):
+        XML_file = XML_filename
+    else:
+        XML_filepath = os.path.dirname(os.path.abspath(__file__))
+        XML_file = XML_filepath + "/" + XML_filename
+
+    return XML_file if os.path.isfile(XML_file) else None
+
+
+def print_mass_summary(success_list, error_list):
+    """
+    Function that prints out a summary of the successfully deidentified DICOM
+    studies and the not propoerly deidentified DICOM studies.
+
+    :param success_list: list of DICOM studies successfully deidentified
+     :type success_list: list
+    :param error_list  : list of DICOM studies not properly deidentified
+     :type error_list  : list
+
+    """
+
+    if success_list:
+        print "\nList of successfully deidentified datasets:"
+        print "\t" + "\n\t".join(str(success) for success in success_list) + "\n"
+    else:
+        print "\nNo datasets were successfully deidentified.\n"
+    if error_list:
+        print "List of datasets that were not successfully deidentified:"
+        print "\t" + "\n\t".join(str(error) for error in error_list) + "\n"
+    else:
+        print "\nAll datasets were successfully deidentified!\n"
