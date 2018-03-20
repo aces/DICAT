@@ -92,6 +92,7 @@ def grep_dicoms_from_folder(dicom_folder):
     # Initialize list of DICOMs and subdirectories
     dicoms_list  = []
     subdirs_list = []
+    has_dicom    = False
     # Grep DICOM files recursively and insert them in dicoms_list
     # Same for subdirectories
     # Regular expression to identify files that are not DICOM.
@@ -105,8 +106,11 @@ def grep_dicoms_from_folder(dicom_folder):
             for dicom_file in files:
                 if pattern.search(dicom_file) is None:
                     dicoms_list.append(os.path.join(root, dicom_file))
+            has_dicom = True
         else:
-            sys.exit('Could not find any files in ' + dicom_folder)
+            continue
+    if not has_dicom:
+        sys.exit('Could not find any files in ' + dicom_folder)
 
     return dicoms_list, subdirs_list
 
