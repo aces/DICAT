@@ -28,7 +28,7 @@ except ImportError:
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
         use_pydicom = False  # set to false as PyDICOM was not found
-
+from dicom.errors import InvalidDicomError
 
 def find_deidentifier_tool():
     """
@@ -92,27 +92,47 @@ def grep_dicoms_from_folder(dicom_folder):
     # Initialize list of DICOMs and subdirectories
     dicoms_list  = []
     subdirs_list = []
-    has_dicom    = False
     # Grep DICOM files recursively and insert them in dicoms_list
     # Same for subdirectories
-    # Regular expression to identify files that are not DICOM.
-    pattern = re.compile(
-        "\.bmp$|\.png$|\.zip$|\.txt$|\.jpeg$|\.pdf$|\.DS_Store|\._")
     for root, subdirs, files in os.walk(dicom_folder, topdown=True):
         if len(files) != 0 or len(subdirs) != 0:
             thisdir = re.sub(dicom_folder, '', root)
             if thisdir != '' and thisdir not in subdirs_list:
                 subdirs_list.append(thisdir)
             for dicom_file in files:
-                if pattern.search(dicom_file) is None:
+                if is_file_a_dicom(root + "/" + dicom_file):
                     dicoms_list.append(os.path.join(root, dicom_file))
-            has_dicom = True
         else:
             continue
-    if not has_dicom:
-        sys.exit('Could not find any files in ' + dicom_folder)
 
     return dicoms_list, subdirs_list
+
+
+def is_file_a_dicom(file):
+    """
+    Check whether a given file is of type DICOM
+
+    :param file: path to the file to identify
+     :type file: str
+
+    :return: True if the file is DICOM, False otherwise
+     :rtype: bool
+
+    """
+
+    if use_pydicom:
+        try:
+            dicom.read_file(file)
+        except InvalidDicomError:
+            return False
+        return True
+    else:
+        try:
+            os.system("dcmdump" + file)
+        except IOError:
+            return False
+        return True
+
 
 
 def grep_dicom_fields(xml_file):
@@ -152,12 +172,18 @@ def grep_dicom_values(dicom_folder, dicom_fields):
 
     """
 
-    # Grep first DICOM of the directory
-    # TODO: Need to check if file is DICOM though, otherwise go to next one
+    # Grep list of DICOMs in the directory (validation that the list of files
+    # are DICOMs happened during grep_dicoms_from_folder)
     (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
+
+    # If no DICOM files were found, return false
+    if not dicoms_list:
+        return []
+
+    # Grep the first DICOM to read field information
     dicom_file = dicoms_list[0]
 
-    # Read DICOM file using PyDICOM
+    # Read DICOM file using PyDICOM or the DICOM tool kit
     if (use_pydicom):
         (dicom_fields) = read_dicom_with_pydicom(dicom_file, dicom_fields)
     else:
@@ -508,10 +534,15 @@ def mass_zapping(dicom_dict_list, verbose):
 
     """
 
-    success_arr = []
-    error_arr   = []
+    success_arr    = []
+    error_arr      = []
+    no_valid_dicom = []
     for row in dicom_dict_list:
         field_dict = map_DICOM_fields(row)
+        if not field_dict:
+            print 'No valid DICOM file was found in ' + row['dcm_dir']
+            no_valid_dicom.append(row['dcm_dir'])
+            continue
         if verbose:
             print 'Deidentifying DICOM study: ' + row['dcm_dir']
 
@@ -528,7 +559,7 @@ def mass_zapping(dicom_dict_list, verbose):
         else:
             error_arr.append(row['dcm_dir'])
 
-    return success_arr, error_arr
+    return success_arr, error_arr, no_valid_dicom
 
 
 def map_DICOM_fields(dicom_dict):
@@ -551,6 +582,9 @@ def map_DICOM_fields(dicom_dict):
     # Read DICOM header and grep identifying DICOM field values
     dicom_dir  = dicom_dict['dcm_dir'].replace('\ ', ' ')  # get rid of '\ '
     field_dict = grep_dicom_values(dicom_dir, field_dict)
+
+    if not field_dict:
+        return []
 
     for key in field_dict.keys():
         if field_dict[key]['Editable'] == False:
@@ -615,24 +649,34 @@ def load_xml(xml_path):
     return XML_file if os.path.isfile(XML_file) else None
 
 
-def print_mass_summary(success_list, error_list):
+def print_mass_summary(success_list, error_list, no_valid_dicom):
     """
     Function that prints out a summary of the successfully deidentified DICOM
     studies and the not propoerly deidentified DICOM studies.
 
-    :param success_list: list of DICOM studies successfully deidentified
-     :type success_list: list
-    :param error_list  : list of DICOM studies not properly deidentified
-     :type error_list  : list
+    :param success_list  : list of DICOM studies successfully deidentified
+     :type success_list  : list
+    :param error_list    : list of DICOM studies not properly deidentified
+     :type error_list    : list
+    :param no_valid_dicom: list of DICOM studies with no valid DICOM files
+     :type no_valid_dicom: list
 
     """
 
+
     if success_list:
+        # print the successful cases
         print "\nList of successfully deidentified datasets:"
         print "\t" + "\n\t".join(str(success) for success in success_list) + "\n"
     else:
         print "\nNo datasets were successfully deidentified.\n"
-    if error_list:
+
+    if no_valid_dicom:
+        # print the cases where no DICOM files were found
+        print "\nList of datasets with no valid DICOM files found:"
+        print "\t" + "\n\t".join(str(invalid) for invalid in no_valid_dicom) + "\n"
+    elif error_list:
+        # print the other cases where something wrong happened
         print "List of datasets that were not successfully deidentified:"
         print "\t" + "\n\t".join(str(error) for error in error_list) + "\n"
     else:

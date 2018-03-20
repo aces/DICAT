@@ -44,8 +44,10 @@ def main():
 
     if os.path.isfile(csv_file):
         dicom_dict_list = methods.read_csv(csv_file)
-        (success_arr, error_arr) = methods.mass_zapping(dicom_dict_list, verbose)
-        methods.print_mass_summary(success_arr, error_arr)
+        (success_arr, error_arr, no_valid_dicom) = methods.mass_zapping(
+            dicom_dict_list, verbose
+        )
+        methods.print_mass_summary(success_arr, error_arr, no_valid_dicom)
     else:
         message = 'ERROR: you must specify a valid CSV file'
         print message

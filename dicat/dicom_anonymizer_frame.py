@@ -121,6 +121,10 @@ class dicom_deidentifier_frame_gui(Frame):
         # Read DICOM header and grep identifying DICOM field values
         field_dict = methods.grep_dicom_values(self.dirname, field_dict)
 
+        if not field_dict:
+            message = "No valid DICOM file was found in " + self.dirname
+            tkMessageBox.showinfo("Error", message)
+
         fields_keys = list(field_dict.keys())
         keys_length = len(fields_keys) + 1
         self.edited_entries = [Tkinter.StringVar() for i in range(keys_length)]
