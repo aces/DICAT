@@ -663,7 +663,6 @@ def print_mass_summary(success_list, error_list, no_valid_dicom):
 
     """
 
-
     if success_list:
         # print the successful cases
         print "\nList of successfully deidentified datasets:"
