@@ -258,7 +258,7 @@ def pydicom_zapping(dicom_file, dicom_fields):
     for name in dicom_fields:
         new_val = ""
         if 'Value' in dicom_fields[name]:
-            new_val = dicom_fields[name]['Value']
+            new_val = dicom_fields[name]['Value'].strip()
 
         if dicom_fields[name]['Editable'] is True:
             try:
@@ -338,10 +338,9 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
 
     # Create an original_dcm and deidentified_dcm directory in the DICOM folder,
     # as well as subdirectories
-    original_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
-        'Value']
-    deidentified_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
-        'Value'] + "_deidentified"
+    patient_name     = dicom_fields['0010,0010']['Value'].strip()
+    original_dir     = dicom_folder + os.path.sep + patient_name
+    deidentified_dir = dicom_folder + os.path.sep + patient_name + "_deidentified"
     os.mkdir(original_dir, 0755)
     os.mkdir(deidentified_dir, 0755)
     # Create subdirectories in original and de-identified directory, as found in
