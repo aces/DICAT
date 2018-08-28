@@ -28,7 +28,7 @@ except ImportError:
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
         use_pydicom = False  # set to false as PyDICOM was not found
-
+from dicom.errors import InvalidDicomError
 
 def find_deidentifier_tool():
     """
@@ -94,21 +94,45 @@ def grep_dicoms_from_folder(dicom_folder):
     subdirs_list = []
     # Grep DICOM files recursively and insert them in dicoms_list
     # Same for subdirectories
-    # Regular expression to identify files that are not DICOM.
-    pattern = re.compile(
-        "\.bmp$|\.png$|\.zip$|\.txt$|\.jpeg$|\.pdf$|\.DS_Store|\._")
     for root, subdirs, files in os.walk(dicom_folder, topdown=True):
         if len(files) != 0 or len(subdirs) != 0:
             thisdir = re.sub(dicom_folder, '', root)
             if thisdir != '' and thisdir not in subdirs_list:
                 subdirs_list.append(thisdir)
             for dicom_file in files:
-                if pattern.search(dicom_file) is None:
+                if is_file_a_dicom(root + "/" + dicom_file):
                     dicoms_list.append(os.path.join(root, dicom_file))
         else:
-            sys.exit('Could not find any files in ' + dicom_folder)
+            continue
 
     return dicoms_list, subdirs_list
+
+
+def is_file_a_dicom(file):
+    """
+    Check whether a given file is of type DICOM
+
+    :param file: path to the file to identify
+     :type file: str
+
+    :return: True if the file is DICOM, False otherwise
+     :rtype: bool
+
+    """
+
+    if use_pydicom:
+        try:
+            dicom.read_file(file)
+        except InvalidDicomError:
+            return False
+        return True
+    else:
+        try:
+            os.system("dcmdump" + file)
+        except IOError:
+            return False
+        return True
+
 
 
 def grep_dicom_fields(xml_file):
@@ -148,12 +172,18 @@ def grep_dicom_values(dicom_folder, dicom_fields):
 
     """
 
-    # Grep first DICOM of the directory
-    # TODO: Need to check if file is DICOM though, otherwise go to next one
+    # Grep list of DICOMs in the directory (validation that the list of files
+    # are DICOMs happened during grep_dicoms_from_folder)
     (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
+
+    # If no DICOM files were found, return false
+    if not dicoms_list:
+        return []
+
+    # Grep the first DICOM to read field information
     dicom_file = dicoms_list[0]
 
-    # Read DICOM file using PyDICOM
+    # Read DICOM file using PyDICOM or the DICOM tool kit
     if (use_pydicom):
         (dicom_fields) = read_dicom_with_pydicom(dicom_file, dicom_fields)
     else:
@@ -408,7 +438,7 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
      :type subdirs_list: list
 
     :returns:
-      original_dir  -> directory containing original DICOM dataset
+      original_dir     -> directory containing original DICOM dataset
       deidentified_dir -> directory containing de-identified DICOM dataset
      :rtype: str
 
@@ -460,65 +490,128 @@ def zip_dicom(directory):
 
 def read_csv(csv_file):
     """
+    Function that reads a CSV file and return its content in an list of
+    dictionaries.
+        - Each row in the CSV will be one entry in the list.
+        - Each column {names : values} for a given row will be stored in a
+        dictionary within that row.
 
-    :param csv_file:
-    :return:
+    Example of a row in the returned array:
+    {'dcm_dir': '/path/to/dicom/dir', 'pname': 'sub-01', 'dob': '', 'sex': 'M'}
+
+    :param csv_file: CSV file to be read
+     :type csv_file: str
+
+    :return: dicom_dict_list -> list of dictionaries with 1 row per DICOM study
+     :rtype: list
 
     """
 
     fieldnames = ['dcm_dir', 'pname', 'dob', 'sex']
-    csv_dict   = []
+    dicom_dict_list   = []
     with open(csv_file) as file:
         reader = csv.DictReader(file, fieldnames, restval='')
 
         for row in reader:
-            csv_dict.append(row)
+            dicom_dict_list.append(row)
 
-    return csv_dict
+    return dicom_dict_list
 
-def mass_zapping(csv_dict):
 
-    success_arr = []
-    error_arr   = []
-    for row in csv_dict:
+def mass_zapping(dicom_dict_list, verbose):
+    """
+    Function that deidentifies a given list of DICOM studies.
+
+    :param dicom_dict_list: list of dictionaries with 1 row per DICOM study.
+                            See description of read_csv() above to see
+                            dictionary's structure
+     :type dicom_dict_list: list
+         
+    :returns:
+      success_arr -> list of DICOM studies successfully deidentified
+      error_arr   -> list of DICOM studies not properly deidentified
+     :rtype: list
+
+    """
+
+    success_arr    = []
+    error_arr      = []
+    no_valid_dicom = []
+    for row in dicom_dict_list:
         field_dict = map_DICOM_fields(row)
+        if not field_dict:
+            print 'No valid DICOM file was found in ' + row['dcm_dir']
+            no_valid_dicom.append(row['dcm_dir'])
+            continue
+        if verbose:
+            print 'Deidentifying DICOM study: ' + row['dcm_dir']
+
+        # get rid of '\ ' in DICOM path and map it to ' ' for the zapping method
+        dicom_dir = row['dcm_dir'].replace('\ ', ' ')
         (deidentified_dcm, original_dcm) = dicom_zapping(
-            row['dcm_dir'], field_dict
+            dicom_dir, field_dict
         )
+
+        # check if deidentification was successful
         if os.path.exists(deidentified_dcm) != [] and os.path.exists(
                 original_dcm) != []:
             success_arr.append(row['dcm_dir'])
         else:
             error_arr.append(row['dcm_dir'])
 
-    return success_arr, error_arr
+    return success_arr, error_arr, no_valid_dicom
 
 
-def map_DICOM_fields(row):
+def map_DICOM_fields(dicom_dict):
+    """
+    Function that maps DICOM values with the new values provided in dicom_dict.
+
+    :param dicom_dict: DICOM dictionary with DICOM path, new patient name, dob
+                       and sex information to modify into the DICOM files
+     :type dicom_dict: dict
+
+    :return: field_dict -> dictionary of {field: values} to be replaced in DICOM
+     :rtype: dict
+
+    """
 
     # Read the XML file with the identifying DICOM fields
     xml_file   = load_xml('data/fields_to_zap.xml')
     field_dict = grep_dicom_fields(xml_file)
 
-
     # Read DICOM header and grep identifying DICOM field values
-    #TODO: be able to read file with space in the path
-    field_dict = grep_dicom_values(row['dcm_dir'], field_dict)
+    dicom_dir  = dicom_dict['dcm_dir'].replace('\ ', ' ')  # get rid of '\ '
+    field_dict = grep_dicom_values(dicom_dir, field_dict)
+
+    if not field_dict:
+        return []
 
     for key in field_dict.keys():
         if field_dict[key]['Editable'] == False:
             continue
         if field_dict[key]['Description'] == 'PatientName':
-            update_DICOM_value(field_dict, key, row['pname'])
+            update_DICOM_value(field_dict, key, dicom_dict['pname'])
         elif field_dict[key]['Description'] == 'PatientBirthDate':
-            update_DICOM_value(field_dict, key, row['dob'])
+            update_DICOM_value(field_dict, key, dicom_dict['dob'])
         elif field_dict[key]['Description'] == 'PatientSex':
-            update_DICOM_value(field_dict, key, row['sex'])
+            update_DICOM_value(field_dict, key, dicom_dict['sex'])
 
     return field_dict
 
 
 def update_DICOM_value(field_dict, key, value):
+    """
+    Function that updates a DICOM value stored in field_dict with the new value
+    provided as input. This new value will be modified later on in the DICOMs.
+
+    :param field_dict: dictionary with DICOM fields and values
+     :type field_dict: dict
+    :param key       : key of the DICOM field to update
+     :type key       : str
+    :param value     : new value to insert into the DICOM files
+     :type value     : str
+
+    """
 
     if 'Value' in field_dict[key]:
         if field_dict[key]['Value'] == value:
@@ -526,9 +619,22 @@ def update_DICOM_value(field_dict, key, value):
         else:
             field_dict[key]['Value']  = value
             field_dict[key]['Update'] = True
+    else:
+        field_dict[key]['Update'] = False
 
 
 def load_xml(xml_path):
+    """
+    Function that determines the full path to the XML file
+
+    :param xml_path: path to the XML file (could be a relative path)
+     :type xml_path: str
+
+    :return: XML_file -> full path to the XML file to be read if it exists  in
+             the filesystem, None otherwise
+     :rtype: str
+
+    """
 
     # Read the XML file with the identifying DICOM fields
     load_xml = PathMethods.resource_path(xml_path)
@@ -540,18 +646,37 @@ def load_xml(xml_path):
         XML_filepath = os.path.dirname(os.path.abspath(__file__))
         XML_file = XML_filepath + "/" + XML_filename
 
-    return XML_file
+    return XML_file if os.path.isfile(XML_file) else None
 
 
-def print_mass_summary(success_arr, error_arr):
+def print_mass_summary(success_list, error_list, no_valid_dicom):
+    """
+    Function that prints out a summary of the successfully deidentified DICOM
+    studies and the not propoerly deidentified DICOM studies.
 
-    if success_arr:
+    :param success_list  : list of DICOM studies successfully deidentified
+     :type success_list  : list
+    :param error_list    : list of DICOM studies not properly deidentified
+     :type error_list    : list
+    :param no_valid_dicom: list of DICOM studies with no valid DICOM files
+     :type no_valid_dicom: list
+
+    """
+
+    if success_list:
+        # print the successful cases
         print "\nList of successfully deidentified datasets:"
-        print "\t" + "\n\t".join(str(success) for success in success_arr) + "\n"
+        print "\t" + "\n\t".join(str(success) for success in success_list) + "\n"
     else:
         print "\nNo datasets were successfully deidentified.\n"
-    if error_arr:
+
+    if no_valid_dicom:
+        # print the cases where no DICOM files were found
+        print "\nList of datasets with no valid DICOM files found:"
+        print "\t" + "\n\t".join(str(invalid) for invalid in no_valid_dicom) + "\n"
+    elif error_list:
+        # print the other cases where something wrong happened
         print "List of datasets that were not successfully deidentified:"
-        print "\t" + "\n\t".join(str(error) for error in error_arr) + "\n"
+        print "\t" + "\n\t".join(str(error) for error in error_list) + "\n"
     else:
         print "\nAll datasets were successfully deidentified!\n"

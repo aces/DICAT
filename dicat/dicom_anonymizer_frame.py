@@ -121,6 +121,10 @@ class dicom_deidentifier_frame_gui(Frame):
         # Read DICOM header and grep identifying DICOM field values
         field_dict = methods.grep_dicom_values(self.dirname, field_dict)
 
+        if not field_dict:
+            message = "No valid DICOM file was found in " + self.dirname
+            tkMessageBox.showinfo("Error", message)
+
         fields_keys = list(field_dict.keys())
         keys_length = len(fields_keys) + 1
         self.edited_entries = [Tkinter.StringVar() for i in range(keys_length)]
@@ -231,14 +235,7 @@ class dicom_deidentifier_frame_gui(Frame):
 
         key_nb = 0
         for key in self.field_dict.keys():
-            if 'Value' in self.field_dict[key]:
-                if self.field_dict[key]['Value'] == new_vals[key_nb]:
-                    self.field_dict[key]['Update'] = False
-                else:
-                    self.field_dict[key]['Update'] = True
-                    self.field_dict[key]['Value'] = new_vals[key_nb]
-            else:
-                self.field_dict[key]['Update'] = False
+            methods.update_DICOM_value(self.field_dict, key, new_vals[key_nb])
             key_nb += 1
 
         # Edit DICOM field values to de-identify the dataset
