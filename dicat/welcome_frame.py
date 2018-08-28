@@ -62,7 +62,8 @@ class welcome_frame_gui(Frame):
         anonymizer  = '''
         1) select a DICOM directory
         2) view the DICOM headers information
-        3) run the de-identifier tool on all DICOMs of the selected directory
+        3) edit or clear the DICOM headers information directly in the table
+        4) run the de-identifier tool on all DICOMs of the selected directory with the edited information
         '''
         text.insert(END, anonymizer, 'default')
 
