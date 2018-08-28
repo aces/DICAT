@@ -19,18 +19,18 @@ Notes:
 use_pydicom = False
 try:
     import pydicom as dicom
-    from dicom.errors import InvalidDicomError
 
     use_pydicom = True  # set to true as PyDICOM was found and imported
 except ImportError:
-    try:  # try importing newer versions of PyDICOM
+    try:  # try importing older versions of PyDICOM
         import dicom
-        from dicom.errors import InvalidDicomError
 
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
         use_pydicom = False  # set to false as PyDICOM was not found
 
+if use_pydicom:
+    from pydicom.errors import InvalidDicomError
 
 def find_deidentifier_tool():
     """
