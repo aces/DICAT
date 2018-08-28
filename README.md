@@ -63,7 +63,7 @@ Windows OS.
 
 ### From the source code
 
-######Requirements: 
+###### Requirements 
 
 Before running DICAT, make sure your systems contains a 
 [Python](https://www.python.org) compiler with the 
@@ -80,7 +80,7 @@ For most platform, PyDICOM can be installed via easy_install:
 ```sudo easy_install pydicom``` 
 
 
-######DICAT installation
+###### DICAT installation
 
 
 To install DICAT source code on a computer, download and save the content of 
