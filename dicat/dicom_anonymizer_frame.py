@@ -23,12 +23,14 @@ class dicom_deidentifier_frame_gui(Frame):
         self.field_dict = {}
         self.message = StringVar()
 
-        # Determine which de-identifier tool to use (PyDICOM or DICOM toolkit) before
-        # starting the program.
+        # Determine if PyDICOM python library is present.
         deidentifier_tool = methods.find_deidentifier_tool()
-        if deidentifier_tool:
-            error = "ERROR: no tool was found to read or de-identify DICOM files. \n " + \
-                    "Please make sure PyDICOM has been properly installed."
+        if not deidentifier_tool:
+            error = "ERROR: PyDICOM does not appear to be installed.\n "      \
+                    + "Please make sure PyDICOM has been properly installed " \
+                    + "before using the DICOM deidentifier tab.\n "           \
+                    + "Check the README.md of the DICAT repository for "     \
+                    + "information on how to install PyDICOM."
             self.message.set(error)
 
         self.initialize()
@@ -86,7 +88,7 @@ class dicom_deidentifier_frame_gui(Frame):
                                padx=(0, 10),
                                sticky=E + W
                              )
-        if not self.message.get():
+        if self.message.get():
             # if error message is set due to not finding the tool, show the error on the screen
             self.messageView.configure(fg="dark red",
                                        font="Helvetica 16 bold italic"

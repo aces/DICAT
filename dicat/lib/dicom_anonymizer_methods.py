@@ -22,56 +22,30 @@ try:
 
     use_pydicom = True  # set to true as PyDICOM was found and imported
 except ImportError:
-    try:  # try importing newer versions of PyDICOM
+    try:  # try importing older versions of PyDICOM
         import dicom
 
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
         use_pydicom = False  # set to false as PyDICOM was not found
-from dicom.errors import InvalidDicomError
+
+if use_pydicom:
+    from pydicom.errors import InvalidDicomError
 
 def find_deidentifier_tool():
     """
-    Determine which de-identifier tool will be used by the program:
-    - PyDICOM python module if found and imported
-    - DICOM toolkit if found on the filesystem
+    Determine if the PyDICOM python module is present and imported.
 
     :param: None
 
-    :return: tool to use for DICOM de-identification
-     :rtype: object
-
-    """
-
-    if use_pydicom:
-        # PyDICOM will be used and returned if PyDICOM was found
-        return 'PyDICOM'
-    elif test_executable('dcmdump'):
-        # DICOM toolkit will be used if dcmdump executable exists
-        return 'DICOM_toolkit'
-    else:
-        # Return False if no tool was found to read and de-identify DICOMs
-        return False
-
-
-def test_executable(executable):
-    """
-    Test if an executable exists.
-    Returns True if executable exists, False if not found.
-
-    :param executable: executable to test
-     :type executable: str
-
-    :return: return True if executable was found, False otherwise
+    :return: True if PyDICOM was found, False otherwise
      :rtype: bool
 
     """
 
-    # try running the executable
-    try:
-        subprocess.call([executable], stdout=open(os.devnull, 'wb'))
+    if use_pydicom:
         return True
-    except OSError:
+    else:
         return False
 
 
@@ -120,18 +94,12 @@ def is_file_a_dicom(file):
 
     """
 
-    if use_pydicom:
-        try:
-            dicom.read_file(file)
-        except InvalidDicomError:
-            return False
-        return True
-    else:
-        try:
-            os.system("dcmdump" + file)
-        except IOError:
-            return False
-        return True
+    try:
+        dicom.read_file(file)
+    except InvalidDicomError:
+        return False
+    return True
+
 
 
 
@@ -183,11 +151,8 @@ def grep_dicom_values(dicom_folder, dicom_fields):
     # Grep the first DICOM to read field information
     dicom_file = dicoms_list[0]
 
-    # Read DICOM file using PyDICOM or the DICOM tool kit
-    if (use_pydicom):
-        (dicom_fields) = read_dicom_with_pydicom(dicom_file, dicom_fields)
-    else:
-        (dicom_fields) = read_dicom_with_dcmdump(dicom_file, dicom_fields)
+    # Read DICOM file using PyDICOM
+    (dicom_fields) = read_dicom_with_pydicom(dicom_file, dicom_fields)
 
     return dicom_fields
 
@@ -223,36 +188,9 @@ def read_dicom_with_pydicom(dicom_file, dicom_fields):
     return dicom_fields
 
 
-def read_dicom_with_dcmdump(dicom_file, dicom_fields):
-    """
-    Read DICOM file using dcmdump from the DICOM toolkit.
-
-    :param dicom_file: DICOM file to read
-     :type dicom_file: str
-    :param dicom_fields: Dictionary containing DICOM fields and values
-     :type dicom_fields: dict
-
-    :return: updated dictionary of DICOM fields and values
-     :rtype : dict
-
-    """
-
-    # Grep information from DICOM header and store them
-    # into dicom_fields dictionary under flag Value
-    for name in dicom_fields:
-        dump_cmd = "dcmdump -ml +P \"" + name + "\" -q \"" + dicom_file + "\""
-        result = subprocess.check_output(dump_cmd, shell=True)
-        tmp_val = re.match(".+\[(.+)\].+", result)
-        if tmp_val:
-            value = tmp_val.group(1)
-            dicom_fields[name]['Value'] = value
-
-    return dicom_fields
-
-
 def dicom_zapping(dicom_folder, dicom_fields):
     """
-    Run dcmodify on all fields to zap using PyDICOM recursive wrapper
+    Zap DICOM fields using PyDICOM recursive wrapper
 
     :param dicom_folder: folder with DICOMs
      :type dicom_folder: str
@@ -286,19 +224,10 @@ def dicom_zapping(dicom_folder, dicom_fields):
         original_dcm = dicom.replace(dicom_folder, original_dir)
         # Move DICOM files from root folder to de-identified folder created
         shutil.move(dicom, deidentified_dcm)
-        if use_pydicom:
-            # copy files from original folder to de-identified folder
-            shutil.copy(deidentified_dcm, original_dcm)
-            # Zap the DICOM fields from DICOM file using PyDICOM
-            pydicom_zapping(deidentified_dcm, dicom_fields)
-        else:
-            # Zap the DICOM fields from DICOM file using dcmodify
-            dcmodify_zapping(deidentified_dcm, dicom_fields)
-            # Grep the .bak files created by dcmdump and move it to original
-            # DICOM folder
-            orig_bak_dcm = deidentified_dcm + ".bak"
-            if os.path.exists(orig_bak_dcm):
-                shutil.move(orig_bak_dcm, original_dcm)
+        # copy files from original folder to de-identified folder
+        shutil.copy(deidentified_dcm, original_dcm)
+        # Zap the DICOM fields from DICOM file using PyDICOM
+        pydicom_zapping(deidentified_dcm, dicom_fields)
 
     # Zip the de-identified and original DICOM folders
     (deidentified_zip, original_zip) = zip_dicom_directories(deidentified_dir,
@@ -344,43 +273,6 @@ def pydicom_zapping(dicom_file, dicom_fields):
             except:
                 continue
     dicom_dataset.save_as(dicom_file)
-
-
-def dcmodify_zapping(dicom_file, dicom_fields):
-    """
-    Run dcmodify on all DICOM fields to zap.
-
-    :param dicom_file: DICOM file to zap
-     :type dicom_file: str
-    :param dicom_fields: dictionary of DICOM fields and values
-     :type dicom_fields: dict
-
-    :returns:
-      original_zip  -> Path to the zip file containing original DICOM files
-      deidentified_zip -> Path to the zip file containing de-identified DICOM files
-     :rtype: str
-
-    """
-
-    # Initialize the dcmodify command
-    modify_cmd = "dcmodify "
-    changed_fields_nb = 0
-    for name in dicom_fields:
-        # Grep the new values
-        new_val = ""
-        if 'Value' in dicom_fields[name]:
-            new_val = dicom_fields[name]['Value']
-
-        # Run dcmodify if update is set to True
-        if not dicom_fields[name]['Editable'] and 'Value' in dicom_fields[name]:
-            modify_cmd += " -ma \"(" + name + ")\"=\" \" "
-            changed_fields_nb += 1
-        else:
-            if dicom_fields[name]['Update'] == True:
-                modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
-                changed_fields_nb += 1
-    modify_cmd += " \"" + dicom_file + "\" "
-    subprocess.call(modify_cmd, shell=True)
 
 
 def zip_dicom_directories(deidentified_dir, original_dir, subdirs_list, root_dir):
