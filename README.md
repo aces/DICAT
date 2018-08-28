@@ -63,7 +63,7 @@ Windows OS.
 
 ### From the source code
 
-###### Requirements: 
+###### Requirements 
 
 Before running DICAT, make sure your systems contains a 
 [Python](https://www.python.org) compiler with the 
