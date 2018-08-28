@@ -97,7 +97,7 @@ directory of DICAT source code (`dicat` directory) and run the following:
 
 ![DICOM deidentifier 1](docs/images/DICOM_deidentification.png)
 
-***DICOM de-identification with DICAT.*** 
+***DICOM de-identification with the DICAT GUI*** 
 
 In the *"DICOM de-identifier"* tab (1), use the select button (2) to choose a 
 directory containing DICOM files to de-identify.
@@ -118,6 +118,13 @@ The *“Clear”* button (6) will erase values from all editable fields.
 Finally, once the user has finalized the edits, clicking on the *“De-identify”* 
 button (7) will run the de-identification tool on the DICOM dataset. 
 
+***Mass DICOM de-identification using `mass_deidentify.py`***
+
+The script `mass_deidentify.py` in the `dicat` directory allows a user to 
+mass de-identify a series of DICOM studies. Running `mass_deidentify.py -h` 
+will display the following information on how to run the script:
+
+![Mass_deidentify_help](docs/images/mass_deidentify_help.png)
 
 ## How to use the ID Key of DICAT
 
