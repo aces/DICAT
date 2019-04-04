@@ -4,12 +4,14 @@ import os, sys, getopt
 
 def main():
     csv_file     = ''
+    xml_zap_file = None
     verbose      = False
-    long_options = ["help", "csvfile=", "verbose"]
+    long_options = ["help", "csvfile=", "xmlfile=", "verbose"]
     usage        = (
         'usage  : mass_deidentify -c <csv_file>\n\n'
         'options: \n'
         '\t-c, --csvfile: CSV file with the following format\n'
+        '\t-x, --xmlfile: XML file with the list of DICOM fields to zap\n'
         '\t-v, --verbose: if set, be verbose. Note: regardless of whether the\n'
         '\t               verbose option is set, a summary of success/failure\n'
         '\t               will be provided at the end of execution.\n\n'
@@ -28,7 +30,7 @@ def main():
     )
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hc:v', long_options)
+        opts, args = getopt.getopt(sys.argv[1:], 'hx:c:v', long_options)
     except getopt.GetoptError as err:
         print usage
         sys.exit(2)
@@ -39,13 +41,21 @@ def main():
             sys.exit()
         elif opt in ("-c", "--csvlist"):
             csv_file = arg
+        if opt in ("-x", "--xmlfile"):
+            xml_zap_file = arg
         if opt in ("-v", "--verbose"):
             verbose = True
+
+    if xml_zap_file and not os.path.isfile(xml_zap_file):
+        message = 'ERROR: Could not find the XML file with the list of DICOM fields to zap'
+        print message
+        print usage
+        sys.exit(2)
 
     if os.path.isfile(csv_file):
         dicom_dict_list = methods.read_csv(csv_file)
         (success_arr, error_arr, no_valid_dicom) = methods.mass_zapping(
-            dicom_dict_list, verbose
+            dicom_dict_list, verbose, xml_zap_file
         )
         methods.print_mass_summary(success_arr, error_arr, no_valid_dicom)
     else:
