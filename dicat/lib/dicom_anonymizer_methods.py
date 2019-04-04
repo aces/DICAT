@@ -409,7 +409,7 @@ def read_csv(csv_file):
     return dicom_dict_list
 
 
-def mass_zapping(dicom_dict_list, verbose):
+def mass_zapping(dicom_dict_list, verbose, xml_file_with_fields_to_zap):
     """
     Function that deidentifies a given list of DICOM studies.
 
@@ -429,7 +429,7 @@ def mass_zapping(dicom_dict_list, verbose):
     error_arr      = []
     no_valid_dicom = []
     for row in dicom_dict_list:
-        field_dict = map_DICOM_fields(row)
+        field_dict = map_DICOM_fields(row, xml_file_with_fields_to_zap)
         if not field_dict:
             print 'No valid DICOM file was found in ' + row['dcm_dir']
             no_valid_dicom.append(row['dcm_dir'])
@@ -453,13 +453,17 @@ def mass_zapping(dicom_dict_list, verbose):
     return success_arr, error_arr, no_valid_dicom
 
 
-def map_DICOM_fields(dicom_dict):
+def map_DICOM_fields(dicom_dict, xml_file_with_fields_to_zap):
     """
     Function that maps DICOM values with the new values provided in dicom_dict.
 
     :param dicom_dict: DICOM dictionary with DICOM path, new patient name, dob
                        and sex information to modify into the DICOM files
      :type dicom_dict: dict
+    :param xml_file_with_fields_to_zap: path to the XML file with the list of
+                                        DICOM fields to zap
+     :type xml_file_with_fields_to_zap: str
+
 
     :return: field_dict -> dictionary of {field: values} to be replaced in DICOM
      :rtype: dict
@@ -467,7 +471,10 @@ def map_DICOM_fields(dicom_dict):
     """
 
     # Read the XML file with the identifying DICOM fields
-    xml_file   = load_xml('data/fields_to_zap.xml')
+    if xml_file_with_fields_to_zap is None:
+        xml_file = load_xml('data/fields_to_zap.xml')
+    else:
+        xml_file = xml_file_with_fields_to_zap
     field_dict = grep_dicom_fields(xml_file)
 
     # Read DICOM header and grep identifying DICOM field values
