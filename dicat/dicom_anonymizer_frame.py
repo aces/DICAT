@@ -2,6 +2,7 @@
 
 import Tkinter, tkFileDialog, tkMessageBox, ttk
 import os
+import re
 from Tkinter import *
 
 # Internal classes import
@@ -103,7 +104,7 @@ class dicom_deidentifier_frame_gui(Frame):
         # clear edit table if it exists
         if hasattr(self, 'field_edit_win'):
             self.field_edit_win.destroy()
-            self.info_message.destroy()
+            self.topPanel.destroy()
 
         # Remove the message from the grid
         self.messageView.grid_forget()
@@ -152,7 +153,6 @@ class dicom_deidentifier_frame_gui(Frame):
             self.field_edit_win.pack(expand=1, fill='both')
             self.field_edit_win.columnconfigure(0, weight=1)
             self.field_edit_win.columnconfigure(1, weight=1)
-            self.field_edit_win.columnconfigure(2, weight=1)
             self.field_edit_win.rowconfigure(0, weight=1)
             self.field_edit_win.rowconfigure(1, weight=1)
 
@@ -256,44 +256,32 @@ class dicom_deidentifier_frame_gui(Frame):
         new_vals = []
         for entries in self.edited_entries:
             new_vals.append(entries.get())
-        # Remove the first item (corresponding to the title row in the
-        # displayed table)
+        # Remove the first item (corresponding to the title row in the displayed table)
         new_vals.pop(0)
 
         key_nb = 0
+        pname_set = 0
         for key in self.field_dict.keys():
+            if re.match(r'PatientName', str(self.field_dict[key]['Description'])):
+                if new_vals[key_nb]:
+                    pname_set = 1
             methods.update_DICOM_value(self.field_dict, key, new_vals[key_nb])
             key_nb += 1
 
-        # Edit DICOM field values to de-identify the dataset
-        # (deidentified_dcm, original_dcm) = ''
-        (deidentified_dcm, original_dcm) = methods.dicom_zapping(
-            self.dirname, self.field_dict)
-
-        self.field_edit_win.destroy()
-        if os.path.exists(deidentified_dcm) != [] and os.path.exists(
-                original_dcm) != []:
-            self.message.set("BOOYA! It's de-identified!")
-            self.messageView.configure( fg="dark green",
-                                    font= "Helvetica 16 bold italic"
-                                  )
-            self.messageView.grid( row=2,
-                                   column=0,
-                                   columnspan=2,
-                                   padx=(0, 10),
-                                   sticky=E+W
-                                 )
+        if not pname_set:
+            tkMessageBox.showinfo("ERROR", "PatientName DICOM field is required to label the scan")
+            self.deidentify()
         else:
-            self.message.set("An error occured during DICOM files de-identification")
-            self.messageView.configure( fg="dark red",
-                                        font= "Helvetica 16 italic"
-                                      )
-            self.messageView.grid( row=2,
-                                   column=0,
-                                   columnspan=2,
-                                   padx=(0, 10),
-                                   sticky=E+W
-                                 )
+            # Edit DICOM field values to de-identify the dataset (deidentified_dcm, original_dcm) = ''
+            (deidentified_dcm, original_dcm) = methods.dicom_zapping(self.dirname, self.field_dict)
 
-
-
+            self.field_edit_win.destroy()
+            self.topPanel.destroy()
+            if os.path.exists(deidentified_dcm) != [] and os.path.exists(original_dcm) != []:
+                self.message.set("BOOYA! It's de-identified!")
+                self.messageView.configure(fg="dark green", font= "Helvetica 16 bold italic")
+                self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E+W)
+            else:
+                self.message.set("An error occured during DICOM files de-identification")
+                self.messageView.configure(fg="dark red", font="Helvetica 16 italic")
+                self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E + W)
