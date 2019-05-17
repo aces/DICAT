@@ -117,11 +117,14 @@ def grep_dicom_fields(xml_file):
     xmldoc = ET.parse(xml_file)
     dicom_fields = {}
     for item in xmldoc.findall('item'):
-        name = item.find('name').text
+        dicom_tag = item.find('name').text
         description = item.find('description').text
         editable = True if (item.find('editable').text == "yes") else False
-        dicom_fields[name] = {"Description": description, "Editable": editable}
-        # dicom_fields[name] = {"Description": description}
+        dicom_fields[dicom_tag] = {
+            "DICOM_tag"  : dicom_tag,
+            "Description": description,
+            "Editable"   : editable
+        }
 
     return dicom_fields
 
