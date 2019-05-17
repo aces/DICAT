@@ -48,7 +48,7 @@ class welcome_frame_gui(Frame):
         text.insert(END, title, 'title')
 
         # Insert introduction of the tool into the text variable
-        intro  = "DICAT 2.1 (DICOM Anonymization Tool) is a simple tool for "
+        intro  = "DICAT 2.2 (DICOM Anonymization Tool) is a simple tool for "
         intro += "de-identification of DICOM datasets. In addition to "
         intro += "de-identifying DICOM files, this tool contains a feature "
         intro += "that allows mapping the candidate's information to its "
