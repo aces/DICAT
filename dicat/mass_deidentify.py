@@ -26,7 +26,11 @@ def main():
         '\t- example of a CSV file with three DICOM studies:\n'
         '\t\t \'/data/John_Doe/\',\'subject_ID_1\',\'1981-01-01\',\'M\'\n'
         '\t\t \'/data/Lana_Bip/\',\'subject_ID_2\',\'\',\'F\'\n'
-        '\t\t \'/data/Suzy_Bud/\',\'subject_ID_3\',\'1979-10-10\',\'\'\n'
+        '\t\t \'/data/Suzy_Bud/\',\'subject_ID_3\',\'1979-10-10\',\'\'\n\n'
+        'examples of XML files can be found in dicat/data directory:\n'
+        '\t- fields_to_zap.xml: default DICAT list of fields to zap\n'
+        '\t- fields_to_zap.xml: more stringent list of fields to zap that could be\n'
+        '\t                     used on imaging data for open science releases\n'
     )
 
     try:
