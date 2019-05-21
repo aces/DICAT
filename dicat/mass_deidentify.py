@@ -10,8 +10,8 @@ def main():
     usage        = (
         'usage  : mass_deidentify -c <csv_file>\n\n'
         'options: \n'
-        '\t-c, --csvfile: CSV file with the following format\n'
-        '\t-x, --xmlfile: XML file with the list of DICOM fields to zap\n'
+        '\t-c, --csvfile: path to the CSV file with the following format\n'
+        '\t-x, --xmlfile: path to the XML file with the list of DICOM fields to zap\n'
         '\t-v, --verbose: if set, be verbose. Note: regardless of whether the\n'
         '\t               verbose option is set, a summary of success/failure\n'
         '\t               will be provided at the end of execution.\n\n'

@@ -53,8 +53,9 @@ Running DICAT will open a window with three different tabs:
 ### Using DICAT executables/applications
 
 Executables of DICAT have been created for most systems and can be found with 
-each release of DICAT in the Github repository. Download the executable 
-relevant to your system and move it to any folder of your choice.
+each [release](https://github.com/aces/DICAT/releases) of DICAT in the Github 
+repository. Download the executable relevant to your system and move it to any 
+folder of your choice.
 
 To open DICAT, simply double click on the executable.
 
@@ -65,7 +66,7 @@ Windows OS.
 
 ###### Requirements 
 
-Before running DICAT, make sure your systems contains a 
+Before running DICAT, make sure your system contains a 
 [Python](https://www.python.org) compiler with the 
 [TkInter](https://wiki.python.org/moin/TkInter) library (usually, TkInter comes 
 by default with most Python installations).
@@ -106,17 +107,18 @@ Once a directory containing DICOM files have been selected (as described in the
 above section), the DICOM fields can be viewed when clicking on the 
 *“View DICOM fields”* button (3).
 
-The DICOM fields will be displayed in a table with editable fields in black (4) 
-and non-editable fields greyed out (5). The non-editable fields will be 
-replaced by empty strings in the DICOM files when running the de-identification, 
-while the editable fields will be replaced by the value entered by the user. 
-By default, editable fields are *“PatientName”*, *“PatientBirthDate”* and 
-*“PatientSex”*.  
- 
-The *“Clear”* button (6) will erase values from all editable fields. 
+The DICOM identifiable fields will be displayed in a table with editable fields (4). 
+
+Users can choose to delete all identifiable fields using the *“Clear All Fields”* 
+button (5). 
+
+Users can also directly edit the fields (6) in the table and all values present in 
+the table will be inserted into the corresponding DICOM fields in the imaging files.
+> Note that the PatientName field is required (7) and will need to be filled 
+with new IDs in order to label the scan for that session.
 
 Finally, once the user has finalized the edits, clicking on the *“De-identify”* 
-button (7) will run the de-identification tool on the DICOM dataset. 
+button (8) will run the de-identification tool on the DICOM dataset. 
 
 ***Mass DICOM de-identification using `mass_deidentify.py`***
 
@@ -165,7 +167,7 @@ column headers (10).
 
 ## Authors
 
-Ayan Sengupta <uam111@gmail.com>              - Concept, DICOM-toolkit implementation, Pydicom implementation   
+Ayan Sengupta <uam111@gmail.com>              - Concept, Pydicom implementation   
 
 Cecile Madjar <cecile.madjar@gmail.com>       - GUI implementation, PyDICOM implementation, python integration of DICOM-toolkit, ID key
 
