@@ -4,6 +4,8 @@ import xml.etree.ElementTree as ET
 import subprocess
 import re
 import shutil
+import csv
+import lib.resource_path_methods as PathMethods
 
 """
 Test whether PyDICOM module exists and import it.
@@ -20,56 +22,30 @@ try:
 
     use_pydicom = True  # set to true as PyDICOM was found and imported
 except ImportError:
-    try:  # try importing newer versions of PyDICOM
+    try:  # try importing older versions of PyDICOM
         import dicom
 
         use_pydicom = True  # set to true as PyDICOM was found and imported
     except ImportError:
         use_pydicom = False  # set to false as PyDICOM was not found
 
+if use_pydicom:
+    from pydicom.errors import InvalidDicomError
 
 def find_deidentifier_tool():
     """
-    Determine which de-identifier tool will be used by the program:
-    - PyDICOM python module if found and imported
-    - DICOM toolkit if found on the filesystem
+    Determine if the PyDICOM python module is present and imported.
 
     :param: None
 
-    :return: tool to use for DICOM de-identification
-     :rtype: object
-
-    """
-
-    if use_pydicom:
-        # PyDICOM will be used and returned if PyDICOM was found
-        return 'PyDICOM'
-    elif test_executable('dcmdump'):
-        # DICOM toolkit will be used if dcmdump executable exists
-        return 'DICOM_toolkit'
-    else:
-        # Return False if no tool was found to read and de-identify DICOMs
-        return False
-
-
-def test_executable(executable):
-    """
-    Test if an executable exists.
-    Returns True if executable exists, False if not found.
-
-    :param executable: executable to test
-     :type executable: str
-
-    :return: return True if executable was found, False otherwise
+    :return: True if PyDICOM was found, False otherwise
      :rtype: bool
 
     """
 
-    # try running the executable
-    try:
-        subprocess.call([executable], stdout=open(os.devnull, 'wb'))
+    if use_pydicom:
         return True
-    except OSError:
+    else:
         return False
 
 
@@ -92,21 +68,39 @@ def grep_dicoms_from_folder(dicom_folder):
     subdirs_list = []
     # Grep DICOM files recursively and insert them in dicoms_list
     # Same for subdirectories
-    # Regular expression to identify files that are not DICOM.
-    pattern = re.compile(
-        "\.bmp$|\.png$|\.zip$|\.txt$|\.jpeg$|\.pdf$|\.DS_Store|\._")
     for root, subdirs, files in os.walk(dicom_folder, topdown=True):
         if len(files) != 0 or len(subdirs) != 0:
             thisdir = re.sub(dicom_folder, '', root)
             if thisdir != '' and thisdir not in subdirs_list:
                 subdirs_list.append(thisdir)
             for dicom_file in files:
-                if pattern.search(dicom_file) is None:
+                if is_file_a_dicom(root + "/" + dicom_file):
                     dicoms_list.append(os.path.join(root, dicom_file))
         else:
-            sys.exit('Could not find any files in ' + dicom_folder)
+            continue
 
     return dicoms_list, subdirs_list
+
+
+def is_file_a_dicom(file):
+    """
+    Check whether a given file is of type DICOM
+
+    :param file: path to the file to identify
+     :type file: str
+
+    :return: True if the file is DICOM, False otherwise
+     :rtype: bool
+
+    """
+
+    try:
+        dicom.read_file(file)
+    except InvalidDicomError:
+        return False
+    return True
+
+
 
 
 def grep_dicom_fields(xml_file):
@@ -123,11 +117,14 @@ def grep_dicom_fields(xml_file):
     xmldoc = ET.parse(xml_file)
     dicom_fields = {}
     for item in xmldoc.findall('item'):
-        name = item.find('name').text
+        dicom_tag = item.find('name').text
         description = item.find('description').text
         editable = True if (item.find('editable').text == "yes") else False
-        dicom_fields[name] = {"Description": description, "Editable": editable}
-        # dicom_fields[name] = {"Description": description}
+        dicom_fields[dicom_tag] = {
+            "DICOM_tag"  : dicom_tag,
+            "Description": description,
+            "Editable"   : editable
+        }
 
     return dicom_fields
 
@@ -146,16 +143,19 @@ def grep_dicom_values(dicom_folder, dicom_fields):
 
     """
 
-    # Grep first DICOM of the directory
-    # TODO: Need to check if file is DICOM though, otherwise go to next one
+    # Grep list of DICOMs in the directory (validation that the list of files
+    # are DICOMs happened during grep_dicoms_from_folder)
     (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
+
+    # If no DICOM files were found, return false
+    if not dicoms_list:
+        return []
+
+    # Grep the first DICOM to read field information
     dicom_file = dicoms_list[0]
 
     # Read DICOM file using PyDICOM
-    if (use_pydicom):
-        (dicom_fields) = read_dicom_with_pydicom(dicom_file, dicom_fields)
-    else:
-        (dicom_fields) = read_dicom_with_dcmdump(dicom_file, dicom_fields)
+    (dicom_fields) = read_dicom_with_pydicom(dicom_file, dicom_fields)
 
     return dicom_fields
 
@@ -191,36 +191,9 @@ def read_dicom_with_pydicom(dicom_file, dicom_fields):
     return dicom_fields
 
 
-def read_dicom_with_dcmdump(dicom_file, dicom_fields):
-    """
-    Read DICOM file using dcmdump from the DICOM toolkit.
-
-    :param dicom_file: DICOM file to read
-     :type dicom_file: str
-    :param dicom_fields: Dictionary containing DICOM fields and values
-     :type dicom_fields: dict
-
-    :return: updated dictionary of DICOM fields and values
-     :rtype : dict
-
-    """
-
-    # Grep information from DICOM header and store them
-    # into dicom_fields dictionary under flag Value
-    for name in dicom_fields:
-        dump_cmd = "dcmdump -ml +P \"" + name + "\" -q \"" + dicom_file + "\""
-        result = subprocess.check_output(dump_cmd, shell=True)
-        tmp_val = re.match(".+\[(.+)\].+", result)
-        if tmp_val:
-            value = tmp_val.group(1)
-            dicom_fields[name]['Value'] = value
-
-    return dicom_fields
-
-
 def dicom_zapping(dicom_folder, dicom_fields):
     """
-    Run dcmodify on all fields to zap using PyDICOM recursive wrapper
+    Zap DICOM fields using PyDICOM recursive wrapper
 
     :param dicom_folder: folder with DICOMs
      :type dicom_folder: str
@@ -254,19 +227,10 @@ def dicom_zapping(dicom_folder, dicom_fields):
         original_dcm = dicom.replace(dicom_folder, original_dir)
         # Move DICOM files from root folder to de-identified folder created
         shutil.move(dicom, deidentified_dcm)
-        if use_pydicom:
-            # copy files from original folder to de-identified folder
-            shutil.copy(deidentified_dcm, original_dcm)
-            # Zap the DICOM fields from DICOM file using PyDICOM
-            pydicom_zapping(deidentified_dcm, dicom_fields)
-        else:
-            # Zap the DICOM fields from DICOM file using dcmodify
-            dcmodify_zapping(deidentified_dcm, dicom_fields)
-            # Grep the .bak files created by dcmdump and move it to original
-            # DICOM folder
-            orig_bak_dcm = deidentified_dcm + ".bak"
-            if os.path.exists(orig_bak_dcm):
-                shutil.move(orig_bak_dcm, original_dcm)
+        # copy files from original folder to de-identified folder
+        shutil.copy(deidentified_dcm, original_dcm)
+        # Zap the DICOM fields from DICOM file using PyDICOM
+        pydicom_zapping(deidentified_dcm, dicom_fields)
 
     # Zip the de-identified and original DICOM folders
     (deidentified_zip, original_zip) = zip_dicom_directories(deidentified_dir,
@@ -297,7 +261,7 @@ def pydicom_zapping(dicom_file, dicom_fields):
     for name in dicom_fields:
         new_val = ""
         if 'Value' in dicom_fields[name]:
-            new_val = dicom_fields[name]['Value']
+            new_val = dicom_fields[name]['Value'].strip()
 
         if dicom_fields[name]['Editable'] is True:
             try:
@@ -312,43 +276,6 @@ def pydicom_zapping(dicom_file, dicom_fields):
             except:
                 continue
     dicom_dataset.save_as(dicom_file)
-
-
-def dcmodify_zapping(dicom_file, dicom_fields):
-    """
-    Run dcmodify on all DICOM fields to zap.
-
-    :param dicom_file: DICOM file to zap
-     :type dicom_file: str
-    :param dicom_fields: dictionary of DICOM fields and values
-     :type dicom_fields: dict
-
-    :returns:
-      original_zip  -> Path to the zip file containing original DICOM files
-      deidentified_zip -> Path to the zip file containing de-identified DICOM files
-     :rtype: str
-
-    """
-
-    # Initialize the dcmodify command
-    modify_cmd = "dcmodify "
-    changed_fields_nb = 0
-    for name in dicom_fields:
-        # Grep the new values
-        new_val = ""
-        if 'Value' in dicom_fields[name]:
-            new_val = dicom_fields[name]['Value']
-
-        # Run dcmodify if update is set to True
-        if not dicom_fields[name]['Editable'] and 'Value' in dicom_fields[name]:
-            modify_cmd += " -ma \"(" + name + ")\"=\" \" "
-            changed_fields_nb += 1
-        else:
-            if dicom_fields[name]['Update'] == True:
-                modify_cmd += " -ma \"(" + name + ")\"=\"" + new_val + "\" "
-                changed_fields_nb += 1
-    modify_cmd += " \"" + dicom_file + "\" "
-    subprocess.call(modify_cmd, shell=True)
 
 
 def zip_dicom_directories(deidentified_dir, original_dir, subdirs_list, root_dir):
@@ -406,7 +333,7 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
      :type subdirs_list: list
 
     :returns:
-      original_dir  -> directory containing original DICOM dataset
+      original_dir     -> directory containing original DICOM dataset
       deidentified_dir -> directory containing de-identified DICOM dataset
      :rtype: str
 
@@ -414,10 +341,9 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
 
     # Create an original_dcm and deidentified_dcm directory in the DICOM folder,
     # as well as subdirectories
-    original_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
-        'Value']
-    deidentified_dir = dicom_folder + os.path.sep + dicom_fields['0010,0010'][
-        'Value'] + "_deidentified"
+    patient_name     = dicom_fields['0010,0010']['Value'].strip()
+    original_dir     = dicom_folder + os.path.sep + patient_name
+    deidentified_dir = dicom_folder + os.path.sep + patient_name + "_deidentified"
     os.mkdir(original_dir, 0755)
     os.mkdir(deidentified_dir, 0755)
     # Create subdirectories in original and de-identified directory, as found in
@@ -454,3 +380,204 @@ def zip_dicom(directory):
         return archive
     else:
         sys.exit(archive + " could not be created.")
+
+
+def read_csv(csv_file):
+    """
+    Function that reads a CSV file and return its content in an list of
+    dictionaries.
+        - Each row in the CSV will be one entry in the list.
+        - Each column {names : values} for a given row will be stored in a
+        dictionary within that row.
+
+    Example of a row in the returned array:
+    {'dcm_dir': '/path/to/dicom/dir', 'pname': 'sub-01', 'dob': '', 'sex': 'M'}
+
+    :param csv_file: CSV file to be read
+     :type csv_file: str
+
+    :return: dicom_dict_list -> list of dictionaries with 1 row per DICOM study
+     :rtype: list
+
+    """
+
+    fieldnames = ['dcm_dir', 'pname', 'dob', 'sex']
+    dicom_dict_list   = []
+    with open(csv_file) as file:
+        reader = csv.DictReader(file, fieldnames, restval='')
+
+        for row in reader:
+            dicom_dict_list.append(row)
+
+    return dicom_dict_list
+
+
+def mass_zapping(dicom_dict_list, verbose, xml_file_with_fields_to_zap):
+    """
+    Function that deidentifies a given list of DICOM studies.
+
+    :param dicom_dict_list: list of dictionaries with 1 row per DICOM study.
+                            See description of read_csv() above to see
+                            dictionary's structure
+     :type dicom_dict_list: list
+         
+    :returns:
+      success_arr -> list of DICOM studies successfully deidentified
+      error_arr   -> list of DICOM studies not properly deidentified
+     :rtype: list
+
+    """
+
+    success_arr    = []
+    error_arr      = []
+    no_valid_dicom = []
+    for row in dicom_dict_list:
+        field_dict = map_DICOM_fields(row, xml_file_with_fields_to_zap)
+        if not field_dict:
+            print 'No valid DICOM file was found in ' + row['dcm_dir']
+            no_valid_dicom.append(row['dcm_dir'])
+            continue
+        if verbose:
+            print 'Deidentifying DICOM study: ' + row['dcm_dir']
+
+        # get rid of '\ ' in DICOM path and map it to ' ' for the zapping method
+        dicom_dir = row['dcm_dir'].replace('\ ', ' ')
+        (deidentified_dcm, original_dcm) = dicom_zapping(
+            dicom_dir, field_dict
+        )
+
+        # check if deidentification was successful
+        if os.path.exists(deidentified_dcm) != [] and os.path.exists(
+                original_dcm) != []:
+            success_arr.append(row['dcm_dir'])
+        else:
+            error_arr.append(row['dcm_dir'])
+
+    return success_arr, error_arr, no_valid_dicom
+
+
+def map_DICOM_fields(dicom_dict, xml_file_with_fields_to_zap):
+    """
+    Function that maps DICOM values with the new values provided in dicom_dict.
+
+    :param dicom_dict: DICOM dictionary with DICOM path, new patient name, dob
+                       and sex information to modify into the DICOM files
+     :type dicom_dict: dict
+    :param xml_file_with_fields_to_zap: path to the XML file with the list of
+                                        DICOM fields to zap
+     :type xml_file_with_fields_to_zap: str
+
+
+    :return: field_dict -> dictionary of {field: values} to be replaced in DICOM
+     :rtype: dict
+
+    """
+
+    # Read the XML file with the identifying DICOM fields
+    if xml_file_with_fields_to_zap is None:
+        xml_file = load_xml('data/fields_to_zap.xml')
+    else:
+        xml_file = xml_file_with_fields_to_zap
+    field_dict = grep_dicom_fields(xml_file)
+
+    # Read DICOM header and grep identifying DICOM field values
+    dicom_dir  = dicom_dict['dcm_dir'].replace('\ ', ' ')  # get rid of '\ '
+    field_dict = grep_dicom_values(dicom_dir, field_dict)
+
+    if not field_dict:
+        return []
+
+    for key in field_dict.keys():
+        if field_dict[key]['Editable'] == False:
+            continue
+        if field_dict[key]['Description'] == 'PatientName':
+            update_DICOM_value(field_dict, key, dicom_dict['pname'])
+        elif field_dict[key]['Description'] == 'PatientBirthDate':
+            update_DICOM_value(field_dict, key, dicom_dict['dob'])
+        elif field_dict[key]['Description'] == 'PatientSex':
+            update_DICOM_value(field_dict, key, dicom_dict['sex'])
+
+    return field_dict
+
+
+def update_DICOM_value(field_dict, key, value):
+    """
+    Function that updates a DICOM value stored in field_dict with the new value
+    provided as input. This new value will be modified later on in the DICOMs.
+
+    :param field_dict: dictionary with DICOM fields and values
+     :type field_dict: dict
+    :param key       : key of the DICOM field to update
+     :type key       : str
+    :param value     : new value to insert into the DICOM files
+     :type value     : str
+
+    """
+
+    if 'Value' in field_dict[key]:
+        if field_dict[key]['Value'] == value:
+            field_dict[key]['Update'] = False
+        else:
+            field_dict[key]['Value']  = value
+            field_dict[key]['Update'] = True
+    else:
+        field_dict[key]['Update'] = False
+
+
+def load_xml(xml_path):
+    """
+    Function that determines the full path to the XML file
+
+    :param xml_path: path to the XML file (could be a relative path)
+     :type xml_path: str
+
+    :return: XML_file -> full path to the XML file to be read if it exists  in
+             the filesystem, None otherwise
+     :rtype: str
+
+    """
+
+    # Read the XML file with the identifying DICOM fields
+    load_xml = PathMethods.resource_path(xml_path)
+    XML_filename = load_xml.return_path()
+
+    if os.path.isfile(XML_filename):
+        XML_file = XML_filename
+    else:
+        XML_filepath = os.path.dirname(os.path.abspath(__file__))
+        XML_file = XML_filepath + "/" + XML_filename
+
+    return XML_file if os.path.isfile(XML_file) else None
+
+
+def print_mass_summary(success_list, error_list, no_valid_dicom):
+    """
+    Function that prints out a summary of the successfully deidentified DICOM
+    studies and the not propoerly deidentified DICOM studies.
+
+    :param success_list  : list of DICOM studies successfully deidentified
+     :type success_list  : list
+    :param error_list    : list of DICOM studies not properly deidentified
+     :type error_list    : list
+    :param no_valid_dicom: list of DICOM studies with no valid DICOM files
+     :type no_valid_dicom: list
+
+    """
+
+    if success_list:
+        # print the successful cases
+        print "\nList of successfully deidentified datasets:"
+        print "\t" + "\n\t".join(str(success) for success in success_list) + "\n"
+    else:
+        print "\nNo datasets were successfully deidentified.\n"
+
+    if no_valid_dicom:
+        # print the cases where no DICOM files were found
+        print "\nList of datasets with no valid DICOM files found:"
+        print "\t" + "\n\t".join(str(invalid) for invalid in no_valid_dicom) + "\n"
+    elif error_list:
+        # print the other cases where something wrong happened
+        print "List of datasets that were not successfully deidentified:"
+        print "\t" + "\n\t".join(str(error) for error in error_list) + "\n"
+    else:
+        print "\nAll datasets were successfully deidentified!\n"

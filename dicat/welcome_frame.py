@@ -48,7 +48,7 @@ class welcome_frame_gui(Frame):
         text.insert(END, title, 'title')
 
         # Insert introduction of the tool into the text variable
-        intro  = "DICAT 2.1 (DICOM Anonymization Tool) is a simple tool for "
+        intro  = "DICAT 2.2 (DICOM Anonymization Tool) is a simple tool for "
         intro += "de-identification of DICOM datasets. In addition to "
         intro += "de-identifying DICOM files, this tool contains a feature "
         intro += "that allows mapping the candidate's information to its "
@@ -62,7 +62,8 @@ class welcome_frame_gui(Frame):
         anonymizer  = '''
         1) select a DICOM directory
         2) view the DICOM headers information
-        3) run the de-identifier tool on all DICOMs of the selected directory
+        3) edit or clear the DICOM headers information directly in the table
+        4) run the de-identifier tool on all DICOMs of the selected directory with the edited information
         '''
         text.insert(END, anonymizer, 'default')
 
