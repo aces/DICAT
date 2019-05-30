@@ -36,12 +36,12 @@ def main():
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'hx:c:v', long_options)
     except getopt.GetoptError as err:
-        print usage
+        print(usage)
         sys.exit(2)
 
     for opt, arg in opts:
         if opt in ('-h', '--help'):
-            print usage
+            print(usage)
             sys.exit()
         elif opt in ("-c", "--csvlist"):
             csv_file = arg
@@ -52,8 +52,8 @@ def main():
 
     if xml_zap_file and not os.path.isfile(xml_zap_file):
         message = 'ERROR: Could not find the XML file with the list of DICOM fields to zap'
-        print message
-        print usage
+        print(message)
+        print(usage)
         sys.exit(2)
 
     if os.path.isfile(csv_file):
@@ -64,8 +64,8 @@ def main():
         methods.print_mass_summary(success_arr, error_arr, no_valid_dicom)
     else:
         message = 'ERROR: you must specify a valid CSV file'
-        print message
-        print usage
+        print(message)
+        print(usage)
         sys.exit(2)
 
 
