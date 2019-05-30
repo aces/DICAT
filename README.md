@@ -67,7 +67,7 @@ Windows OS.
 ###### Requirements 
 
 Before running DICAT, make sure your system contains a 
-[Python](https://www.python.org) compiler with the 
+[Python 3](https://www.python.org) compiler with the 
 [TkInter](https://wiki.python.org/moin/TkInter) library (usually, TkInter comes 
 by default with most Python installations).
 
