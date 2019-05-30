@@ -260,8 +260,7 @@ def pydicom_zapping(dicom_file, dicom_fields):
     for name in dicom_fields:
         new_val = ""
         if 'Value' in dicom_fields[name]:
-            new_val = dicom_fields[name]['Value']\
-            new_val.strip()
+            new_val = str(dicom_fields[name]['Value']).strip()
 
         if dicom_fields[name]['Editable'] is True:
             try:
