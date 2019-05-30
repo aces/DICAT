@@ -1,9 +1,11 @@
 #!/usr/bin/python
 
-import Tkinter, tkFileDialog, tkMessageBox, ttk
+import tkinter
 import os
 import re
-from Tkinter import *
+from tkinter import *
+from tkinter import filedialog
+from tkinter import messagebox
 
 # Internal classes import
 import lib.dicom_anonymizer_methods as methods
@@ -47,7 +49,7 @@ class dicom_deidentifier_frame_gui(Frame):
         self.frame.columnconfigure(1, weight=1)
 
         # Initialize default text that will be in self.entry
-        self.entryVariable = Tkinter.StringVar()
+        self.entryVariable = tkinter.StringVar()
         self.entryVariable.set("Select a DICOM directory")
 
         # Create an entry with a default text that will be replaced by the path
@@ -56,7 +58,7 @@ class dicom_deidentifier_frame_gui(Frame):
             self.frame, width=40, textvariable=self.entryVariable
         )
         self.entry.focus_set()
-        self.entry.selection_range(0, Tkinter.END)
+        self.entry.selection_range(0, tkinter.END)
 
         # Create a select button to use to select a DICOM directory
         self.buttonSelect = Button(
@@ -94,7 +96,7 @@ class dicom_deidentifier_frame_gui(Frame):
         self.messageView.grid_forget()
 
         """Returns a selected directory name."""
-        self.dirname = tkFileDialog.askdirectory(**self.dir_opt)
+        self.dirname = filedialog.askdirectory(**self.dir_opt)
         self.entryVariable.set(self.dirname)
         self.buttonView.configure(state=NORMAL)
         return self.dirname
@@ -118,10 +120,10 @@ class dicom_deidentifier_frame_gui(Frame):
 
         if not field_dict:
             message = "No valid DICOM file was found in " + self.dirname
-            tkMessageBox.showinfo("Error", message)
+            messagebox.showinfo("Error", message)
 
         # print out a warning message at the top of the table
-        self.topPanel = Tkinter.Frame(self.parent)
+        self.topPanel = tkinter.Frame(self.parent)
         self.topPanel.pack(fill='both', expand=1)
 
         info_bold_msg = "WARNING: Every value present in the 'Value in DICOM file'" \
@@ -147,7 +149,7 @@ class dicom_deidentifier_frame_gui(Frame):
 
         fields_keys = list(field_dict.keys())
         keys_length = len(fields_keys) + 1
-        self.edited_entries = [Tkinter.StringVar() for i in range(keys_length)]
+        self.edited_entries = [tkinter.StringVar() for i in range(keys_length)]
         if len(field_dict) != 0:
             self.field_edit_win = Frame(self.parent)
             self.field_edit_win.pack(expand=1, fill='both')
@@ -158,12 +160,12 @@ class dicom_deidentifier_frame_gui(Frame):
 
             # set column names
             self.keep_all = 0
-            self.field_edit_win.Name_field = Tkinter.Label(
+            self.field_edit_win.Name_field = tkinter.Label(
                 self.field_edit_win, text="DICOM field name", relief="sunken",
                 width=30,            anchor="w",              fg="white",
                 bg="#282828",        height=2
             )
-            self.field_edit_win.Name_value = Tkinter.Label(
+            self.field_edit_win.Name_value = tkinter.Label(
                 self.field_edit_win, text="Value in DICOM file", relief="sunken",
                 width=55,            anchor="w",                 fg="white",
                 bg="#282828",        height=2
@@ -193,12 +195,12 @@ class dicom_deidentifier_frame_gui(Frame):
                 if label_text == 'PatientName:':
                     label_text += ' (IDs to label the scan are required)'
                     pname_color = "#006400"
-                self.field_edit_win.Field_label = Tkinter.Label(
+                self.field_edit_win.Field_label = tkinter.Label(
                     self.field_edit_win, text=label_text, relief='ridge',
                     width=30,            anchor="w",      fg=pname_color,
                     bg='#C0C0C0'
                 )
-                self.field_edit_win.Field = Tkinter.Entry(
+                self.field_edit_win.Field = tkinter.Entry(
                     self.field_edit_win,
                     textvariable=self.edited_entries[self.key_index],
                     width=55,
@@ -228,19 +230,19 @@ class dicom_deidentifier_frame_gui(Frame):
 
             self.field_dict = field_dict
 
-            self.bottomPanel = Tkinter.Frame(self.field_edit_win)
+            self.bottomPanel = tkinter.Frame(self.field_edit_win)
             self.bottomPanel.grid(
                 row=self.key_index, column=0, columnspan=3, pady=10
             )
 
-            self.field_edit_win.button_done = Tkinter.Button(
+            self.field_edit_win.button_done = tkinter.Button(
                 self.bottomPanel,
                 text=u"De-identify",
                 command=self.collect_edited_data
             )
             self.field_edit_win.button_done.grid(column=1, row=0, padx=20)
 
-            self.field_edit_win.buttonClear = Tkinter.Button(
+            self.field_edit_win.buttonClear = tkinter.Button(
                 self.bottomPanel, text=u"Clear All Fields", command=self.clear
             )
             self.field_edit_win.buttonClear.grid(column=2, row=0, padx=20)
@@ -269,7 +271,7 @@ class dicom_deidentifier_frame_gui(Frame):
             key_nb += 1
 
         if not pname_set:
-            tkMessageBox.showinfo("ERROR", "PatientName DICOM field is required to label the scan")
+            messagebox.showinfo("ERROR", "PatientName DICOM field is required to label the scan")
             self.deidentify()
         else:
             # Edit DICOM field values to de-identify the dataset (deidentified_dcm, original_dcm) = ''

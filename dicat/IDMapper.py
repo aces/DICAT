@@ -1,11 +1,12 @@
 #!/usr/bin/python
 
-import Tkinter, Tkconstants, tkFileDialog, tkMessageBox, re, datetime
-from Tkinter import *
+import tkinter, datetime
+from tkinter import *
+from tkinter import filedialog
+from tkinter import ttk
 from xml.dom import minidom
 
 
-import ttk
 
 def sortby(tree, col, descending):
     """Sort tree contents when a column is clicked on."""
@@ -48,7 +49,7 @@ class IDMapper_frame_gui(Frame):
 
         # select an existing candidate.xml file
         # Initialize default text that will be in self.entry
-        self.entryVariable = Tkinter.StringVar()
+        self.entryVariable = tkinter.StringVar()
         self.entryVariable.set("Open an XML file with candidate's key")
 
         # Create an entry with a default text that will be replaced by the path
@@ -58,7 +59,7 @@ class IDMapper_frame_gui(Frame):
                            textvariable=self.entryVariable
                           )
         self.entry.focus_set()
-        self.entry.selection_range(0, Tkinter.END)
+        self.entry.selection_range(0, tkinter.END)
 
         # Create an open button to use to select an XML file with candidate's
         # key info
@@ -366,7 +367,7 @@ class IDMapper_frame_gui(Frame):
     def openfilename(self):
 
         """Returns a selected file name."""
-        self.filename = tkFileDialog.askopenfilename(
+        self.filename = filedialog.askopenfilename(
             filetypes=[("XML files", "*.xml")]
         )
         self.entryVariable.set(self.filename)
