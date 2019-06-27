@@ -449,13 +449,12 @@ def mass_zapping(dicom_dict_list, verbose, xml_file_with_fields_to_zap):
 
         # get rid of '\ ' in DICOM path and map it to ' ' for the zapping method
         dicom_dir = row['dcm_dir'].replace('\ ', ' ')
-        (deidentified_dcm, original_dcm) = dicom_zapping(
-            dicom_dir, field_dict
-        )
+        (deidentified_dcm, original_dcm) = dicom_zapping(dicom_dir, field_dict)
 
         # check if deidentification was successful
-        if os.path.exists(deidentified_dcm) != [] and os.path.exists(
-                original_dcm) != []:
+        if not deidentified_dcm and not original_dcm:
+            error_arr.append(row['dcm_dir'] + ': Permission Denied')
+        elif os.path.exists(deidentified_dcm) != [] and os.path.exists(original_dcm) != []:
             success_arr.append(row['dcm_dir'])
         else:
             error_arr.append(row['dcm_dir'])
