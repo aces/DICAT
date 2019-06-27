@@ -279,11 +279,19 @@ class dicom_deidentifier_frame_gui(Frame):
 
             self.field_edit_win.destroy()
             self.topPanel.destroy()
-            if os.path.exists(deidentified_dcm) != [] and os.path.exists(original_dcm) != []:
+
+            if not deidentified_dcm and not original_dcm:
+                # if folder variables are not defined, then permission denied to create the folders
+                self.message.set("PERMISSION DENIED: cannot write in " + self.dirname)
+                self.messageView.configure(fg="dark red", font="Helvetica 16 italic")
+                self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E + W)
+            elif os.path.exists(deidentified_dcm) != [] and os.path.exists(original_dcm) != []:
+                # if paths exists, then return success message
                 self.message.set("BOOYA! It's de-identified!")
                 self.messageView.configure(fg="dark green", font= "Helvetica 16 bold italic")
                 self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E+W)
             else:
+                # if paths do not exists, then something went wrong
                 self.message.set("An error occured during DICOM files de-identification")
                 self.messageView.configure(fg="dark red", font="Helvetica 16 italic")
                 self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E + W)

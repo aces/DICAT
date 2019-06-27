@@ -214,6 +214,8 @@ def dicom_zapping(dicom_folder, dicom_fields):
     (original_dir, deidentified_dir) = create_directories(dicom_folder,
                                                       dicom_fields,
                                                       subdirs_list)
+    if not original_dir and not deidentified_dir:
+        return None, None
 
     # Move DICOMs into the original_directory created and copy DICOMs into the
     # deidentified_folder
@@ -343,13 +345,19 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
     patient_name     = dicom_fields['0010,0010']['Value'].strip()
     original_dir     = dicom_folder + os.path.sep + patient_name
     deidentified_dir = dicom_folder + os.path.sep + patient_name + "_deidentified"
-    os.mkdir(original_dir, 0o755)
-    os.mkdir(deidentified_dir, 0o755)
+    try:
+        os.mkdir(original_dir, 0o755)
+        os.mkdir(deidentified_dir, 0o755)
+    except OSError:
+        return None, None
     # Create subdirectories in original and de-identified directory, as found in
     # DICOM folder
     for subdir in subdirs_list:
-        os.mkdir(original_dir + os.path.sep + subdir, 0o755)
-        os.mkdir(deidentified_dir + os.path.sep + subdir, 0o755)
+        try:
+            os.mkdir(original_dir + os.path.sep + subdir, 0o755)
+            os.mkdir(deidentified_dir + os.path.sep + subdir, 0o755)
+        except OSError:
+            return None, None
 
     return original_dir, deidentified_dir
 
