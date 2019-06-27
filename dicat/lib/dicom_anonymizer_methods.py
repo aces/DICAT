@@ -214,6 +214,8 @@ def dicom_zapping(dicom_folder, dicom_fields):
     (original_dir, deidentified_dir) = create_directories(dicom_folder,
                                                       dicom_fields,
                                                       subdirs_list)
+    if not original_dir and not deidentified_dir:
+        return None, None
 
     # Move DICOMs into the original_directory created and copy DICOMs into the
     # deidentified_folder
@@ -343,13 +345,19 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
     patient_name     = dicom_fields['0010,0010']['Value'].strip()
     original_dir     = dicom_folder + os.path.sep + patient_name
     deidentified_dir = dicom_folder + os.path.sep + patient_name + "_deidentified"
-    os.mkdir(original_dir, 0o755)
-    os.mkdir(deidentified_dir, 0o755)
+    try:
+        os.mkdir(original_dir, 0o755)
+        os.mkdir(deidentified_dir, 0o755)
+    except OSError:
+        return None, None
     # Create subdirectories in original and de-identified directory, as found in
     # DICOM folder
     for subdir in subdirs_list:
-        os.mkdir(original_dir + os.path.sep + subdir, 0o755)
-        os.mkdir(deidentified_dir + os.path.sep + subdir, 0o755)
+        try:
+            os.mkdir(original_dir + os.path.sep + subdir, 0o755)
+            os.mkdir(deidentified_dir + os.path.sep + subdir, 0o755)
+        except OSError:
+            return None, None
 
     return original_dir, deidentified_dir
 
@@ -441,13 +449,12 @@ def mass_zapping(dicom_dict_list, verbose, xml_file_with_fields_to_zap):
 
         # get rid of '\ ' in DICOM path and map it to ' ' for the zapping method
         dicom_dir = row['dcm_dir'].replace('\ ', ' ')
-        (deidentified_dcm, original_dcm) = dicom_zapping(
-            dicom_dir, field_dict
-        )
+        (deidentified_dcm, original_dcm) = dicom_zapping(dicom_dir, field_dict)
 
         # check if deidentification was successful
-        if os.path.exists(deidentified_dcm) != [] and os.path.exists(
-                original_dcm) != []:
+        if not deidentified_dcm and not original_dcm:
+            error_arr.append(row['dcm_dir'] + ': Permission Denied')
+        elif os.path.exists(deidentified_dcm) != [] and os.path.exists(original_dcm) != []:
             success_arr.append(row['dcm_dir'])
         else:
             error_arr.append(row['dcm_dir'])
