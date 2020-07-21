@@ -52,12 +52,12 @@ class DataWindow(Toplevel):
         self.wait_window(self)
 
 
-    def body(self, master):
+    def body(self, parent):
         """
         Creates the body of the 'data window'.
 
-        :param master: frame in which to draw the body of the data window
-         :type master: object
+        :param parent: frame in which to draw the body of the data window
+         :type parent: object
 
         """
 
