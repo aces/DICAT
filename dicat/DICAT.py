@@ -9,18 +9,18 @@ from welcome_frame import welcome_frame_gui
 
 class DicAT_application():
 
-    # Constructor of the class DicAT called with a parent widget ("master")
+    # Constructor of the class DicAT called with a parent widget ("parent")
     # to which we will add a number of child widgets. The constructor starts
     # by creating a "Frame" widget. A frame is a simple container.
-    def __init__(self, master, side=LEFT):
+    def __init__(self, parent, side=LEFT):
 
         self.dir_opt = {}
 
         # Title of the application
-        master.title("DICAT")
+        parent.title("DICAT")
 
         # Use notebook (nb) from ttk from Tkinter to create tabs
-        self.nb = ttk.Notebook(master)
+        self.nb = ttk.Notebook(parent)
 
         # Add frames as pages for ttk.Notebook
         self.page1 = ttk.Frame(self.nb)
