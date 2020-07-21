@@ -16,14 +16,14 @@ import ui.menubar as MenuBar
 class DicAT_application():
 
 
-    def __init__(self, master, side=LEFT):
+    def __init__(self, parent, side=LEFT):
         """
-        Constructor of the class DICAT called with a parent widget ("master")
+        Constructor of the class DICAT called with a parent widget ("parent")
         to which we will add a number of child widgets. The constructor starts
         by creating a "Frame" widget. A frame is a simple container.
 
-        :param master:
-         :type master: object
+        :param parent:
+         :type parent: object
         :param side:
          :type side:
 
@@ -32,10 +32,10 @@ class DicAT_application():
         self.dir_opt = {}
 
         # Title of the application
-        master.title("DICAT")
+        parent.title("DICAT")
 
         # Use notebook (nb) from ttk from Tkinter to create tabs
-        self.nb = ttk.Notebook(master)
+        self.nb = ttk.Notebook(parent)
 
         # Add frames as pages for ttk.Notebook
         self.page1 = ttk.Frame(self.nb)
@@ -62,7 +62,7 @@ class DicAT_application():
         self.dicom_deidentifier_tab()
         self.id_key_frame()
         self.welcome_page()
-        self.scheduler_page(master)
+        self.scheduler_page(parent)
 
         # refresh tab when selecting it
         self.page3.bind("<Visibility>", self.update_scheduler)
@@ -97,17 +97,17 @@ class DicAT_application():
         # start the Welcome page
         welcome_frame_gui(self.page1)
 
-    def scheduler_page(self, master):
+    def scheduler_page(self, parent):
         """
         Start the scheduler frame.
 
-        :param master:
-         :type master:
+        :param parent:
+         :type parent:
         """
 
         # description_frame_gui the menu bar and start the scheduler frame
-        menu = MenuBar.SchedulerMenuBar(master)
-        master.config(menu=menu)
+        menu = MenuBar.SchedulerMenuBar(parent)
+        parent.config(menu=menu)
         self.scheduler = UserInterface(self.page3)
 
     def update_scheduler(self, event):
