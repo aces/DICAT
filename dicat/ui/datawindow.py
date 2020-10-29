@@ -1,6 +1,10 @@
 # import standard packages
 from Tkinter import *
 from ttk import *
+
+# import external package from https://github.com/moshekaplan/tkinter_components
+import CalendarDialog.CalendarDialog as CalendarDialog
+
 # import internal packages
 import ui.dialogbox as DialogBox
 import lib.utilities as Utilities
@@ -162,7 +166,12 @@ class DataWindow(Toplevel):
             self.candidate_pane, text=MultiLanguage.candidate_dob
         )
         self.text_dob  = Entry(       # date of birth text box
-            self.candidate_pane, textvariable=self.text_dob_var
+            self.candidate_pane, textvariable=self.text_dob_var, width=15
+        )
+        self.dob_picker  = Button(    # date of birth date picker
+            self.candidate_pane,
+            text='Date Picker',
+            command=self.date_picker_event
         )
         self.label_gender = Label(    # gender label
             self.candidate_pane, text=MultiLanguage.candidate_gender
@@ -215,10 +224,13 @@ class DataWindow(Toplevel):
             column=2, row=1, padx=10, pady=5, sticky=N+S+E+W
         )
         self.label_dob.grid(      # draw date of birth label
-            column=3, row=0, padx=10, pady=5, sticky=N+S+E+W
+            column=3, row=0, columnspan=2, padx=10, pady=5, sticky=N+S+E+W
         )
         self.text_dob.grid(       # draw date of birth text box
-            column=3, row=1, padx=10, pady=5, sticky=N+S+E+W
+            column=3, row=1, padx=(10, 0), pady=5, sticky=N+S+E+W
+        )
+        self.dob_picker.grid(
+            column=4, row=1, padx=(0,10), pady=5, sticky=N+S+E+W
         )
         self.label_gender.grid(   # draw gender label
             column=0, row=2, padx=10, pady=5, sticky=N+S+E+W
@@ -238,6 +250,22 @@ class DataWindow(Toplevel):
         self.text_phone.grid(     # draw phone number text box
             column=2, row=3, padx=10, pady=5, sticky=N+S+E+W
         )
+
+
+    def date_picker_event(self):
+        """
+        Date picker event. Once a date have been chosen from CalendarDialog,
+        will print the result into the self.text_dob_var entry variable with
+        the proper format.
+
+        """
+
+        # Initialize the calendar dialog window
+        cd = CalendarDialog.CalendarDialog(self.candidate_pane)
+
+        # Grep the date picked and print it in self.text_dob_var entry variable
+        date_picked = cd.result
+        self.text_dob_var.set(date_picked.strftime("%Y-%m-%d"))
 
 
     def schedule_pane_ui(self, visitset):
