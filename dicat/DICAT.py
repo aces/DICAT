@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import ttk
-from Tkinter import *
+from tkinter import *
 
 from dicom_anonymizer_frame import dicom_deidentifier_frame_gui
 from IDMapper import IDMapper_frame_gui

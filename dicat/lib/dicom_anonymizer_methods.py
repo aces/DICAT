@@ -344,13 +344,13 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
     patient_name     = dicom_fields['0010,0010']['Value'].strip()
     original_dir     = dicom_folder + os.path.sep + patient_name
     deidentified_dir = dicom_folder + os.path.sep + patient_name + "_deidentified"
-    os.mkdir(original_dir, 0755)
-    os.mkdir(deidentified_dir, 0755)
+    os.mkdir(original_dir, 0o755)
+    os.mkdir(deidentified_dir, 0o755)
     # Create subdirectories in original and de-identified directory, as found in
     # DICOM folder
     for subdir in subdirs_list:
-        os.mkdir(original_dir + os.path.sep + subdir, 0755)
-        os.mkdir(deidentified_dir + os.path.sep + subdir, 0755)
+        os.mkdir(original_dir + os.path.sep + subdir, 0o755)
+        os.mkdir(deidentified_dir + os.path.sep + subdir, 0o755)
 
     return original_dir, deidentified_dir
 
@@ -420,7 +420,7 @@ def mass_zapping(dicom_dict_list, verbose, xml_file_with_fields_to_zap):
                             See description of read_csv() above to see
                             dictionary's structure
      :type dicom_dict_list: list
-         
+
     :returns:
       success_arr -> list of DICOM studies successfully deidentified
       error_arr   -> list of DICOM studies not properly deidentified
@@ -434,11 +434,11 @@ def mass_zapping(dicom_dict_list, verbose, xml_file_with_fields_to_zap):
     for row in dicom_dict_list:
         field_dict = map_DICOM_fields(row, xml_file_with_fields_to_zap)
         if not field_dict:
-            print 'No valid DICOM file was found in ' + row['dcm_dir']
+            print('No valid DICOM file was found in ' + row['dcm_dir'])
             no_valid_dicom.append(row['dcm_dir'])
             continue
         if verbose:
-            print 'Deidentifying DICOM study: ' + row['dcm_dir']
+            print('Deidentifying DICOM study: ' + row['dcm_dir'])
 
         # get rid of '\ ' in DICOM path and map it to ' ' for the zapping method
         dicom_dir = row['dcm_dir'].replace('\ ', ' ')
@@ -566,18 +566,18 @@ def print_mass_summary(success_list, error_list, no_valid_dicom):
 
     if success_list:
         # print the successful cases
-        print "\nList of successfully deidentified datasets:"
-        print "\t" + "\n\t".join(str(success) for success in success_list) + "\n"
+        print("\nList of successfully deidentified datasets:")
+        print("\t" + "\n\t".join(str(success) for success in success_list) + "\n")
     else:
-        print "\nNo datasets were successfully deidentified.\n"
+        print("\nNo datasets were successfully deidentified.\n")
 
     if no_valid_dicom:
         # print the cases where no DICOM files were found
-        print "\nList of datasets with no valid DICOM files found:"
-        print "\t" + "\n\t".join(str(invalid) for invalid in no_valid_dicom) + "\n"
+        print("\nList of datasets with no valid DICOM files found:")
+        print("\t" + "\n\t".join(str(invalid) for invalid in no_valid_dicom) + "\n")
     elif error_list:
         # print the other cases where something wrong happened
-        print "List of datasets that were not successfully deidentified:"
-        print "\t" + "\n\t".join(str(error) for error in error_list) + "\n"
+        print("List of datasets that were not successfully deidentified:")
+        print("\t" + "\n\t".join(str(error) for error in error_list) + "\n")
     else:
-        print "\nAll datasets were successfully deidentified!\n"
+        print("\nAll datasets were successfully deidentified!\n")
