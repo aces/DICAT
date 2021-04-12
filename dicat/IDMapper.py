@@ -1,7 +1,8 @@
 #!/usr/bin/python
 
-import Tkinter, Tkconstants, tkFileDialog, tkMessageBox, re, datetime
-from Tkinter import *
+import tkinter, re, datetime
+import tkinter.filedialog as tkFileDialog
+from tkinter import *
 from xml.dom import minidom
 
 
@@ -22,9 +23,9 @@ def sortby(tree, col, descending):
     tree.heading(col,
         command=lambda col=col: sortby(tree, col, int(not descending)))
 
-  
+
 class IDMapper_frame_gui(Frame):
-    
+
     def __init__(self, parent):
         """Initialize the application"""
         self.parent = parent
@@ -48,7 +49,7 @@ class IDMapper_frame_gui(Frame):
 
         # select an existing candidate.xml file
         # Initialize default text that will be in self.entry
-        self.entryVariable = Tkinter.StringVar()
+        self.entryVariable = tkinter.StringVar()
         self.entryVariable.set("Open an XML file with candidate's key")
 
         # Create an entry with a default text that will be replaced by the path
@@ -58,7 +59,7 @@ class IDMapper_frame_gui(Frame):
                            textvariable=self.entryVariable
                           )
         self.entry.focus_set()
-        self.entry.selection_range(0, Tkinter.END)
+        self.entry.selection_range(0, tkinter.END)
 
         # Create an open button to use to select an XML file with candidate's
         # key info
@@ -91,14 +92,14 @@ class IDMapper_frame_gui(Frame):
 
 
     def InitUI(self):
-        
+
         self.frame = Frame(self.parent)
         self.frame.pack(expand=1, fill='both')
 
         for i in range(0, 3):
             self.frame.columnconfigure(i, weight=6)
         self.frame.columnconfigure(3, weight=1)
-        
+
         for i in range(3, 4):
             self.frame.rowconfigure(i, weight=1)
 
@@ -148,11 +149,11 @@ class IDMapper_frame_gui(Frame):
                                          columns=self.tableColumns,
                                          show="headings")
         for col in self.tableColumns:
-            self.datatable.heading(col, text=col.title(), 
+            self.datatable.heading(col, text=col.title(),
                                    command=lambda c=col: sortby(self.datatable, c, 0))
 
         self.datatable.bind("<<TreeviewSelect>>", self.OnRowClick)
-      
+
         self.ErrorMessage = StringVar()
         self.error = Label(self.frame, textvariable=self.ErrorMessage, fg='red')
 
@@ -163,7 +164,7 @@ class IDMapper_frame_gui(Frame):
         self.candidateid.grid(row=1, column=0, padx=(0,4), pady=(0,10), sticky=E+W)
         self.candidatename.grid(row=1, column=1, padx=(4,4), pady=(0,10), sticky=E+W)
         self.candidateDoB.grid(row=1, column=2, padx=(4,4), pady=(0,10), sticky=E+W)
- 
+
         self.buttonAdd.grid(row=2, column=1, padx=(4,0), sticky=E+W)
         self.buttonClear.grid(row=1, column=3, padx=(4,0), sticky=E+W)
         self.buttonSearch.grid(row=2, column=0, padx=(4,0), sticky=E+W)
@@ -195,7 +196,7 @@ class IDMapper_frame_gui(Frame):
 
 
     def SaveMapAction(self):
-        
+
         """Function which performs the action of writing the XML file"""
         f = open(self.filename, "w")
         f.write("<?xml version=\"1.0\"?>\n<data>\n")
@@ -214,7 +215,7 @@ class IDMapper_frame_gui(Frame):
 
 
     def AddIdentifierEvent(self):
-        
+
         name = self.candidatename.get()
         candid = self.candidateid.get()
         dob = self.candidateDoB.get()
@@ -225,7 +226,7 @@ class IDMapper_frame_gui(Frame):
         """
         Adds the given identifier and real name to the mapping. If
         the "save" parameter is true, this also triggers the saving
-        of the XML file. 
+        of the XML file.
         This is set to False on initial load.
         """
         self.ErrorMessage.set("")
@@ -252,28 +253,28 @@ class IDMapper_frame_gui(Frame):
 
         mapList = [candid, realname, dob]
         self.IDMap[candid] = mapList
-                        
+
         insertedList = [(candid, realname, dob)]
         for item in insertedList:
             self.datatable.insert('', 'end', values=item)
-        
+
         if(save):
             self.SaveMapAction()
 
 
     def OnRowClick(self, event):
-        
+
         """Update the text boxes' data on row click"""
         item_id = str(self.datatable.focus())
         item = self.datatable.item(item_id)['values']
-        
+
         self.textCandId.set(item[0])
         self.textCandName.set(item[1])
         self.textCandDoB.set(item[2])
 
 
     def clear(self):
-        
+
         self.textCandId.set("")
         self.textCandName.set("")
         self.textCandDoB.set("")
@@ -394,11 +395,11 @@ class IDMapper_frame_gui(Frame):
         return self.filename
 
 def main():
-       
+
     root = Tk()
     app = IDMapper_frame_gui(root)
     root.mainloop()
- 
+
 
 if __name__ == "__main__":
     main()
