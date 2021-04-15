@@ -427,7 +427,7 @@ def mass_zapping(dicom_dict_list, verbose, xml_file_with_fields_to_zap):
                             See description of read_csv() above to see
                             dictionary's structure
      :type dicom_dict_list: list
-         
+
     :returns:
       success_arr -> list of DICOM studies successfully deidentified
       error_arr   -> list of DICOM studies not properly deidentified

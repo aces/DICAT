@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
-import tkinter
+import tkinter, ttk
+import tkinter.filedialog as tkFileDialog
+import tkinter.messagebox as tkMessageBox
 import os
 import re
 from tkinter import *
-from tkinter import filedialog
-from tkinter import messagebox
 
 # Internal classes import
 import lib.dicom_anonymizer_methods as methods
