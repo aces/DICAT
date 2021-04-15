@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import tkinter, re, datetime
-import tkinter.filedialog as tkFileDialog
+import tkinter.filedialog as tkfiledialog
 import ttk
 from tkinter import *
 from xml.dom import minidom
@@ -367,7 +367,7 @@ class IDMapper_frame_gui(Frame):
     def openfilename(self):
 
         """Returns a selected file name."""
-        self.filename = filedialog.askopenfilename(
+        self.filename = tkfiledialog.askopenfilename(
             filetypes=[("XML files", "*.xml")]
         )
         self.entryVariable.set(self.filename)

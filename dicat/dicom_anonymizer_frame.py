@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
 import tkinter, ttk
-import tkinter.filedialog as tkFileDialog
-import tkinter.messagebox as tkMessageBox
+import tkinter.filedialog as tkfiledialog
+import tkinter.messagebox as tkmessagebox
 import os
 import re
 from tkinter import *
@@ -96,7 +96,7 @@ class dicom_deidentifier_frame_gui(Frame):
         self.messageView.grid_forget()
 
         """Returns a selected directory name."""
-        self.dirname = filedialog.askdirectory(**self.dir_opt)
+        self.dirname = tkfiledialog.askdirectory(**self.dir_opt)
         self.entryVariable.set(self.dirname)
         self.buttonView.configure(state=NORMAL)
         return self.dirname
@@ -120,7 +120,7 @@ class dicom_deidentifier_frame_gui(Frame):
 
         if not field_dict:
             message = "No valid DICOM file was found in " + self.dirname
-            messagebox.showinfo("Error", message)
+            tkmessagebox.showinfo("Error", message)
 
         # print out a warning message at the top of the table
         self.topPanel = tkinter.Frame(self.parent)
@@ -271,7 +271,7 @@ class dicom_deidentifier_frame_gui(Frame):
             key_nb += 1
 
         if not pname_set:
-            messagebox.showinfo("ERROR", "PatientName DICOM field is required to label the scan")
+            tkmessagebox.showinfo("ERROR", "PatientName DICOM field is required to label the scan")
             self.deidentify()
         else:
             # Edit DICOM field values to de-identify the dataset (deidentified_dcm, original_dcm) = ''
