@@ -193,6 +193,7 @@ class dicom_deidentifier_frame_gui(Frame):
 
                 if not field_dict[keys]['Editable']:
                     # if field is not editable, do not show it in the list
+                    self.key_index += 1
                     continue
 
                 # set DICOM field names and DICOM values
