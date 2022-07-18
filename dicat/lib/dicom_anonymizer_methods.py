@@ -342,6 +342,8 @@ def create_directories(dicom_folder, dicom_fields, subdirs_list):
 
     # Create an original_dcm and deidentified_dcm directory in the DICOM folder,
     # as well as subdirectories
+    if type(dicom_fields['0010,0010']['Value']) != 'str':
+        dicom_fields['0010,0010']['Value'] = str(dicom_fields['0010,0010']['Value'])
     patient_name     = dicom_fields['0010,0010']['Value'].strip()
     original_dir     = dicom_folder + os.path.sep + patient_name
     deidentified_dir = dicom_folder + os.path.sep + patient_name + "_deidentified"

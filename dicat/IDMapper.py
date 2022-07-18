@@ -1,9 +1,12 @@
 #!/usr/bin/python
 
-import tkinter, re, datetime
+import datetime
+import re
+import tkinter
 import tkinter.filedialog as tkfiledialog
-import ttk
+
 from tkinter import *
+from tkinter import ttk
 from xml.dom import minidom
 
 

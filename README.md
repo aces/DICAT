@@ -74,11 +74,11 @@ by default with most Python installations).
 For Ubuntu distributions, TkInter can be installed via apt-get:
 ```sudo apt-get install python-tk```
 
-The [PyDICOM](https://pydicom.github.io/pydicom/stable/getting_started.html#installing) 
+The [PyDICOM](https://pydicom.github.io/) 
 package is also required by DICAT. 
 
-For most platform, PyDICOM can be installed via easy_install: 
-```sudo easy_install pydicom``` 
+For most platform, PyDICOM can be installed via `pip`: 
+```pip install pydicom``` 
 
 
 ###### DICAT installation

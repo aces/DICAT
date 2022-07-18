@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from tkinter import *
+from tkinter import ttk
 
 '''
 lib.resource_path_methods has been created for Pyinstaller.

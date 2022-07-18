@@ -1,11 +1,13 @@
 #!/usr/bin/python
 
-import tkinter, ttk
-import tkinter.filedialog as tkfiledialog
-import tkinter.messagebox as tkmessagebox
 import os
 import re
+import tkinter
+import tkinter.filedialog as tkfiledialog
+import tkinter.messagebox as tkmessagebox
+
 from tkinter import *
+from tkinter import ttk
 
 # Internal classes import
 import lib.dicom_anonymizer_methods as methods
@@ -187,10 +189,15 @@ class dicom_deidentifier_frame_gui(Frame):
                 # that they are all editable in the GUI. Note, the reason we don't
                 # modify the XML here is so that the mass_deidentifier can still
                 # run with only PatientName, DoB and Gender as editable
-                field_dict[keys]['Editable'] = True
+                # field_dict[keys]['Editable'] = True
+
+                if not field_dict[keys]['Editable']:
+                    # if field is not editable, do not show it in the list
+                    self.key_index += 1
+                    continue
 
                 # set DICOM field names and DICOM values
-                label_text  = str(field_dict[keys]['Description']) + ":"
+                label_text = str(field_dict[keys]['Description']) + ":"
                 pname_color = "black"
                 if label_text == 'PatientName:':
                     label_text += ' (IDs to label the scan are required)'
