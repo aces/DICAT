@@ -15,6 +15,16 @@
       <editable>no</editable>
     </item>
     <item>
+      <name>0008,0022</name>
+      <description>AcquisitionDate</description>
+      <editable>yes</editable>
+    </item>
+    <item>
+      <name>qc-0008,0022</name>
+      <description>AcquisitionDate</description>
+      <editable>yes</editable>
+    </item>
+    <item>
       <name>0008,0080</name>
       <description>InstitutionName</description>
       <editable>no</editable>
