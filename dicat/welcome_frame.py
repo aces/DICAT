@@ -9,6 +9,7 @@ Need to load images or external files using these methods, otherwise the
 created application would not find them.
 '''
 import lib.resource_path_methods as PathMethods
+from pathlib import Path
 
 class welcome_frame_gui(Frame):
 
@@ -20,9 +21,9 @@ class welcome_frame_gui(Frame):
         self.frame = Frame(self.parent)
         self.frame.pack(expand=1, fill='both')
 
-
         # Insert DICAT logo on the right side of the screen
-        load_img = PathMethods.resource_path("images/DICAT_logo.gif")
+        imgp = Path(__file__).parent.joinpath("images/DICAT_logo.gif")
+        load_img = PathMethods.resource_path(imgp)
         imgPath  = load_img.return_path()
         logo     = PhotoImage(file = imgPath)
         logo_image = Label(self.frame,
