@@ -186,33 +186,12 @@ def read_dicom_with_pydicom(dicom_file, dicom_fields):
         # choose the original name even if the name is starting with "qc-"
         qname = name[3:] if name.startswith("qc-") else name
 
-        # try:
-        #     description = dicom_fields[qname]['Description']
-        #     value = dicom_dataset.data_element(description).value
-        #     # change the original name (qc or not qc)
-        #     dicom_fields[name]['Value'] = value
-        # except:
-        #     continue
-
-        print("------")
         try:
             description = dicom_fields[qname]['Description']
-            print(description)
-            print(dicom_fields[name])
             value = dicom_dataset.data_element(description).value
-            print("AAA")
-            if 'ForceInsert' in dicom_fields[name] and dicom_fields[name]['ForceInsert']:
-                print(" -> force insert")
-                value = ""
-            print(value)
             # change the original name (qc or not qc)
             dicom_fields[name]['Value'] = value
-            print("CHANGED")
-        except KeyError as ke:
-            print(f"KeyError: {name} - {ke}")
-            continue
-        except Exception as e:
-            print(f"Error: {name} - {e}")
+        except:
             continue
 
     return dicom_fields
@@ -272,14 +251,6 @@ def dicom_zapping(dicom_folder, dicom_fields):
     return deidentified_zip, original_zip
 
 
-def force_insert_fields(dicom_fields):
-    # print("Force insert")
-    # d = {tag:'' for tag in dicom_fields if dicom_fields[tag]['ForceInsert']}
-    # # update field then return
-    # dicom_fields.update(d)
-    return dicom_fields
-
-
 def pydicom_zapping(dicom_file, dicom_fields):
     """
     Actual zapping method for PyDICOM
@@ -295,6 +266,11 @@ def pydicom_zapping(dicom_file, dicom_fields):
 
     dicom_dataset = dicom.read_file(dicom_file)
 
+    # tags to force insert in the final file
+    forceInsertTags = [tag for tag in dicom_fields 
+                       if 'ForceInsert' in dicom_fields[tag]
+                       and dicom_fields[tag]['ForceInsert']]
+
     for name in dicom_fields:
         new_val = ""
         if 'Value' in dicom_fields[name]:
@@ -304,12 +280,30 @@ def pydicom_zapping(dicom_file, dicom_fields):
             try:
                 dicom_dataset.data_element(
                     dicom_fields[name]['Description']).value = new_val
+            except KeyError as ke:
+                # key error are triggered when a key is not found in the DICOM 
+                # file header. If 'forceInsert' is true for this field, it will
+                # be forcefully added here.
+                # 
+                # if force insert tag, check the value change
+                if name in forceInsertTags:
+                    setattr(dicom_dataset, dicom_fields[name]['Description'], new_val)
+                continue
             except:
                 continue
         else:
             try:
                 dicom_dataset.data_element(
                     dicom_fields[name]['Description']).value = ''
+            except KeyError as ke:
+                # key error are triggered when a key is not found in the DICOM 
+                # file header. If 'forceInsert' is true for this field, it will
+                # be forcefully added here.
+                # 
+                # if force insert tag, check the value change
+                if name in forceInsertTags:
+                    setattr(dicom_dataset, dicom_fields[name]['Description'], '')
+                continue
             except:
                 continue
     dicom_dataset.save_as(dicom_file)
@@ -557,7 +551,6 @@ def update_DICOM_value(field_dict, key, value):
      :type value     : str
 
     """
-
     if 'Value' in field_dict[key]:
         if field_dict[key]['Value'] == value:
             field_dict[key]['Update'] = False
@@ -566,6 +559,11 @@ def update_DICOM_value(field_dict, key, value):
             field_dict[key]['Update'] = True
     else:
         field_dict[key]['Update'] = False
+
+    # force insert
+    if 'ForceInsert' in field_dict[key] and field_dict[key]['ForceInsert']:
+        field_dict[key]['Update'] = True
+        field_dict[key]['Value']  = value
 
 
 def load_xml(xml_path):
