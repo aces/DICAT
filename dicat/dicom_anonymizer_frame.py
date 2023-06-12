@@ -268,6 +268,20 @@ class dicom_deidentifier_frame_gui(Frame):
         # Remove the first item (corresponding to the title row in the displayed table)
         new_vals.pop(0)
 
+        print(self.edited_entries)
+        print(new_vals)
+
+
+        print(self.field_dict['0008,0022'])
+
+        # force insert fields
+        self.field_dict = methods.force_insert_fields(self.field_dict)
+
+        print(self.field_dict['0008,0022'])
+
+        raise
+
+        # update dicom values
         key_nb = 0
         pname_set = 0
         for key in self.field_dict.keys():

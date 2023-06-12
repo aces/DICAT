@@ -100,8 +100,6 @@ def is_file_a_dicom(file):
     return True
 
 
-
-
 def grep_dicom_fields(xml_file):
     """
     Read DICOM fields from XML file called "fields_to_zap.xml"
@@ -118,11 +116,16 @@ def grep_dicom_fields(xml_file):
     for item in xmldoc.findall('item'):
         dicom_tag = item.find('name').text
         description = item.find('description').text
-        editable = True if (item.find('editable').text == "yes") else False
+        editable = (item.find('editable') is not None
+                    and item.find('editable').text == "yes")
+        forceInsert = (not dicom_tag.startswith("qc-")
+                       and item.find('forceInsert') is not None
+                       and item.find('forceInsert').text == "yes")
         dicom_fields[dicom_tag] = {
             "DICOM_tag"  : dicom_tag,
             "Description": description,
-            "Editable"   : editable
+            "Editable"   : editable,
+            "ForceInsert": forceInsert
         }
 
     return dicom_fields
@@ -180,11 +183,36 @@ def read_dicom_with_pydicom(dicom_file, dicom_fields):
     # into dicom_fields dictionary under flag Value
     # Dictionnary of DICOM values to be returned
     for name in dicom_fields:
+        # choose the original name even if the name is starting with "qc-"
+        qname = name[3:] if name.startswith("qc-") else name
+
+        # try:
+        #     description = dicom_fields[qname]['Description']
+        #     value = dicom_dataset.data_element(description).value
+        #     # change the original name (qc or not qc)
+        #     dicom_fields[name]['Value'] = value
+        # except:
+        #     continue
+
+        print("------")
         try:
-            description = dicom_fields[name]['Description']
+            description = dicom_fields[qname]['Description']
+            print(description)
+            print(dicom_fields[name])
             value = dicom_dataset.data_element(description).value
+            print("AAA")
+            if 'ForceInsert' in dicom_fields[name] and dicom_fields[name]['ForceInsert']:
+                print(" -> force insert")
+                value = ""
+            print(value)
+            # change the original name (qc or not qc)
             dicom_fields[name]['Value'] = value
-        except:
+            print("CHANGED")
+        except KeyError as ke:
+            print(f"KeyError: {name} - {ke}")
+            continue
+        except Exception as e:
+            print(f"Error: {name} - {e}")
             continue
 
     return dicom_fields
@@ -242,6 +270,14 @@ def dicom_zapping(dicom_folder, dicom_fields):
 
     # return zip files
     return deidentified_zip, original_zip
+
+
+def force_insert_fields(dicom_fields):
+    # print("Force insert")
+    # d = {tag:'' for tag in dicom_fields if dicom_fields[tag]['ForceInsert']}
+    # # update field then return
+    # dicom_fields.update(d)
+    return dicom_fields
 
 
 def pydicom_zapping(dicom_file, dicom_fields):
