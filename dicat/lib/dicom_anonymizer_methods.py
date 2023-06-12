@@ -183,13 +183,9 @@ def read_dicom_with_pydicom(dicom_file, dicom_fields):
     # into dicom_fields dictionary under flag Value
     # Dictionnary of DICOM values to be returned
     for name in dicom_fields:
-        # choose the original name even if the name is starting with "qc-"
-        qname = name[3:] if name.startswith("qc-") else name
-
         try:
-            description = dicom_fields[qname]['Description']
+            description = dicom_fields[name]['Description']
             value = dicom_dataset.data_element(description).value
-            # change the original name (qc or not qc)
             dicom_fields[name]['Value'] = value
         except:
             continue
