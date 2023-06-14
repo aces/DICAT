@@ -100,8 +100,6 @@ def is_file_a_dicom(file):
     return True
 
 
-
-
 def grep_dicom_fields(xml_file):
     """
     Read DICOM fields from XML file called "fields_to_zap.xml"
@@ -118,11 +116,16 @@ def grep_dicom_fields(xml_file):
     for item in xmldoc.findall('item'):
         dicom_tag = item.find('name').text
         description = item.find('description').text
-        editable = True if (item.find('editable').text == "yes") else False
+        editable = (item.find('editable') is not None
+                    and item.find('editable').text == "yes")
+        forceInsert = (not dicom_tag.startswith("qc-")
+                       and item.find('forceInsert') is not None
+                       and item.find('forceInsert').text == "yes")
         dicom_fields[dicom_tag] = {
             "DICOM_tag"  : dicom_tag,
             "Description": description,
-            "Editable"   : editable
+            "Editable"   : editable,
+            "ForceInsert": forceInsert
         }
 
     return dicom_fields
@@ -291,23 +294,31 @@ def pydicom_zapping(dicom_file, dicom_fields):
 
     dicom_dataset = dicom.read_file(dicom_file)
 
+    # tags to force insert in the final file
+    forceInsertTags = [tag for tag in dicom_fields 
+                       if dicom_fields[tag].get('ForceInsert', False)]
+
     for name in dicom_fields:
         new_val = ""
         if 'Value' in dicom_fields[name]:
             new_val = str(dicom_fields[name]['Value']).strip()
 
-        if dicom_fields[name]['Editable'] is True:
-            try:
-                dicom_dataset.data_element(
-                    dicom_fields[name]['Description']).value = new_val
-            except:
-                continue
-        else:
-            try:
-                dicom_dataset.data_element(
-                    dicom_fields[name]['Description']).value = ''
-            except:
-                continue
+        # value to insert
+        val = new_val if dicom_fields[name]['Editable'] else ''
+
+        try:
+            dicom_dataset.data_element(
+                dicom_fields[name]['Description']).value = val
+        except KeyError as ke:
+            # key error are triggered when a key is not found in the DICOM
+            # file header. If 'forceInsert' is true for this field, it will
+            # be forcefully added here.
+            #
+            # if force insert tag, check the value change
+            if name in forceInsertTags:
+                setattr(dicom_dataset, dicom_fields[name]['Description'], val)
+        except:
+            continue
     dicom_dataset.save_as(dicom_file)
 
 
@@ -553,7 +564,6 @@ def update_DICOM_value(field_dict, key, value):
      :type value     : str
 
     """
-
     if 'Value' in field_dict[key]:
         if field_dict[key]['Value'] == value:
             field_dict[key]['Update'] = False
@@ -562,6 +572,11 @@ def update_DICOM_value(field_dict, key, value):
             field_dict[key]['Update'] = True
     else:
         field_dict[key]['Update'] = False
+
+    # force insert
+    if 'ForceInsert' in field_dict[key] and field_dict[key]['ForceInsert']:
+        field_dict[key]['Update'] = True
+        field_dict[key]['Value']  = value
 
 
 def load_xml(xml_path):
