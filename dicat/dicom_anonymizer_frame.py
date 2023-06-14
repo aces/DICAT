@@ -185,6 +185,10 @@ class dicom_deidentifier_frame_gui(Frame):
             self.key_index = 1
             for keys in fields_keys:
 
+                # set force insert field before editable fields
+                if 'ForceInsert' in field_dict[keys] and field_dict[keys]['ForceInsert']:
+                    self.edited_entries[self.key_index].set("")
+
                 # set the Editable of the dictionary to True for all entries now
                 # that they are all editable in the GUI. Note, the reason we don't
                 # modify the XML here is so that the mass_deidentifier can still
@@ -268,6 +272,7 @@ class dicom_deidentifier_frame_gui(Frame):
         # Remove the first item (corresponding to the title row in the displayed table)
         new_vals.pop(0)
 
+        # update dicom values
         key_nb = 0
         pname_set = 0
         for key in self.field_dict.keys():
@@ -294,7 +299,7 @@ class dicom_deidentifier_frame_gui(Frame):
                 self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E + W)
             elif os.path.exists(deidentified_dcm) != [] and os.path.exists(original_dcm) != []:
                 # if paths exists, then return success message
-                self.message.set("BOOYA! It's de-identified!")
+                self.message.set("It's de-identified!")
                 self.messageView.configure(fg="dark green", font= "Helvetica 16 bold italic")
                 self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E+W)
             else:
