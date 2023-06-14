@@ -264,44 +264,29 @@ def pydicom_zapping(dicom_file, dicom_fields):
 
     # tags to force insert in the final file
     forceInsertTags = [tag for tag in dicom_fields 
-                       if 'ForceInsert' in dicom_fields[tag]
-                       and dicom_fields[tag]['ForceInsert']]
+                       if dicom_fields[tag].get('ForceInsert', False)]
 
     for name in dicom_fields:
         new_val = ""
         if 'Value' in dicom_fields[name]:
             new_val = str(dicom_fields[name]['Value']).strip()
 
-        if dicom_fields[name]['Editable'] is True:
-            try:
-                dicom_dataset.data_element(
-                    dicom_fields[name]['Description']).value = new_val
-            except KeyError as ke:
-                # key error are triggered when a key is not found in the DICOM 
-                # file header. If 'forceInsert' is true for this field, it will
-                # be forcefully added here.
-                # 
-                # if force insert tag, check the value change
-                if name in forceInsertTags:
-                    setattr(dicom_dataset, dicom_fields[name]['Description'], new_val)
-                continue
-            except:
-                continue
-        else:
-            try:
-                dicom_dataset.data_element(
-                    dicom_fields[name]['Description']).value = ''
-            except KeyError as ke:
-                # key error are triggered when a key is not found in the DICOM 
-                # file header. If 'forceInsert' is true for this field, it will
-                # be forcefully added here.
-                # 
-                # if force insert tag, check the value change
-                if name in forceInsertTags:
-                    setattr(dicom_dataset, dicom_fields[name]['Description'], '')
-                continue
-            except:
-                continue
+        # value to insert
+        val = new_val if dicom_fields[name]['Editable'] else ''
+
+        try:
+            dicom_dataset.data_element(
+                dicom_fields[name]['Description']).value = val
+        except KeyError as ke:
+            # key error are triggered when a key is not found in the DICOM
+            # file header. If 'forceInsert' is true for this field, it will
+            # be forcefully added here.
+            #
+            # if force insert tag, check the value change
+            if name in forceInsertTags:
+                setattr(dicom_dataset, dicom_fields[name]['Description'], val)
+        except:
+            continue
     dicom_dataset.save_as(dicom_file)
 
 
