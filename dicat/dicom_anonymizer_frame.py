@@ -17,7 +17,7 @@ Need to load images or external files using these methods, otherwise the
 created application would not find them.
 '''
 import lib.resource_path_methods as PathMethods
-
+from pathlib import Path
 
 
 class dicom_deidentifier_frame_gui(Frame):
@@ -114,7 +114,8 @@ class dicom_deidentifier_frame_gui(Frame):
         self.messageView.grid_forget()
 
         # load XML file and create the field dictionary
-        XML_file   = methods.load_xml("data/fields_to_zap.xml")
+        field_path = Path(__file__).parent.joinpath("data/fields_to_zap.xml")
+        XML_file   = methods.load_xml(field_path)
         field_dict = methods.grep_dicom_fields(XML_file)
 
         # Read DICOM header and grep identifying DICOM field values
@@ -201,7 +202,10 @@ class dicom_deidentifier_frame_gui(Frame):
                     continue
 
                 # set DICOM field names and DICOM values
-                label_text = str(field_dict[keys]['Description']) + ":"
+                if keys.startswith("qc-"):
+                    label_text = f"{field_dict[keys]['Description']} (QC):"
+                else:
+                    label_text = f"{field_dict[keys]['Description']}:"
                 pname_color = "black"
                 if label_text == 'PatientName:':
                     label_text += ' (IDs to label the scan are required)'
@@ -282,28 +286,40 @@ class dicom_deidentifier_frame_gui(Frame):
             methods.update_DICOM_value(self.field_dict, key, new_vals[key_nb])
             key_nb += 1
 
-        if not pname_set:
-            tkmessagebox.showinfo("ERROR", "PatientName DICOM field is required to label the scan")
+        # validate the qc fields
+        try:
+            methods.validate_qc_fields(self.field_dict)
+            qc_fields_valid = True
+        except Exception as e:
+            print(e)
+            tkmessagebox.showinfo("ERROR", e)
             self.deidentify()
-        else:
-            # Edit DICOM field values to de-identify the dataset (deidentified_dcm, original_dcm) = ''
-            (deidentified_dcm, original_dcm) = methods.dicom_zapping(self.dirname, self.field_dict)
-
-            self.field_edit_win.destroy()
-            self.topPanel.destroy()
-
-            if not deidentified_dcm and not original_dcm:
-                # if folder variables are not defined, then permission denied to create the folders
-                self.message.set("PERMISSION DENIED: cannot write in " + self.dirname)
-                self.messageView.configure(fg="dark red", font="Helvetica 16 italic")
-                self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E + W)
-            elif os.path.exists(deidentified_dcm) != [] and os.path.exists(original_dcm) != []:
-                # if paths exists, then return success message
-                self.message.set("It's de-identified!")
-                self.messageView.configure(fg="dark green", font= "Helvetica 16 bold italic")
-                self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E+W)
+            qc_fields_valid = False
+        
+        # 
+        if qc_fields_valid:
+            if not pname_set:
+                tkmessagebox.showinfo("ERROR", "PatientName DICOM field is required to label the scan")
+                self.deidentify()
             else:
-                # if paths do not exists, then something went wrong
-                self.message.set("An error occured during DICOM files de-identification")
-                self.messageView.configure(fg="dark red", font="Helvetica 16 italic")
-                self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E + W)
+                # Edit DICOM field values to de-identify the dataset (deidentified_dcm, original_dcm) = ''
+                (deidentified_dcm, original_dcm) = methods.dicom_zapping(self.dirname, self.field_dict)    
+
+                self.field_edit_win.destroy()
+                self.topPanel.destroy()
+
+                if not deidentified_dcm and not original_dcm:
+                    # if folder variables are not defined, then permission denied to create the folders
+                    self.message.set("PERMISSION DENIED: cannot write in " + self.dirname)
+                    self.messageView.configure(fg="dark red", font="Helvetica 16 italic")
+                    self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E + W)
+                elif os.path.exists(deidentified_dcm) != [] and os.path.exists(original_dcm) != []:
+                    # if paths exists, then return success message
+                    self.message.set("BOOYA! It's de-identified!")
+                    self.messageView.configure(fg="dark green", font= "Helvetica 16 bold italic")
+                    self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E+W)
+                else:
+                    # if paths do not exists, then something went wrong
+                    self.message.set("An error occured during DICOM files de-identification")
+                    self.messageView.configure(fg="dark red", font="Helvetica 16 italic")
+                    self.messageView.grid(row=2, column=0, columnspan=2, padx=(0, 10), sticky=E + W)

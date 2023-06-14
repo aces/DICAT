@@ -183,9 +183,13 @@ def read_dicom_with_pydicom(dicom_file, dicom_fields):
     # into dicom_fields dictionary under flag Value
     # Dictionnary of DICOM values to be returned
     for name in dicom_fields:
+        # choose the original name even if the name is starting with "qc-"
+        qname = name[3:] if name.startswith("qc-") else name
+
         try:
-            description = dicom_fields[name]['Description']
+            description = dicom_fields[qname]['Description']
             value = dicom_dataset.data_element(description).value
+            # change the original name (qc or not qc)
             dicom_fields[name]['Value'] = value
         except:
             continue
@@ -245,6 +249,34 @@ def dicom_zapping(dicom_folder, dicom_fields):
 
     # return zip files
     return deidentified_zip, original_zip
+
+def validate_qc_fields(dicom_fields):
+    """
+    Validate the QC fields are identical to their non-qc counterpart.
+
+    :param dicom_fields: Dictionary with DICOM fields & values to use
+     :type dicom_fields: dict
+
+    :return: None
+    """
+
+    for tag in dicom_fields:
+
+        # qc field?
+        if not dicom_fields[tag]['DICOM_tag'].startswith('qc-'):
+            continue
+        # if value not changed
+        if 'Value' not in dicom_fields[tag]:
+            continue
+
+        # get new value
+        original_tag = tag[3:]
+        qc_val = str(dicom_fields[tag]['Value']).strip()
+        non_qc_val = str(dicom_fields[original_tag]['Value']).strip()
+
+        # validate associated (field <> qc field)
+        if qc_val != non_qc_val:
+            raise Exception("'(" + original_tag + ") " + dicom_fields[original_tag]['Description'] + "' and QC Values are different!")
 
 
 def pydicom_zapping(dicom_file, dicom_fields):
