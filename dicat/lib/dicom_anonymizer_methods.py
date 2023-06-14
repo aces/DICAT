@@ -208,7 +208,7 @@ def dicom_zapping(dicom_folder, dicom_fields):
       original_zip  -> path to the zip file of the original DICOMs
      :rtype: str
 
-    """   
+    """
 
     # Grep all DICOMs present in directory
     (dicoms_list, subdirs_list) = grep_dicoms_from_folder(dicom_folder)
