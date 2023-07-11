@@ -127,7 +127,12 @@ def grep_dicom_fields(xml_file):
             "Editable"   : editable,
             "ForceInsert": forceInsert
         }
-
+        # adding a missing tag, should also include VR
+        # see: https://pydicom.github.io/pydicom/stable/guides/element_value_types.html
+        if forceInsert:
+            if item.find('VR') is None:
+                raise Exception(f"Item {dicom_tag} has forceInsert tag, and should also have the VR tag")
+            dicom_fields[dicom_tag]['VR'] = item.find('VR').text
     return dicom_fields
 
 
@@ -265,14 +270,20 @@ def validate_qc_fields(dicom_fields):
         # qc field?
         if not dicom_fields[tag]['DICOM_tag'].startswith('qc-'):
             continue
-        # if value not changed
-        if 'Value' not in dicom_fields[tag]:
-            continue
 
-        # get new value
+        # original tag
         original_tag = tag[3:]
-        qc_val = str(dicom_fields[tag]['Value']).strip()
-        non_qc_val = str(dicom_fields[original_tag]['Value']).strip()
+
+        # get value
+        try:
+            qc_val = str(dicom_fields[tag]['Value']).strip()
+        except KeyError:
+            qc_val = ""
+
+        try:
+            non_qc_val = str(dicom_fields[original_tag]['Value']).strip()
+        except KeyError:
+            non_qc_val = ""
 
         # validate associated (field <> qc field)
         if qc_val != non_qc_val:
@@ -299,6 +310,10 @@ def pydicom_zapping(dicom_file, dicom_fields):
                        if dicom_fields[tag].get('ForceInsert', False)]
 
     for name in dicom_fields:
+        # skip qc values
+        if name.startswith("qc-"):
+            continue
+
         new_val = ""
         if 'Value' in dicom_fields[name]:
             new_val = str(dicom_fields[name]['Value']).strip()
@@ -307,6 +322,7 @@ def pydicom_zapping(dicom_file, dicom_fields):
         val = new_val if dicom_fields[name]['Editable'] else ''
 
         try:
+            # update value
             dicom_dataset.data_element(
                 dicom_fields[name]['Description']).value = val
         except KeyError as ke:
@@ -315,8 +331,13 @@ def pydicom_zapping(dicom_file, dicom_fields):
             # be forcefully added here.
             #
             # if force insert tag, check the value change
+            # the VR tag will be used here
             if name in forceInsertTags:
-                setattr(dicom_dataset, dicom_fields[name]['Description'], val)
+                dicom_dataset.add_new(
+                    dicom_fields[name]['Description'],
+                    dicom_fields[name]['VR'],
+                    new_val
+                )
         except:
             continue
     dicom_dataset.save_as(dicom_file)
@@ -564,19 +585,20 @@ def update_DICOM_value(field_dict, key, value):
      :type value     : str
 
     """
+    # exists in DICOM or is editable
     if 'Value' in field_dict[key]:
         if field_dict[key]['Value'] == value:
             field_dict[key]['Update'] = False
         else:
             field_dict[key]['Value']  = value
             field_dict[key]['Update'] = True
-    else:
-        field_dict[key]['Update'] = False
-
-    # force insert
-    if 'ForceInsert' in field_dict[key] and field_dict[key]['ForceInsert']:
-        field_dict[key]['Update'] = True
-        field_dict[key]['Value']  = value
+    else: # does not exist in DICOM
+        # edited anyway (force insert)
+        if value:
+            field_dict[key]['Value']  = value
+            field_dict[key]['Update'] = True
+        else: # no edition
+            field_dict[key]['Update'] = False
 
 
 def load_xml(xml_path):
