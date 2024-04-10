@@ -820,6 +820,11 @@
         <editable>no</editable>
     </item>
     <item>
+        <name>0400,0561</name>
+        <description>OriginalAttributesSequence</description>
+        <editable>no</editable>
+    </item>
+    <item>
         <name>2200,0005</name>
         <description>BarcodeValue</description>
         <editable>no</editable>
