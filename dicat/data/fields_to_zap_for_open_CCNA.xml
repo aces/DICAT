@@ -451,11 +451,6 @@
         <editable>no</editable>
     </item>
     <item>
-        <name></name>
-        <description></description>
-        <editable>no</editable>
-    </item>
-    <item>
         <name>0010,4000</name>
         <description>PatientComments</description>
         <editable>no</editable>

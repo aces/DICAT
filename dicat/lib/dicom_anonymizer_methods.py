@@ -94,7 +94,7 @@ def is_file_a_dicom(file):
     """
 
     try:
-        dicom.read_file(file)
+        dicom.dcmread(file)
     except InvalidDicomError:
         return False
     return True
@@ -114,8 +114,10 @@ def grep_dicom_fields(xml_file):
     xmldoc = ET.parse(xml_file)
     dicom_fields = {}
     for item in xmldoc.findall('item'):
-        dicom_tag = item.find('name').text
-        description = item.find('description').text
+        dicom_tag = item.findtext('name')
+        description = item.findtext('description')
+        if not dicom_tag or not description:
+            continue
         editable = (item.find('editable') is not None
                     and item.find('editable').text == "yes")
         forceInsert = (not dicom_tag.startswith("qc-")
@@ -177,7 +179,7 @@ def read_dicom_with_pydicom(dicom_file, dicom_fields):
     """
 
     # Read DICOM file
-    dicom_dataset = dicom.read_file(dicom_file)
+    dicom_dataset = dicom.dcmread(dicom_file)
 
     # Grep information from DICOM header and store them
     # into dicom_fields dictionary under flag Value
@@ -292,7 +294,7 @@ def pydicom_zapping(dicom_file, dicom_fields):
 
     """
 
-    dicom_dataset = dicom.read_file(dicom_file)
+    dicom_dataset = dicom.dcmread(dicom_file)
 
     # tags to force insert in the final file
     forceInsertTags = [tag for tag in dicom_fields 
@@ -442,8 +444,14 @@ def read_csv(csv_file):
         - Each column {names : values} for a given row will be stored in a
         dictionary within that row.
 
-    Example of a row in the returned array:
-    {'dcm_dir': '/path/to/dicom/dir', 'pname': 'sub-01', 'dob': '', 'sex': 'M'}
+    The headerless CSV columns are:
+        DICOM_DIR, PatientName, PatientID, PatientBirthDate, DateAcquired,
+        StudyDate, SeriesDate, AcquisitionDate, ContentDate,
+        PerformedProcedureStepStartDate, AcquisitionDateTime,
+        PerformedProcedureStepEndDate
+
+    DateAcquired is a generator metadata value and is not a DICOM field in
+    the XML profile, so it is retained in the row but not written to files.
 
     :param csv_file: CSV file to be read
      :type csv_file: str
@@ -453,7 +461,20 @@ def read_csv(csv_file):
 
     """
 
-    fieldnames = ['dcm_dir', 'pname', 'dob', 'sex']
+    fieldnames = [
+        'dcm_dir',
+        'PatientName',
+        'PatientID',
+        'PatientBirthDate',
+        'DateAcquired',
+        'StudyDate',
+        'SeriesDate',
+        'AcquisitionDate',
+        'ContentDate',
+        'PerformedProcedureStepStartDate',
+        'AcquisitionDateTime',
+        'PerformedProcedureStepEndDate',
+    ]
     dicom_dict_list   = []
     with open(csv_file) as file:
         reader = csv.DictReader(file, fieldnames, restval='')
@@ -493,7 +514,7 @@ def mass_zapping(dicom_dict_list, verbose, xml_file_with_fields_to_zap):
             print('Deidentifying DICOM study: ' + row['dcm_dir'])
 
         # get rid of '\ ' in DICOM path and map it to ' ' for the zapping method
-        dicom_dir = row['dcm_dir'].replace('\ ', ' ')
+        dicom_dir = row['dcm_dir'].replace('\\ ', ' ')
         (deidentified_dcm, original_dcm) = dicom_zapping(dicom_dir, field_dict)
 
         # check if deidentification was successful
@@ -532,21 +553,18 @@ def map_DICOM_fields(dicom_dict, xml_file_with_fields_to_zap):
     field_dict = grep_dicom_fields(xml_file)
 
     # Read DICOM header and grep identifying DICOM field values
-    dicom_dir  = dicom_dict['dcm_dir'].replace('\ ', ' ')  # get rid of '\ '
+    dicom_dir  = dicom_dict['dcm_dir'].replace('\\ ', ' ')  # get rid of '\ '
     field_dict = grep_dicom_values(dicom_dir, field_dict)
 
     if not field_dict:
         return []
 
     for key in field_dict.keys():
-        if field_dict[key]['Editable'] == False:
+        if not field_dict[key]['Editable']:
             continue
-        if field_dict[key]['Description'] == 'PatientName':
-            update_DICOM_value(field_dict, key, dicom_dict['pname'])
-        elif field_dict[key]['Description'] == 'PatientBirthDate':
-            update_DICOM_value(field_dict, key, dicom_dict['dob'])
-        elif field_dict[key]['Description'] == 'PatientSex':
-            update_DICOM_value(field_dict, key, dicom_dict['sex'])
+        description = field_dict[key]['Description']
+        if description in dicom_dict:
+            update_DICOM_value(field_dict, key, dicom_dict[description])
 
     return field_dict
 
