@@ -238,14 +238,17 @@ def dicom_zapping(dicom_folder, dicom_fields):
         deidentified_dcm = dicom.replace(dicom_folder, deidentified_dir)
         deidentified_name = os.path.basename(deidentified_dcm)
         patient_name = str(dicom_fields['0010,0010']['Value']).strip()
+        # Only substitute an identifying prefix (e.g. vendor filenames that
+        # embed the patient name before a dot-separated suffix). Filenames
+        # with no dot (e.g. "IM_0001", "DICOMDIR") carry no PII and must be
+        # left untouched, otherwise every file in a directory collapses to
+        # the same name and overwrites its siblings.
         if '.' in deidentified_name:
             _, filename_suffix = deidentified_name.split('.', 1)
             deidentified_name = patient_name + '.' + filename_suffix
-        else:
-            deidentified_name = patient_name
-        deidentified_dcm = os.path.join(
-            os.path.dirname(deidentified_dcm), deidentified_name
-        )
+            deidentified_dcm = os.path.join(
+                os.path.dirname(deidentified_dcm), deidentified_name
+            )
         # Move the original file first so its archive keeps the source name.
         shutil.move(dicom, original_dcm)
         # Read once from the original and write the zapped copy directly,
