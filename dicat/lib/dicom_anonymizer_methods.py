@@ -593,14 +593,13 @@ def update_DICOM_value(field_dict, key, value):
      :type value     : str
 
     """
-    if 'Value' in field_dict[key]:
-        if field_dict[key]['Value'] == value:
-            field_dict[key]['Update'] = False
-        else:
-            field_dict[key]['Value']  = value
-            field_dict[key]['Update'] = True
-    else:
+    if 'Value' in field_dict[key] and field_dict[key]['Value'] == value:
         field_dict[key]['Update'] = False
+    else:
+        # always record the new value, even if the tag was absent from the
+        # sampled DICOM file, so downstream code can rely on 'Value' existing
+        field_dict[key]['Value']  = value
+        field_dict[key]['Update'] = True
 
     # force insert
     if 'ForceInsert' in field_dict[key] and field_dict[key]['ForceInsert']:
