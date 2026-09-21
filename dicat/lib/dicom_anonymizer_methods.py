@@ -248,10 +248,9 @@ def dicom_zapping(dicom_folder, dicom_fields):
         )
         # Move the original file first so its archive keeps the source name.
         shutil.move(dicom, original_dcm)
-        # Copy the original into the de-identified folder under its new name.
-        shutil.copy(original_dcm, deidentified_dcm)
-        # Zap the DICOM fields from DICOM file using PyDICOM
-        pydicom_zapping(deidentified_dcm, dicom_fields)
+        # Read once from the original and write the zapped copy directly,
+        # instead of a separate full-file copy plus a second read/write pass.
+        pydicom_zapping(original_dcm, dicom_fields, deidentified_dcm)
 
     # Zip the de-identified and original DICOM folders
     (deidentified_zip, original_zip) = zip_dicom_directories(deidentified_dir,
@@ -292,7 +291,7 @@ def validate_qc_fields(dicom_fields):
             raise Exception("'(" + original_tag + ") " + dicom_fields[original_tag]['Description'] + "' and QC Values are different!")
 
 
-def pydicom_zapping(dicom_file, dicom_fields):
+def pydicom_zapping(dicom_file, dicom_fields, output_file=None):
     """
     Actual zapping method for PyDICOM
 
@@ -300,6 +299,9 @@ def pydicom_zapping(dicom_file, dicom_fields):
      :type dicom_file: str
     :param dicom_fields: Dictionary with DICOM fields & values to use
      :type dicom_fields: dict
+    :param output_file: path to save the de-identified DICOM to, defaults to
+                        overwriting dicom_file in place
+     :type output_file: str
 
     :return: None
 
@@ -332,7 +334,7 @@ def pydicom_zapping(dicom_file, dicom_fields):
                 setattr(dicom_dataset, dicom_fields[name]['Description'], val)
         except:
             continue
-    dicom_dataset.save_as(dicom_file)
+    dicom_dataset.save_as(output_file or dicom_file)
 
 
 def zip_dicom_directories(deidentified_dir, original_dir, subdirs_list, root_dir):
