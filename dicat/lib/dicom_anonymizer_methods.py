@@ -231,14 +231,25 @@ def dicom_zapping(dicom_folder, dicom_fields):
     for dicom in dicoms_list:
         if not len(dicom):
             continue
-        # set path to de-identified DICOM file
-        deidentified_dcm = dicom.replace(dicom_folder, deidentified_dir)
         # set path to original DICOM file
         original_dcm = dicom.replace(dicom_folder, original_dir)
-        # Move DICOM files from root folder to de-identified folder created
-        shutil.move(dicom, deidentified_dcm)
-        # copy files from original folder to de-identified folder
-        shutil.copy(deidentified_dcm, original_dcm)
+        # Use the anonymized patient name for the de-identified filename while
+        # retaining the suffix that identifies the image instance.
+        deidentified_dcm = dicom.replace(dicom_folder, deidentified_dir)
+        deidentified_name = os.path.basename(deidentified_dcm)
+        patient_name = str(dicom_fields['0010,0010']['Value']).strip()
+        if '.' in deidentified_name:
+            _, filename_suffix = deidentified_name.split('.', 1)
+            deidentified_name = patient_name + '.' + filename_suffix
+        else:
+            deidentified_name = patient_name
+        deidentified_dcm = os.path.join(
+            os.path.dirname(deidentified_dcm), deidentified_name
+        )
+        # Move the original file first so its archive keeps the source name.
+        shutil.move(dicom, original_dcm)
+        # Copy the original into the de-identified folder under its new name.
+        shutil.copy(original_dcm, deidentified_dcm)
         # Zap the DICOM fields from DICOM file using PyDICOM
         pydicom_zapping(deidentified_dcm, dicom_fields)
 
