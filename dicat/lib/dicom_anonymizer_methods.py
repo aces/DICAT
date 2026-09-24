@@ -94,7 +94,7 @@ def is_file_a_dicom(file):
     """
 
     try:
-        dicom.read_file(file)
+        dicom.dcmread(file)
     except InvalidDicomError:
         return False
     return True
@@ -114,8 +114,10 @@ def grep_dicom_fields(xml_file):
     xmldoc = ET.parse(xml_file)
     dicom_fields = {}
     for item in xmldoc.findall('item'):
-        dicom_tag = item.find('name').text
-        description = item.find('description').text
+        dicom_tag = item.findtext('name')
+        description = item.findtext('description')
+        if not dicom_tag or not description:
+            continue
         editable = (item.find('editable') is not None
                     and item.find('editable').text == "yes")
         forceInsert = (not dicom_tag.startswith("qc-")
@@ -177,7 +179,7 @@ def read_dicom_with_pydicom(dicom_file, dicom_fields):
     """
 
     # Read DICOM file
-    dicom_dataset = dicom.read_file(dicom_file)
+    dicom_dataset = dicom.dcmread(dicom_file)
 
     # Grep information from DICOM header and store them
     # into dicom_fields dictionary under flag Value
@@ -229,16 +231,29 @@ def dicom_zapping(dicom_folder, dicom_fields):
     for dicom in dicoms_list:
         if not len(dicom):
             continue
-        # set path to de-identified DICOM file
-        deidentified_dcm = dicom.replace(dicom_folder, deidentified_dir)
         # set path to original DICOM file
         original_dcm = dicom.replace(dicom_folder, original_dir)
-        # Move DICOM files from root folder to de-identified folder created
-        shutil.move(dicom, deidentified_dcm)
-        # copy files from original folder to de-identified folder
-        shutil.copy(deidentified_dcm, original_dcm)
-        # Zap the DICOM fields from DICOM file using PyDICOM
-        pydicom_zapping(deidentified_dcm, dicom_fields)
+        # Use the anonymized patient name for the de-identified filename while
+        # retaining the suffix that identifies the image instance.
+        deidentified_dcm = dicom.replace(dicom_folder, deidentified_dir)
+        deidentified_name = os.path.basename(deidentified_dcm)
+        patient_name = str(dicom_fields['0010,0010']['Value']).strip()
+        # Only substitute an identifying prefix (e.g. vendor filenames that
+        # embed the patient name before a dot-separated suffix). Filenames
+        # with no dot (e.g. "IM_0001", "DICOMDIR") carry no PII and must be
+        # left untouched, otherwise every file in a directory collapses to
+        # the same name and overwrites its siblings.
+        if '.' in deidentified_name:
+            _, filename_suffix = deidentified_name.split('.', 1)
+            deidentified_name = patient_name + '.' + filename_suffix
+            deidentified_dcm = os.path.join(
+                os.path.dirname(deidentified_dcm), deidentified_name
+            )
+        # Move the original file first so its archive keeps the source name.
+        shutil.move(dicom, original_dcm)
+        # Read once from the original and write the zapped copy directly,
+        # instead of a separate full-file copy plus a second read/write pass.
+        pydicom_zapping(original_dcm, dicom_fields, deidentified_dcm)
 
     # Zip the de-identified and original DICOM folders
     (deidentified_zip, original_zip) = zip_dicom_directories(deidentified_dir,
@@ -279,7 +294,7 @@ def validate_qc_fields(dicom_fields):
             raise Exception("'(" + original_tag + ") " + dicom_fields[original_tag]['Description'] + "' and QC Values are different!")
 
 
-def pydicom_zapping(dicom_file, dicom_fields):
+def pydicom_zapping(dicom_file, dicom_fields, output_file=None):
     """
     Actual zapping method for PyDICOM
 
@@ -287,12 +302,15 @@ def pydicom_zapping(dicom_file, dicom_fields):
      :type dicom_file: str
     :param dicom_fields: Dictionary with DICOM fields & values to use
      :type dicom_fields: dict
+    :param output_file: path to save the de-identified DICOM to, defaults to
+                        overwriting dicom_file in place
+     :type output_file: str
 
     :return: None
 
     """
 
-    dicom_dataset = dicom.read_file(dicom_file)
+    dicom_dataset = dicom.dcmread(dicom_file)
 
     # tags to force insert in the final file
     forceInsertTags = [tag for tag in dicom_fields 
@@ -319,7 +337,7 @@ def pydicom_zapping(dicom_file, dicom_fields):
                 setattr(dicom_dataset, dicom_fields[name]['Description'], val)
         except:
             continue
-    dicom_dataset.save_as(dicom_file)
+    dicom_dataset.save_as(output_file or dicom_file)
 
 
 def zip_dicom_directories(deidentified_dir, original_dir, subdirs_list, root_dir):
@@ -442,8 +460,14 @@ def read_csv(csv_file):
         - Each column {names : values} for a given row will be stored in a
         dictionary within that row.
 
-    Example of a row in the returned array:
-    {'dcm_dir': '/path/to/dicom/dir', 'pname': 'sub-01', 'dob': '', 'sex': 'M'}
+    The headerless CSV columns are:
+        DICOM_DIR, PatientName, PatientID, PatientBirthDate, DateAcquired,
+        StudyDate, SeriesDate, AcquisitionDate, ContentDate,
+        PerformedProcedureStepStartDate, AcquisitionDateTime,
+        PerformedProcedureStepEndDate
+
+    DateAcquired is a generator metadata value and is not a DICOM field in
+    the XML profile, so it is retained in the row but not written to files.
 
     :param csv_file: CSV file to be read
      :type csv_file: str
@@ -453,7 +477,20 @@ def read_csv(csv_file):
 
     """
 
-    fieldnames = ['dcm_dir', 'pname', 'dob', 'sex']
+    fieldnames = [
+        'dcm_dir',
+        'PatientName',
+        'PatientID',
+        'PatientBirthDate',
+        'DateAcquired',
+        'StudyDate',
+        'SeriesDate',
+        'AcquisitionDate',
+        'ContentDate',
+        'PerformedProcedureStepStartDate',
+        'AcquisitionDateTime',
+        'PerformedProcedureStepEndDate',
+    ]
     dicom_dict_list   = []
     with open(csv_file) as file:
         reader = csv.DictReader(file, fieldnames, restval='')
@@ -493,7 +530,7 @@ def mass_zapping(dicom_dict_list, verbose, xml_file_with_fields_to_zap):
             print('Deidentifying DICOM study: ' + row['dcm_dir'])
 
         # get rid of '\ ' in DICOM path and map it to ' ' for the zapping method
-        dicom_dir = row['dcm_dir'].replace('\ ', ' ')
+        dicom_dir = row['dcm_dir'].replace('\\ ', ' ')
         (deidentified_dcm, original_dcm) = dicom_zapping(dicom_dir, field_dict)
 
         # check if deidentification was successful
@@ -532,21 +569,18 @@ def map_DICOM_fields(dicom_dict, xml_file_with_fields_to_zap):
     field_dict = grep_dicom_fields(xml_file)
 
     # Read DICOM header and grep identifying DICOM field values
-    dicom_dir  = dicom_dict['dcm_dir'].replace('\ ', ' ')  # get rid of '\ '
+    dicom_dir  = dicom_dict['dcm_dir'].replace('\\ ', ' ')  # get rid of '\ '
     field_dict = grep_dicom_values(dicom_dir, field_dict)
 
     if not field_dict:
         return []
 
     for key in field_dict.keys():
-        if field_dict[key]['Editable'] == False:
+        if not field_dict[key]['Editable']:
             continue
-        if field_dict[key]['Description'] == 'PatientName':
-            update_DICOM_value(field_dict, key, dicom_dict['pname'])
-        elif field_dict[key]['Description'] == 'PatientBirthDate':
-            update_DICOM_value(field_dict, key, dicom_dict['dob'])
-        elif field_dict[key]['Description'] == 'PatientSex':
-            update_DICOM_value(field_dict, key, dicom_dict['sex'])
+        description = field_dict[key]['Description']
+        if description in dicom_dict:
+            update_DICOM_value(field_dict, key, dicom_dict[description])
 
     return field_dict
 
@@ -564,14 +598,13 @@ def update_DICOM_value(field_dict, key, value):
      :type value     : str
 
     """
-    if 'Value' in field_dict[key]:
-        if field_dict[key]['Value'] == value:
-            field_dict[key]['Update'] = False
-        else:
-            field_dict[key]['Value']  = value
-            field_dict[key]['Update'] = True
-    else:
+    if 'Value' in field_dict[key] and field_dict[key]['Value'] == value:
         field_dict[key]['Update'] = False
+    else:
+        # always record the new value, even if the tag was absent from the
+        # sampled DICOM file, so downstream code can rely on 'Value' existing
+        field_dict[key]['Value']  = value
+        field_dict[key]['Update'] = True
 
     # force insert
     if 'ForceInsert' in field_dict[key] and field_dict[key]['ForceInsert']:
